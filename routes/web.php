@@ -5,8 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LandlordRegisterController;
 
 Route::get('/landlord/register', [LandlordRegisterController::class, 'create'])->name('landlord.register');
-Route::post('/landlord/register', [LandlordRegisterController::class, 'store'])->name('landlord.register.store');
-
+Route::post('/landlord/register', [LandlordRegisterController::class, 'store'])->name('landlord.register');
 
 Route::get('/', function () {
     return view('welcome');

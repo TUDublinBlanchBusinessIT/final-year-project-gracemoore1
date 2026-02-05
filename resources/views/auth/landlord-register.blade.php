@@ -28,7 +28,7 @@
     <div class="card">
         <h1>Please Enter:</h1>
 
-        <form method="POST" action="{{ route('landlord.register.store') }}">
+        <form method="POST" action="{{ route('landlord.register') }}">
             @csrf
 
             <label>Firstname:</label>
@@ -42,6 +42,12 @@
             <label>Email Address:</label>
             <input type="email" name="email" placeholder="example123@rentconnect.ie" value="{{ old('email') }}" required>
             @error('email') <div class="error">{{ $message }}</div> @enderror
+
+            <label>Phone Number:</label>
+            <input type="text" name="phone" value="{{ old('phone') }}" required
+            inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
+            @error('phone') <div class="error">{{ $message }}</div> @enderror
+        
 
             <label>Password:</label>
             <input type="password" name="password" required>

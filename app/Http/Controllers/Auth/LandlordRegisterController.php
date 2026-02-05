@@ -23,7 +23,8 @@ class LandlordRegisterController extends Controller
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'surname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email', 'unique:landlord,email'],
+            'phone' => ['required', 'regex:/^[0-9]{7,15}$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -31,14 +32,17 @@ class LandlordRegisterController extends Controller
             'name' => $request->first_name . ' ' . $request->surname,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            // if you later add role column, we’ll set it here
         ]);
 
         Landlord::create([
-            'user_id' => $user->id,
-            'first_name' => $request->first_name,
-            'surname' => $request->surname,
+            'firstname' => $request->first_name,
+            'surname'   => $request->surname,
+            'email'     => $request->email,
+            'phone' => $request->phone,
+            'password'  => Hash::make($request->password),
+            'verified'  => 0,
         ]);
+
 
         event(new Registered($user)); // triggers email verification if enabled
 

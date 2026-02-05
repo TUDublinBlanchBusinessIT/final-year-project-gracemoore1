@@ -6,10 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Landlord extends Model
 {
+    protected $table = 'landlord';
+    public $timestamps = false;
+
     protected $fillable = [
-        'user_id',
-        'first_name',
+        'firstname',
         'surname',
+        'email',
+        'phone',
+        'password',
+        'verified'
     ];
 }
+
 
