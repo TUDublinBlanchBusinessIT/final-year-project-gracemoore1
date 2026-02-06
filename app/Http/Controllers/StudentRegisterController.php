@@ -70,7 +70,6 @@ class StudentRegisterController extends Controller
         return view('student.verify-id');
     }
 
-    // Accept ocr_text from browser-based OCR, not an image file
     public function verifyId(Request $request)
     {
         $request->validate([
@@ -83,22 +82,77 @@ class StudentRegisterController extends Controller
         }
 
         $text = strtolower($request->input('ocr_text'));
+        $text_clean = str_replace(['<', ' '], '', $text);
 
-        // Check first name and surname
-        $firstnameMatch = str_contains($text, strtolower($registration['firstname']));
-        $surnameMatch = str_contains($text, strtolower($registration['surname']));
+        // Prepare names for matching
+        $firstname = strtolower($registration['firstname']);
+        $surname = strtolower($registration['surname']);
+        $firstname_nospace = str_replace(' ', '', $firstname);
+        $surname_nospace = str_replace(' ', '', $surname);
 
-        // Match dateofbirth loosely (day + year only)
-        preg_match_all('/\d{1,2}[\/\-]?[A-Z]{3,9}[\/\-]?\d{4}|\d{2}\/\d{2}\/\d{4}/i', $text, $matches);
-        $dobFound = false;
-        foreach ($matches[0] as $dateText) {
-            $dateTextLower = strtolower($dateText);
-            if (stripos($dateTextLower, date('d', strtotime($registration['dateofbirth']))) !== false &&
-                stripos($dateTextLower, date('Y', strtotime($registration['dateofbirth']))) !== false) {
-                $dobFound = true;
+        // Check for first name (with and without spaces, in both text and cleaned text)
+        $firstnameMatch =
+            str_contains($text, $firstname) ||
+            str_contains($text_clean, $firstname) ||
+            str_contains($text, $firstname_nospace) ||
+            str_contains($text_clean, $firstname_nospace);
+
+        // Check for surname (with and without spaces, in both text and cleaned text)
+        $surnameMatch =
+            str_contains($text, $surname) ||
+            str_contains($text_clean, $surname) ||
+            str_contains($text, $surname_nospace) ||
+            str_contains($text_clean, $surname_nospace);
+
+        // Fuzzy match if not exact (80% similarity or higher)
+        if (!$firstnameMatch) {
+            similar_text($firstname, $text, $firstPercent);
+            similar_text($firstname, $text_clean, $firstPercentClean);
+            similar_text($firstname_nospace, $text, $firstPercentNoSpace);
+            similar_text($firstname_nospace, $text_clean, $firstPercentCleanNoSpace);
+            $firstnameMatch = max($firstPercent, $firstPercentClean, $firstPercentNoSpace, $firstPercentCleanNoSpace) >= 80;
+        }
+        if (!$surnameMatch) {
+            similar_text($surname, $text, $surPercent);
+            similar_text($surname, $text_clean, $surPercentClean);
+            similar_text($surname_nospace, $text, $surPercentNoSpace);
+            similar_text($surname_nospace, $text_clean, $surPercentCleanNoSpace);
+            $surnameMatch = max($surPercent, $surPercentClean, $surPercentNoSpace, $surPercentCleanNoSpace) >= 80;
+        }
+
+        // Robust date-of-birth matching for Irish passports and OCR quirks
+        $dob = strtotime($registration['dateofbirth']);
+        $day = date('d', $dob);
+        $year = date('Y', $dob);
+        $month = date('M', $dob); // e.g. JAN
+
+        // List of possible month representations (add more if needed)
+        $possibleMonths = [
+            strtolower($month), // jan
+            strtolower(date('F', $dob)), // january
+            strtolower(substr($month, 0, 2)), // ja
+            'ean', // common OCR error for JAN
+            'ian', // another OCR error for JAN
+            'jan.', // with dot
+            'janua', // partial
+            'january', // full
+            // Add more if you see other OCR mistakes
+        ];
+
+        // Check if day and year are anywhere in the text
+        $dayFound = stripos($text, ltrim($day, '0')) !== false || stripos($text, $day) !== false;
+        $yearFound = stripos($text, $year) !== false;
+
+        // Check if any possible month representation is in the text
+        $monthFound = false;
+        foreach ($possibleMonths as $m) {
+            if (stripos($text, $m) !== false) {
+                $monthFound = true;
                 break;
             }
         }
+
+        $dobFound = $dayFound && $monthFound && $yearFound;
 
         if ($firstnameMatch && $surnameMatch && $dobFound) {
             // Only create the student now, if not already created
