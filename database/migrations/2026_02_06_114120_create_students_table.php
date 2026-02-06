@@ -1,0 +1,26 @@
+<?php
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('students', function (Blueprint $table) {
+            $table->id();
+            $table->string('firstname');
+            $table->string('surname');
+            $table->date('dob');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->string('email_code')->nullable();
+            $table->boolean('email_verified')->default(false);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('students');
+    }
+};
+
+

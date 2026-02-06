@@ -4,8 +4,6 @@ RentConnect is a secure student accommodation platform designed to connect verif
 
 The platform is built around a RESTful API backend that enables both the web and mobile applications to access the same data and services, ensuring consistency across platforms and easier scaling.
 
----
-
 ## 🚀 Features
 
 ### 👤 User Authentication & Verification
