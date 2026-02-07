@@ -28,7 +28,7 @@
     <div class="card">
         <h1>Please Enter:</h1>
 
-        <form method="POST" action="{{ route('landlord.register') }}">
+        <form method="POST" action="{{ route('landlord.register.store') }}">
             @csrf
 
             <label>Firstname:</label>

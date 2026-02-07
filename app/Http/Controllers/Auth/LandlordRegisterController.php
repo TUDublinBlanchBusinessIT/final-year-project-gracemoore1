@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Log;
+
 
 class LandlordRegisterController extends Controller
 {
@@ -28,6 +30,9 @@ class LandlordRegisterController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        Log::info('Before login, Auth check:', ['auth' => Auth::check()]);
+
+
         $user = User::create([
             'name' => $request->first_name . ' ' . $request->surname,
             'email' => $request->email,
@@ -44,11 +49,18 @@ class LandlordRegisterController extends Controller
         ]);
 
 
-        event(new Registered($user)); // triggers email verification if enabled
+       event(new Registered($user));
 
         Auth::login($user);
+        Log::info('After login, Auth check:', ['auth' => Auth::check()]);
 
-        return redirect()->route('verification.notice');
-    }
-}
+        //Log::info('Landlord registered + logged in', [
+            //'user_id' => $user->id,
+            //'auth_check' => Auth::check(),
+        //]);
+
+        return view('auth.verify-email');
+
+ 
+    }}
 

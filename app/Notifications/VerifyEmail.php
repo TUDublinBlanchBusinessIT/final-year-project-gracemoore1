@@ -1,61 +1,39 @@
-<x-mail::message>
+<?php
 
-{{-- Header / Logo --}}
-<x-slot:header>
-    <div style="text-align: center; padding: 20px 0;">
-        <img src="{{ asset('images/RentConnectlogo.png') }}"
-             alt="RentConnect"
-             style="height: 55px;">
-    </div>
-</x-slot:header>
+namespace App\Notifications;
 
-{{-- Greeting --}}
-@if (! empty($greeting))
-# {{ $greeting }}
-@else
-# Hello!
-@endif
+use Illuminate\Auth\Notifications\VerifyEmail as BaseVerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\URL;
 
-{{-- Intro Lines --}}
-@foreach ($introLines as $line)
-{{ $line }}
+class VerifyEmail extends BaseVerifyEmail
+{
+    public function toMail($notifiable)
+    {
+        $verificationUrl = $this->verificationUrl($notifiable);
 
-@endforeach
+        return (new MailMessage)
+            ->subject('Verify your email address – RentConnect')
+            ->greeting('Hello!')
+            ->line('Thanks for signing up to RentConnect.')
+            ->action('Verify Email Address', $verificationUrl)
+            ->line('If you did not create an account, no further action is required.')
+            ->salutation("Regards,\nRentConnect")
+            ->withSymfonyMessage(function ($message) {
+                
+                $message->embedFromPath(public_path('images/RentConnectlogo.png'), 'rentconnectlogo');
+            });
+    }
 
-{{-- Action Button --}}
-@isset($actionText)
-<x-mail::button :url="$actionUrl" color="primary">
-{{ $actionText }}
-</x-mail::button>
-@endisset
-
-{{-- Outro Lines --}}
-@foreach ($outroLines as $line)
-{{ $line }}
-
-@endforeach
-
-{{-- Salutation --}}
-Regards,  
-**RentConnect**
-
-{{-- Subcopy --}}
-@isset($actionText)
-<x-slot:subcopy>
-If you're having trouble clicking the **"{{ $actionText }}"** button,
-copy and paste the URL below into your web browser:
-
-<span class="break-all">
-{{ $actionUrl }}
-</span>
-</x-slot:subcopy>
-@endisset
-
-{{-- Footer --}}
-<x-slot:footer>
-    <div style="text-align: center; color: #6b7280; font-size: 12px;">
-        © {{ date('Y') }} RentConnect. All rights reserved.
-    </div>
-</x-slot:footer>
-
-</x-mail::message>
+    protected function verificationUrl($notifiable)
+    {
+        return URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            [
+                'id' => $notifiable->getKey(),
+                'hash' => sha1($notifiable->getEmailForVerification()),
+            ]
+        );
+    }
+}

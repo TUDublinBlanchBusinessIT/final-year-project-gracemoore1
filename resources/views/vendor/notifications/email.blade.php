@@ -2,12 +2,11 @@
 
 {{-- Header / Logo --}}
 <x-slot:header>
-    <div style="text-align: center; padding: 20px 0;">
-        <img src="{{ asset('images/RentConnectlogo.png') }}"
-             alt="RentConnect"
-             style="height: 55px;">
+    <div style="text-align:center; padding: 20px 0; font-weight: 700; font-size: 20px; letter-spacing: .3px;">
+        RentConnect
     </div>
 </x-slot:header>
+
 
 {{-- Greeting --}}
 @if (! empty($greeting))
