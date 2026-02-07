@@ -17,3 +17,7 @@ Route::post('/student/verify-email', [StudentRegisterController::class, 'verifyE
 
 Route::get('/student/verify-id', [StudentRegisterController::class, 'showVerifyId']);
 Route::post('/student/verify-id', [StudentRegisterController::class, 'verifyId']);
+
+
+// Dashboard
+Route::get('/home', [StudentRegisterController::class, 'dashboard'])->name('student.dashboard');

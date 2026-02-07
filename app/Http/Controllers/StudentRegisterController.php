@@ -175,6 +175,11 @@ class StudentRegisterController extends Controller
 
         return back()->withErrors(['ocr_text' => 'ID verification failed. Make sure your details are clearly visible.']);
     }
+
+    public function dashboard() {
+        $listings = [];  
+        return view('student.dashboard', compact('listings'));
+    }
 }
 
 
