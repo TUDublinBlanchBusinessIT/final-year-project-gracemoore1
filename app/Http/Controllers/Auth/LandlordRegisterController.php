@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Log;
+use App\Models\PendingLandlord;
+use App\Mail\LandlordVerificationCodeMail;
+use Illuminate\Support\Facades\Mail;
+
 
 
 class LandlordRegisterController extends Controller
@@ -22,45 +26,36 @@ class LandlordRegisterController extends Controller
 
     public function store(Request $request)
     {
+        // Validate input
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'surname' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email', 'unique:landlord,email'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:pending_landlords,email'],
             'phone' => ['required', 'regex:/^[0-9]{7,15}$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        Log::info('Before login, Auth check:', ['auth' => Auth::check()]);
+        // Generate 4-digit verification code
+        $code = rand(1000, 9999);
 
-
-        $user = User::create([
-            'name' => $request->first_name . ' ' . $request->surname,
+        // Save to pending_landlords table
+        $pending = PendingLandlord::create([
+            'first_name' => $request->first_name,
+            'surname' => $request->surname,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        Landlord::create([
-            'firstname' => $request->first_name,
-            'surname'   => $request->surname,
-            'email'     => $request->email,
             'phone' => $request->phone,
-            'password'  => Hash::make($request->password),
-            'verified'  => 0,
+            'password' => Hash::make($request->password),
+            'verification_code' => $code,
+            'code_expires_at' => now()->addMinutes(10),
         ]);
 
+        // Send verification email
+        Mail::to($pending->email)->send(new LandlordVerificationCodeMail($code));
 
-       event(new Registered($user));
+        // Redirect to the 4-digit code entry page
+        return redirect()->route('landlord.verify.email', ['email' => $pending->email]);
+    }
+}
 
-        Auth::login($user);
-        Log::info('After login, Auth check:', ['auth' => Auth::check()]);
 
-        //Log::info('Landlord registered + logged in', [
-            //'user_id' => $user->id,
-            //'auth_check' => Auth::check(),
-        //]);
-
-        return view('auth.verify-email');
-
- 
-    }}
 

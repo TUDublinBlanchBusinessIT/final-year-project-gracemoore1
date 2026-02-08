@@ -3,6 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LandlordRegisterController;
+use App\Http\Controllers\Auth\LandlordCodeVerificationController; 
+use App\Http\Controllers\Auth\LandlordOCRController;
+
 
 
 Route::get('/landlord/register', [LandlordRegisterController::class, 'create'])
@@ -10,6 +13,21 @@ Route::get('/landlord/register', [LandlordRegisterController::class, 'create'])
 
 Route::post('/landlord/register', [LandlordRegisterController::class, 'store'])
     ->name('landlord.register.store');
+
+
+Route::get('/landlord/verify-email', function () {
+    return view('landlord.verify-email');
+})->name('landlord.verify.email');
+
+Route::post('/landlord/verify-email', [LandlordCodeVerificationController::class, 'verify'])
+    ->name('landlord.verify.email.submit');
+
+Route::get('/landlord/verify-id', function () {
+    return view('landlord.verify-id');
+})->name('landlord.verify.id');
+
+Route::post('/landlord/verify-id', [LandlordOCRController::class, 'verify'])
+    ->name('landlord.verify.id.submit');
 
 
 
@@ -26,9 +44,6 @@ Route::get('/verify-email', function () {
     return view('auth.verify-email');
 })->name('verification.notice');
 
-//Route::get('/verify-email', function () {
-    //return view('auth.verify-email');
-//})->middleware('auth')->name('verification.notice');
 
 
 Route::middleware('auth')->group(function () {
