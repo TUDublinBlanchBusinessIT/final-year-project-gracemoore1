@@ -28,6 +28,7 @@ class LandlordOCRController extends Controller
 
         // Clean OCR text
         $text = strtolower($request->input('ocr_text'));
+        \Log::info('OCR OUTPUT:', ['text' => $text]);
         $text = preg_replace('/[^a-z0-9\s]/', ' ', $text); // remove weird OCR symbols
         $text = preg_replace('/\s+/', ' ', $text); // normalize spaces
 

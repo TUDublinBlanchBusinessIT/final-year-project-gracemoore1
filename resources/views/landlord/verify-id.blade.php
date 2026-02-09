@@ -38,31 +38,82 @@
         const statusText = document.getElementById('status');
         const submitBtn = document.getElementById('submit-btn');
 
+
+        async function preprocessImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    // Upscale 
+                    canvas.width = img.width * 2;
+                    canvas.height = img.height * 2;
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Convert to grayscale
+                    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    let data = imageData.data;
+
+                    for (let i = 0; i < data.length; i += 4) {
+                        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        data[i] = avg;
+                        data[i + 1] = avg;
+                        data[i + 2] = avg;
+                    }
+
+                    ctx.putImageData(imageData, 0, 0);
+
+                    // Increase contrast
+                    const contrast = 40;
+                    const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+                    let contrasted = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    let cd = contrasted.data;
+
+                    for (let i = 0; i < cd.length; i += 4) {
+                        cd[i] = factor * (cd[i] - 128) + 128;
+                        cd[i + 1] = factor * (cd[i + 1] - 128) + 128;
+                        cd[i + 2] = factor * (cd[i + 2] - 128) + 128;
+                    }
+
+                    ctx.putImageData(contrasted, 0, 0);
+
+                    // Return processed image
+                    canvas.toBlob((blob) => resolve(blob), 'image/png');
+                };
+
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+
         fileInput.addEventListener('change', async function () {
             const file = this.files[0];
             if (!file) return;
 
-            statusText.textContent = 'Running OCR, please wait...';
+            statusText.textContent = 'Processing image...';
             submitBtn.disabled = true;
 
-            const reader = new FileReader();
-            reader.onload = async function (e) {
-                const imageData = e.target.result;
+            try {
+                // Preprocess the image before OCR
+                const processedImage = await preprocessImage(file);
 
-                try {
-                    const result = await Tesseract.recognize(imageData, 'eng');
-                    const text = result.data.text || '';
-                    ocrField.value = text;
-                    statusText.textContent = 'OCR complete. You can now verify your ID.';
-                    submitBtn.disabled = false;
-                } catch (err) {
-                    console.error(err);
-                    statusText.textContent = 'OCR failed. Please try another image.';
-                    submitBtn.disabled = true;
-                }
-            };
+                statusText.textContent = 'Running OCR...';
 
-            reader.readAsDataURL(file);
+                const result = await Tesseract.recognize(processedImage, 'eng');
+                const text = result.data.text || '';
+
+                ocrField.value = text;
+                statusText.textContent = 'OCR complete. You can now verify your ID.';
+                submitBtn.disabled = false;
+
+            } catch (err) {
+                console.error(err);
+                statusText.textContent = 'OCR failed. Please try another image.';
+                submitBtn.disabled = true;
+            }
         });
     </script>
 </body>
