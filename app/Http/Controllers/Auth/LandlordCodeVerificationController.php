@@ -35,4 +35,31 @@ class LandlordCodeVerificationController extends Controller
 
         return redirect()->route('landlord.verify.id', ['email' => $pending->email]);
     }
+
+
+    public function resend(Request $request)
+    {
+        $email = $request->email;
+
+        
+        $pending = PendingLandlord::where('email', $email)->first();
+
+        if (!$pending) {
+            return back()->withErrors(['email' => 'We could not find your registration.']);
+        }
+
+        $newCode = rand(1000, 9999);
+
+        
+        $pending->update([
+            'verification_code' => $newCode,
+            'code_expires_at' => now()->addMinutes(10),
+        ]);
+
+        
+        Mail::to($pending->email)->send(new LandlordVerificationMail($pending));
+
+        return back()->with('success', 'A new code has been sent to your email.');
+    }
+
 }

@@ -94,11 +94,12 @@ class LandlordOCRController extends Controller
             // Log in and redirect
             Auth::login($user);
 
-            return redirect('/dashboard')->with('success', 'ID verified!');
+           return redirect('/dashboard')->with('welcome', 'Registration complete! Welcome ' . $pending->first_name . '!');
         }
 
         return back()->withErrors([
-            'ocr_text' => 'ID verification failed. Make sure your details are clearly visible.',
+            'ocr_text' => 'ID verification failed. Please ensure your ID is upright (not sideways) and that all text is clearly visible.',
         ]);
+
     }
 }
