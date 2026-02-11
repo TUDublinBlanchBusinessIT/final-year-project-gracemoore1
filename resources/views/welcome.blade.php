@@ -135,7 +135,8 @@
 
         <div class="login">
             Already have an account?<br>
-            <a href="/login">Log in here</a>
+            <a href="{{ route('login') }}" class="text-blue-600 underline">Log in here</a>
+
         </div>
     </div>
 </body>

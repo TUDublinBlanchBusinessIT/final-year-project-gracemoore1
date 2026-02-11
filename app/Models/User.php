@@ -15,12 +15,20 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'email_verified_at', 
+        'ocr_verified',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
+    protected $casts = [
+    'email_verified_at' => 'datetime',
+    'ocr_verified' => 'boolean',
+];
+
 
     protected function casts(): array
     {

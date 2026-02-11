@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LandlordRegisterController;
 use App\Http\Controllers\Auth\LandlordCodeVerificationController; 
 use App\Http\Controllers\Auth\LandlordOCRController;
+use Illuminate\Http\Request;
+
 
 
 
@@ -22,9 +24,10 @@ Route::get('/landlord/verify-email', function () {
 Route::post('/landlord/verify-email', [LandlordCodeVerificationController::class, 'verify'])
     ->name('landlord.verify.email.submit');
 
-Route::get('/landlord/verify-id', function () {
-    return view('landlord.verify-id');
+Route::get('/landlord/verify-id', function (Request $request) {
+    return view('landlord.verify-id', ['email' => $request->email]);
 })->name('landlord.verify.id');
+
 
 Route::post('/landlord/verify-id', [LandlordOCRController::class, 'verify'])
     ->name('landlord.verify.id.submit');
@@ -54,6 +57,15 @@ Route::middleware('auth')->group(function () {
 
 Route::post('/landlord/resend-code', [LandlordCodeVerificationController::class, 'resend'])
     ->name('landlord.verify.email.resend');
+
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+    ->name('login');
+
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
 });
 
