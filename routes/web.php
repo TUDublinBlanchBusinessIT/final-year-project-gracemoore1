@@ -6,6 +6,9 @@ use App\Http\Controllers\Auth\LandlordRegisterController;
 use App\Http\Controllers\Auth\LandlordCodeVerificationController; 
 use App\Http\Controllers\Auth\LandlordOCRController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\PasswordController;
+
 
 
 
@@ -67,6 +70,26 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
+
+
+
 });
 
 require __DIR__.'/auth.php';
+
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->name('password.request');
+
+
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+    ->name('password.email');
+
+
+Route::get('/reset-password/{token}', function ($token) {
+    return view('auth.reset-password', ['token' => $token]);
+})->name('password.reset');
+
+
+Route::post('/reset-password', [PasswordController::class, 'store'])
+    ->name('password.update');

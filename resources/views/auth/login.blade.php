@@ -133,7 +133,7 @@
         <button type="submit">Log In</button>
 
         <div class="link-row">
-            <a href="#">Forgot your password?</a>
+            <a href="{{ route('password.request') }}">Forgot your password?</a>
         </div>
 
         <a href="{{ url('/') }}" class="back-btn">← Back to account selection</a>
