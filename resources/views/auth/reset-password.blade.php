@@ -82,8 +82,8 @@
 <div class="container">
     <img src="/images/RentConnectlogo.png" class="logo">
 
-    <h1>Forgot Password</h1>
-    <p>Enter your email and we’ll send you a reset link.</p>
+    <h1>Create New Password</h1>
+    <p>Please enter your new password below.</p>
 
     <form method="POST" action="{{ route('password.update') }}">
         @csrf
