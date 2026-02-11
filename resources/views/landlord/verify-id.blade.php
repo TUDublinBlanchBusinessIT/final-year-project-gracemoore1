@@ -209,6 +209,58 @@
                 gap: 25px;
             }
         }
+
+        .help-icon {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            background: var(--rc-blue);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 14px;
+        }
+
+        .ocr-help-box {
+            background: #f5f7ff;
+            border-left: 4px solid var(--rc-blue);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            max-width: 380px;
+            text-align: left;
+        }
+        .close-help {
+            margin-top: 10px;
+            background: var(--rc-blue);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .upload-shifted {
+            margin-top: 20px; 
+        }
+
+        .ocr-help-box {
+        	background: #f5f7ff;
+            border-left: 4px solid var(--rc-blue);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            margin-bottom: 60px;
+            max-width: 380px;
+            text-align: left;
+        }
+
+
+
     </style>
 </head>
 
@@ -241,8 +293,22 @@
 
     <!-- CARD -->
     <div class="container">
-        <h1>OCR Verification</h1>
+        <h1>
+            OCR Verification
+            <span class="help-icon" onclick="toggleOCRHelp()">?</span>
+        </h1>
         <p>Please upload a clear photo of your ID</p>
+        <div id="ocrHelpBox" class="ocr-help-box" style="display: none;">
+            <h3>What is OCR?</h3>
+            <p>
+                Optical Character Recognition (OCR) is a secure process where you upload a photo 
+                of your government‑issued ID so we can confirm it’s really you creating the account.
+                This helps keep everyone safe on the platform by reducing scams and preventing fake accounts.
+                Your ID image is processed securely and <strong>never stored</strong>.
+            </p>
+            <button onclick="toggleOCRHelp()" class="close-help">Close</button>
+    </div>
+
 
 
         <form id="ocrForm" method="POST" action="{{ route('landlord.verify.id.submit') }}">
@@ -251,7 +317,7 @@
             <input type="hidden" name="email" value="{{ $email }}">
             <input type="hidden" name="ocr_text" id="ocr_text">
 
-            <label class="upload-box">
+            <label class="upload-box" id="uploadBox">
                 <span class="upload-text">Click or drag to upload</span>
                 <input id="fileInput" type="file" accept="image/*" required>
             </label>
@@ -280,7 +346,6 @@
     const statusText = document.getElementById('status');
     const ocrField = document.getElementById('ocr_text');
 
-    /* IMAGE PREPROCESSING (your original code) */
     async function preprocessImage(file) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -373,6 +438,13 @@
         verifyBtn.classList.add('processing');
         verifyBtn.textContent = "Processing…";
     });
+
+    function toggleOCRHelp() {
+        const box = document.getElementById('ocrHelpBox');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+
+}
+
 </script>
 
 </body>
