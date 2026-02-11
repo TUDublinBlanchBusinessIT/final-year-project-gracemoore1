@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\StudentCodeMail;
 
 class StudentRegisterController extends Controller
 {
@@ -23,7 +24,7 @@ class StudentRegisterController extends Controller
             'password' => 'required|confirmed|min:6',
         ]);
 
-        $code = rand(1000, 9999); // 4-digit verification code
+        $code = rand(1000, 9999);
 
         session([
             'registration_data' => [
@@ -36,12 +37,12 @@ class StudentRegisterController extends Controller
             ]
         ]);
 
-        Mail::raw("Your verification code is: $code", function($m) use ($data) {
-            $m->to($data['email'])->subject('Verify your email');
-        });
+        Mail::to($data['email'])->send(new StudentCodeMail($code));
+    // ⬆️ END DEBUG BLOCK
 
         return redirect('/student/verify-email');
-    }
+}
+
 
     public function showVerify() {
         return view('student.verify-email');
@@ -55,7 +56,7 @@ class StudentRegisterController extends Controller
             return back()->withErrors(['code' => 'No registration data found.']);
         }
 
-        if ($request->code != $registration['email_verification_code']) {
+        if ((string)$request->code !== (string)$registration['email_verification_code']) {
             return back()->withErrors(['code' => 'Invalid verification code']);
         }
 
