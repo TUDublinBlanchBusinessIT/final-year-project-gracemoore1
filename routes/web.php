@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\LandlordOCRController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\PasswordController;
+use App\Models\Listing;
 
 
 
@@ -59,6 +60,10 @@ Route::get('/home', [StudentRegisterController::class, 'dashboard'])->name('stud
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+
+
+
 
 
 

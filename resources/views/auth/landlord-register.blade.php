@@ -84,7 +84,7 @@
         }
 
         input {
-            width:100%;
+            width:90%;
             padding: 12px 14px;
             border-radius: 10px;
             border: 1px solid #e2e8f0;
