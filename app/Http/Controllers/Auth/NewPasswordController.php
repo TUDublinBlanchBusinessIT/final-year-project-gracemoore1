@@ -33,28 +33,38 @@ class NewPasswordController extends Controller
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
+    // Student
+        $reset = \Illuminate\Support\Facades\DB::table('student_password_resets')
+            ->where('email', $request->email)
+            ->where('token', $request->token)
+            ->first();
+        if ($reset) {
+            $student = \App\Models\Student::where('email', $request->email)->first();
+            if ($student) {
+                $student->password = \Illuminate\Support\Facades\Hash::make($request->password);
+                $student->save();
+                \Illuminate\Support\Facades\DB::table('student_password_resets')->where('email', $request->email)->delete();
+                return redirect()->route('login')->with('status', 'Password reset successfully. Please log in.');
+            }
+     }
+
+    // Default for landlords (NO CHANGE)
+        $status = \Illuminate\Support\Facades\Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user) use ($request) {
+            function ($user) use ($request) {
                 $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
+                    'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+                    'remember_token' => \Illuminate\Support\Str::random(60),
                 ])->save();
 
-                event(new PasswordReset($user));
+                event(new \Illuminate\Auth\Events\PasswordReset($user));
             }
         );
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
-        return $status == Password::PASSWORD_RESET
+        return $status == \Illuminate\Support\Facades\Password::PASSWORD_RESET
                     ? redirect()->route('login')->with('status', __($status))
                     : back()->withInput($request->only('email'))
                         ->withErrors(['email' => __($status)]);
