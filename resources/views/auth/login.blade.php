@@ -1,6 +1,3 @@
-@if ($errors->any())
-    <div style="color: red;">{{ $errors->first() }}</div>
-@endif
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -126,7 +123,11 @@
 
     <h1>Welcome Back!</h1>
     <p>Log in to your RentConnect account</p>
-
+    @if ($errors->any())
+        <div style="color: #fff; background: #e74c3c; border-radius: 6px; padding: 10px; margin-bottom: 15px;">
+            {{ $errors->first() }}
+        </div>
+    @endif
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
