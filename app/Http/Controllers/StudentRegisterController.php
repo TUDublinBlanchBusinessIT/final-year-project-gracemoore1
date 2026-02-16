@@ -178,9 +178,14 @@ class StudentRegisterController extends Controller
     }
 
     public function dashboard() {
+        if (!session()->has('student_id')) {
+            return redirect('/login');
+        }
         $listings = [];  
         return view('student.dashboard', compact('listings'));
-    }
+        }
+
+
 }
 
 

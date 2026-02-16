@@ -1,24 +1,37 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\ProfileController;
+
+// Landlord controllers
 use App\Http\Controllers\Auth\LandlordRegisterController;
 use App\Http\Controllers\Auth\LandlordCodeVerificationController; 
 use App\Http\Controllers\Auth\LandlordOCRController;
-use Illuminate\Http\Request;
+
+// Student controllers
+use App\Http\Controllers\StudentRegisterController;
+use App\Http\Controllers\StudentPasswordResetController;
+
+// Breeze / Laravel User Controllers
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\AuthController;
 
 
-
-
+/*
+|--------------------------------------------------------------------------
+| LANDLORD REGISTRATION + VERIFICATION
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/landlord/register', [LandlordRegisterController::class, 'create'])
     ->name('landlord.register.show');
 
 Route::post('/landlord/register', [LandlordRegisterController::class, 'store'])
     ->name('landlord.register.store');
-
 
 Route::get('/landlord/verify-email', function () {
     return view('landlord.verify-email');
@@ -31,18 +44,29 @@ Route::get('/landlord/verify-id', function (Request $request) {
     return view('landlord.verify-id', ['email' => $request->email]);
 })->name('landlord.verify.id');
 
-
 Route::post('/landlord/verify-id', [LandlordOCRController::class, 'verify'])
     ->name('landlord.verify.id.submit');
 
+Route::post('/landlord/resend-code', [LandlordCodeVerificationController::class, 'resend'])
+    ->name('landlord.verify.email.resend');
 
+
+/*
+|--------------------------------------------------------------------------
+| PUBLIC HOME
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// routes/web.php
-use App\Http\Controllers\StudentRegisterController;
+
+/*
+|--------------------------------------------------------------------------
+| STUDENT REGISTRATION + VERIFICATION
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/student/register', [StudentRegisterController::class, 'showForm']);
 Route::post('/student/register', [StudentRegisterController::class, 'register']);
@@ -53,58 +77,79 @@ Route::post('/student/verify-email', [StudentRegisterController::class, 'verifyE
 Route::get('/student/verify-id', [StudentRegisterController::class, 'showVerifyId']);
 Route::post('/student/verify-id', [StudentRegisterController::class, 'verifyId']);
 
-
-// Dashboard
-Route::get('/home', [StudentRegisterController::class, 'dashboard'])->name('student.dashboard');
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+Route::get('/home', [StudentRegisterController::class, 'dashboard'])
+    ->name('student.dashboard');
 
 
+/*
+|--------------------------------------------------------------------------
+| STUDENT PASSWORD RESET
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/verify-email', function () {
-    return view('auth.verify-email');
-})->name('verification.notice');
+Route::get('/student/forgot-password', [StudentPasswordResetController::class, 'showForgot'])
+    ->name('student.password.request');
+
+Route::post('/student/forgot-password', [StudentPasswordResetController::class, 'sendResetLink'])
+    ->name('student.password.email');
+
+Route::get('/student/reset-password/{token}', [StudentPasswordResetController::class, 'showResetForm'])
+    ->name('student.password.reset');
+
+Route::post('/student/reset-password', [StudentPasswordResetController::class, 'resetPassword'])
+    ->name('student.password.update');
 
 
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-Route::post('/landlord/resend-code', [LandlordCodeVerificationController::class, 'resend'])
-    ->name('landlord.verify.email.resend');
-
-
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+/*
+|--------------------------------------------------------------------------
+| DEFAULT USER AUTH (LANDLORD LOGIN)
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])
     ->name('login');
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
-
-
-
-});
-
 require __DIR__.'/auth.php';
+
+
+/*
+|--------------------------------------------------------------------------
+| PASSWORD RESET (LANDLORD ONLY – Breeze)
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 })->name('password.request');
 
-
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
     ->name('password.email');
-
 
 Route::get('/reset-password/{token}', function ($token) {
     return view('auth.reset-password', ['token' => $token]);
 })->name('password.reset');
 
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+    ->name('password.email');
 
-Route::post('/reset-password', [PasswordController::class, 'store'])
-    ->name('password.update');
+
+/*
+|--------------------------------------------------------------------------
+| USER PROFILE (LANDLORD – Breeze)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+
+});

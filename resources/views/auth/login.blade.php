@@ -1,3 +1,6 @@
+@if ($errors->any())
+    <div style="color: red;">{{ $errors->first() }}</div>
+@endif
 <!DOCTYPE html>
 <html lang="en">
 <head>

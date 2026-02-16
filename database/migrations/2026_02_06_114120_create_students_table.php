@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
 return new class extends Migration
 {
     public function up(): void
@@ -8,10 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('firstname');
             $table->string('surname');
-            $table->date('dob');
+            $table->date('dateofbirth');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('email_code')->nullable();
             $table->boolean('email_verified')->default(false);
             $table->timestamps();
         });
