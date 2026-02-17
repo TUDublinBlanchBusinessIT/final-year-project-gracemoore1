@@ -40,14 +40,17 @@ class StudentPasswordResetController extends Controller
             ]
         );
 
-        Mail::to($request->email)->send(new StudentResetPasswordMail($token));
+        Mail::to($request->email)->send(new StudentResetPasswordMail($token, $student->email));
 
         return back()->with('success', 'A password reset link has been emailed to you.');
     }
 
     public function showResetForm($token)
     {
-        return view('student.reset-password', ['token' => $token]);
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => request('email')
+            ]);
     }
 
     public function resetPassword(Request $request)

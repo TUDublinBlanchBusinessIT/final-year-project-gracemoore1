@@ -20,7 +20,7 @@ class PasswordResetLinkController extends Controller
                 ['email' => $request->email],
                 ['email' => $request->email, 'token' => $token, 'created_at' => now()]
             );
-            \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\StudentResetPasswordMail($token));
+            \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\StudentResetPasswordMail($token, $student->email));
             return back()->with('status', 'A password reset link has been emailed to you.');
         }
 

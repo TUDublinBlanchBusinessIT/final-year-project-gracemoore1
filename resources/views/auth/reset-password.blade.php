@@ -85,12 +85,23 @@
     <h1>Create New Password</h1>
     <p>Please enter your new password below.</p>
 
-    <form method="POST" action="{{ route('password.update') }}">
+    @if ($errors->any())
+        <div style="color: #fff; background: #e74c3c; border-radius: 6px; padding: 10px; margin-bottom: 15px;">
+            {{ $errors->first() }}
+        </div>
+    @endif
+    @if (session('status'))
+        <div style="color: #fff; background: #27ae60; border-radius: 6px; padding: 10px; margin-bottom: 15px;">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('password.store') }}">
         @csrf
 
     
         <input type="hidden" name="token" value="{{ $token }}">
-        <input type="hidden" name="email" value="{{ request('email') }}">
+        <input type="hidden" name="email" value="{{ $email ?? '' }}">
 
    
         <input type="password" name="password" placeholder="New Password" required>

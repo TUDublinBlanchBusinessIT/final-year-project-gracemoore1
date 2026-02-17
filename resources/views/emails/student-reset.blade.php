@@ -2,10 +2,11 @@
 
 <p>You requested a password reset for your RentConnect student account.</p>
 
-<p>Click this link to reset password:</p>
+<p>Click this link to reset password: <br>
 
-<p>{{ url('/student/reset-password/' . $token) }}
+{{ url('/student/reset-password/' . $token) . '?email=' . urlencode($student_email) }}
     Reset Password
-</a></p>
+    </a>
+</p>
 
 <p>If you did not request this, ignore this email.</p>
