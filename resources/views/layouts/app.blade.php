@@ -20,7 +20,7 @@
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow">
+                <header class="bg-white shadow lg:pl-60">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -28,9 +28,18 @@
             @endisset
 
             <!-- Page Content -->
-            <main>
-                {{ $slot }}
+            <!-- <main> -->
+                <!--{{ $slot }} -->
+
+           <!-- </main> -->
+            
+
+            <main class="pb-24 lg:pl-60 lg:pb-0">
+                {{ $slot ?? '' }}
             </main>
+
+            @include('partials.landlord-nav')
+
         </div>
     </body>
 </html>

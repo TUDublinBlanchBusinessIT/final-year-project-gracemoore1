@@ -37,6 +37,18 @@ Route::post('/landlord/verify-id', [LandlordOCRController::class, 'verify'])
     ->name('landlord.verify.id.submit');
 
 
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
+
+    Route::get('/messages', fn () => view('landlord.messages'))->name('messages');
+
+    Route::get('/landlord-support', fn () => view('landlord.support'))->name('landlord.support');
+
+    // Breeze usually already has profile routes, keep as-is
+});
+
+
 
 Route::get('/', function () {
     return view('welcome');

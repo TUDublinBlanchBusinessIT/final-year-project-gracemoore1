@@ -1,3 +1,121 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer components {
+  .landlord-link {
+    @apply w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition;
+  }
+
+  .landlord-active {
+    @apply bg-blue-50 text-blue-600;
+  }
+
+  .landlord-tab {
+    @apply flex flex-col items-center justify-center gap-1 w-20 py-2 rounded-xl text-slate-500 hover:text-slate-900 transition;
+  }
+
+  .landlord-tab-active {
+    @apply bg-blue-50 text-blue-600;
+  }
+}
+
+
+/* CONTENT SPACING */
+.landlord-content{
+    padding-bottom: 90px; /* mobile bottom nav space */
+}
+
+/* NAV BASE */
+.landlord-nav{
+    position: fixed;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid rgba(15,23,42,.08);
+    box-shadow: 0 16px 40px rgba(15,23,42,.12);
+}
+
+/* ITEMS */
+.landlord-item{
+    text-decoration: none;
+    color: #64748b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    border-radius: 14px;
+    transition: background .12s ease, color .12s ease, transform .12s ease;
+}
+
+.landlord-item:hover{
+    transform: translateY(-1px);
+}
+
+.landlord-item.active{
+    background: rgba(45,108,255,.12);
+    color: #2d6cff;
+}
+
+.landlord-ico{
+    font-size: 20px;
+    line-height: 1;
+}
+
+.landlord-label{
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* MOBILE: bottom nav */
+@media (max-width: 900px){
+    .landlord-nav{
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 18px;
+        width: min(520px, calc(100% - 28px));
+        height: 62px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 8px;
+    }
+
+    .landlord-item{
+        width: 56px;
+        height: 46px;
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+/* DESKTOP: sidebar */
+@media (min-width: 901px){
+    .landlord-content{
+        padding-bottom: 0;
+        padding-left: 240px; /* space for sidebar */
+    }
+
+    .landlord-nav{
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 220px;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 18px;
+        gap: 8px;
+    }
+
+    .landlord-item{
+        justify-content:flex-start;
+        padding: 12px 14px;
+    }
+
+    .landlord-label{
+        font-size: 14px;
+    }
+}
+
