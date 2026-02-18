@@ -8,6 +8,7 @@
             background: #f5f7fb;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
+
         .admin-dashboard-container {
             max-width: 900px;
             margin: 40px auto;
@@ -16,20 +17,28 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
             padding: 40px 30px;
             text-align: center;
+            overflow: hidden;
         }
+
         .dashboard-title {
             font-size: 30px;
             font-weight: 800;
             color: rgb(38, 98, 227);
             margin-bottom: 10px;
         }
+
+/* FIXED: Even 2x2 grid layout */
         .icon-row {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 40px 0 0 0;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(2, 160px); /* Fixed width for cards */
+            grid-template-rows: repeat(2, auto);
+            column-gap: 70px;   /* Large horizontal gap between columns */
+            row-gap: 30px;      /* Small vertical gap between rows */
+            margin-top: 32px;
+            justify-content: center; /* Centre the grid horizontally */
+            align-items: center;
         }
+
         .icon-card {
             background: #f5f7fb;
             border-radius: 12px;
@@ -43,29 +52,37 @@
             cursor: pointer;
             text-decoration: none;
         }
+
         .icon-card:hover {
             box-shadow: 0 4px 16px rgba(38,98,227,0.12);
             background: #eaf1fc;
         }
+
         .icon-card svg {
             width: 48px;
             height: 48px;
             margin-bottom: 16px;
             color: rgb(38, 98, 227);
         }
+
         .icon-label {
             font-size: 17px;
             font-weight: 600;
             color: #333;
             margin-top: 8px;
         }
+
+/* FIXED: Perfect mobile behaviour */
         @media (max-width: 700px) {
             .icon-row {
-                flex-direction: column;
-                gap: 24px;
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                column-gap: 0;
+                row-gap: 16px;
+                justify-content: center;
             }
             .icon-card {
-                width: 100%;
+                width: 90%;
             }
         }
     </style>
