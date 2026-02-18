@@ -1,10 +1,49 @@
 {{-- DESKTOP SIDEBAR --}}
 <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-60 bg-white border-r border-slate-200 px-4 py-6 z-50">
     <div class="w-full flex flex-col gap-2">
-        <div class="px-3 pb-4">
-            <div class="text-lg font-extrabold text-slate-900">RentConnect</div>
-            <div class="text-xs text-slate-500 mt-1">Landlord</div>
-        </div>
+        <div class="px-3 pb-5 border-b border-slate-200">
+    {{-- Brand --}}
+    <!-- <div class="text-lg font-extrabold text-blue-600">
+        RentConnect
+    </div> -->
+
+    {{-- User dropdown (moved from top nav) --}}
+    <div class="mt-3">
+        <x-dropdown align="left" width="48">
+            <x-slot name="trigger">
+                <button type="button"
+                    class="w-full flex items-center justify-between gap-2 rounded-xl px-3 py-2
+                           text-blue-600 font-semibold text-sm hover:bg-blue-50 transition">
+                    <span class="truncate">{{ Auth::user()->name }}</span>
+
+                    <svg class="h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </x-slot>
+
+            <x-slot name="content">
+                <x-dropdown-link :href="route('profile.edit')">
+                    {{ __('Profile') }}
+                </x-dropdown-link>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <x-dropdown-link :href="route('logout')"
+                        onclick="event.preventDefault(); this.closest('form').submit();">
+                        {{ __('Log Out') }}
+                    </x-dropdown-link>
+                </form>
+            </x-slot>
+        </x-dropdown>
+    </div>
+
+    {{-- Role label --}}
+    <div class="text-xs text-slate-500 mt-2 px-3">
+        Landlord
+    </div>
+</div>
+
 
         <a href="{{ route('dashboard') }}"
            class="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition

@@ -1,6 +1,15 @@
 <x-app-layout>
-    <div style="max-width:900px;margin:0 auto;padding:24px;">
-        <h1 style="font-size:28px;font-weight:800;">Landlord Support</h1>
-        <p style="color:#64748b;">Coming soon.</p>
+    <x-slot name="header">
+        <h2 class="text-2xl font-bold text-slate-900">
+            Landlord Support
+        </h2>
+    </x-slot>
+
+    <div class="py-8">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <p class="text-slate-600">Support page coming soon.</p>
+            </div>
+        </div>
     </div>
 </x-app-layout>
