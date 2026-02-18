@@ -19,13 +19,9 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\AuthController;
+//admin controller
+use App\Http\Controllers\AdminDashboardController;
 
-
-/*
-|--------------------------------------------------------------------------
-| LANDLORD REGISTRATION + VERIFICATION
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/landlord/register', [LandlordRegisterController::class, 'create'])
     ->name('landlord.register.show');
@@ -51,22 +47,13 @@ Route::post('/landlord/resend-code', [LandlordCodeVerificationController::class,
     ->name('landlord.verify.email.resend');
 
 
-/*
-|--------------------------------------------------------------------------
-| PUBLIC HOME
-|--------------------------------------------------------------------------
-*/
+
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 
-/*
-|--------------------------------------------------------------------------
-| STUDENT REGISTRATION + VERIFICATION
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/student/register', [StudentRegisterController::class, 'showForm']);
 Route::post('/student/register', [StudentRegisterController::class, 'register']);
@@ -81,11 +68,7 @@ Route::get('/home', [StudentRegisterController::class, 'dashboard'])
     ->name('student.dashboard');
 
 
-/*
-|--------------------------------------------------------------------------
-| STUDENT PASSWORD RESET
-|--------------------------------------------------------------------------
-*/
+
 
 Route::get('/student/forgot-password', [StudentPasswordResetController::class, 'showForgot'])
     ->name('student.password.request');
@@ -100,11 +83,7 @@ Route::post('/student/reset-password', [StudentPasswordResetController::class, '
     ->name('student.password.update');
 
 
-/*
-|--------------------------------------------------------------------------
-| DEFAULT USER AUTH (LANDLORD LOGIN)
-|--------------------------------------------------------------------------
-*/
+
 
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])
     ->name('login');
@@ -114,11 +93,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 require __DIR__.'/auth.php';
 
 
-/*
-|--------------------------------------------------------------------------
-| PASSWORD RESET (LANDLORD ONLY – Breeze)
-|--------------------------------------------------------------------------
-*/
+
 
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
@@ -135,11 +110,7 @@ Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
     ->name('password.email');
 
 
-/*
-|--------------------------------------------------------------------------
-| USER PROFILE (LANDLORD – Breeze)
-|--------------------------------------------------------------------------
-*/
+
 
 Route::middleware('auth')->group(function () {
 
@@ -153,3 +124,40 @@ Route::middleware('auth')->group(function () {
         ->name('profile.destroy');
 
 });
+
+//admin
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+Route::get('/admin/reports', function () {
+    return view('admin.reports');
+})->name('admin.reports');
+
+Route::get('/admin/accounts', function () {
+    return view('admin.accounts');
+})->name('admin.accounts');
+
+Route::get('/admin/partnerships', function () {
+    return view('admin.partnerships');
+})->name('admin.partnerships');
+
+Route::get('/admin/chatbot', function () {
+    return view('admin.chatbot');
+})->name('admin.chatbot');
+
+Route::get('/dashboard', function () {
+    // Admin
+    if (session('role') === 'admin' || session('admin_id')) {
+        return redirect()->route('admin.dashboard');
+    }
+    // Student
+    if (session('student_id')) {
+        return redirect()->route('student.dashboard');
+    }
+    // Not logged in
+    return redirect()->route('login');
+    })->name('dashboard');
+
+    Route::post('/logout', function () {
+    session()->flush();
+    return redirect('/login');
+})->name('logout');

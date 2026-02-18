@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -28,6 +29,60 @@ class AuthenticatedSessionController extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
+
+        $admin = \DB::table('administrator')
+            ->join('staff', 'administrator.id', '=', 'staff.id')
+            ->where('staff.email', $request->email)
+            ->select(
+                'administrator.id as admin_id',
+                'staff.firstname',
+                'staff.password as staff_password'
+            )
+            ->first();
+
+        if ($admin && Hash::check($request->password, $admin->staff_password)) {
+
+            session([
+                'admin_id'        => $admin->admin_id,
+                'role'            => 'admin',
+                'admin_firstname' => $admin->firstname
+            ]);
+
+            return redirect()->route('admin.dashboard');
+        }
+
+
+
+    // hardcode for admins here
+    
+        //$admins = [
+            //[
+                //'email' => 'B00153832@mytudublin.ie',
+                //'password' => '$2y$12$7sVW45vjjvXNnQQnNPYHWubMt59UcNMiTljQrTugiolNVzLWugK9C',  // MoyaGrace123
+                //'id' => 5,
+                //'firstname' => 'Moya'
+            //],
+            //[
+                //'email' => 'gmoore0001@icloud.com',
+                //'password' => '$2y$12$7sVW45vjjvXNnQQnNPYHWubMt59UcNMiTljQrTugiolNVzLWugK9C',  // MoyaGrace123
+                //'id' => 6,
+                //'firstname' => 'Grace'
+            //]
+        //];
+        
+        //foreach ($admins as $admin) {
+            //if ($admin['email'] === $request->email) {
+        // Debug: Check if the password matches the hash
+                //$result = Hash::check($request->password, $admin['password']);
+                //if ($result) {
+            // Success: log in admin
+                    //session(['admin_id' => $admin['id']]);
+                    //session(['role' => 'admin']);
+                    //session(['admin_firstname' => $admin['firstname']]);
+                    //return redirect()->route('admin.dashboard');
+            //}
+        //}
+
 
     // Check Student
         $student = \App\Models\Student::where('email', $request->email)->first();
@@ -56,7 +111,6 @@ class AuthenticatedSessionController extends Controller
         // Not found or wrong password
         return back()->withErrors(['email' => 'Invalid email or password.']);
     }
-
 
     /**
      * Destroy an authenticated session.
