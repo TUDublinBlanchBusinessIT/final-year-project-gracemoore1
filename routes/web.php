@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Models\Listing;
+use App\Http\Controllers\Landlord\LandlordRentalController;
 
 
 
@@ -46,6 +47,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/landlord-support', fn () => view('landlord.support'))->name('landlord.support');
 
     // Breeze usually already has profile routes, keep as-is
+});
+
+Route::middleware(['auth', 'verified'])->prefix('landlord')->name('landlord.')->group(function () {
+    Route::get('/rentals', [LandlordRentalController::class, 'index'])->name('rentals.index');
+    Route::get('/rentals/create', [LandlordRentalController::class, 'create'])->name('rentals.create');
+    Route::post('/rentals', [LandlordRentalController::class, 'store'])->name('rentals.store');
+    Route::get('/rentals/{rental}/edit', [LandlordRentalController::class, 'edit'])->name('rentals.edit');
+    Route::put('/rentals/{rental}', [LandlordRentalController::class, 'update'])->name('rentals.update');
+    Route::delete('/rentals/{rental}', [LandlordRentalController::class, 'destroy'])->name('rentals.destroy');
 });
 
 
