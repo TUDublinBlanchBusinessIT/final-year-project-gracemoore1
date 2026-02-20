@@ -193,3 +193,9 @@ Route::get('/dashboard', function () {
     session()->flush();
     return redirect('/login');
 })->name('logout');
+
+Route::post('/admin/partnerships', [App\Http\Controllers\PartnershipController::class, 'store'])->name('admin.partnerships.store');
+
+Route::get('/serviceprovider/dashboard', function () {
+    return view('serviceprovider.dashboard');
+})->name('serviceprovider.dashboard');
