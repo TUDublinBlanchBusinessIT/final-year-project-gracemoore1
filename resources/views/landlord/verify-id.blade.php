@@ -259,6 +259,59 @@
             text-align: left;
         }
 
+        #progressWrap{
+            width: 100%;
+            max-width: 520px;
+            margin-top: 14px;
+        }
+
+        .progressRow{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+        .progressTrack{
+            flex:1;
+            height: 12px;
+            background: #e8eefc;
+            border-radius: 999px;
+            overflow:hidden;
+        }
+
+        .progressBar{
+            height: 100%;
+            background: var(--rc-blue);
+            border-radius: 999px;
+            transition: width .15s ease;
+        }
+
+        .progressPct{
+            min-width: 44px;
+            text-align:right;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .progressStage{
+            margin-top: 8px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .verify-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .verify-btn {
+            background: var(--rc-blue);
+            color: white;
+            transition: all .2s ease;
+        }
+
+
 
 
     </style>
@@ -328,7 +381,22 @@
 
             <p id="status"></p>
 
-            <button id="verifyBtn" type="submit" disabled>Verify ID</button>
+            
+            <div id="progressWrap" style="display:none;">
+                <div class="progressRow">
+                    <div class="progressTrack">
+                        <div id="progressBar" class="progressBar" style="width:0%;"></div>
+                    </div>
+                    <div id="progressPct" class="progressPct">0%</div>
+                </div>
+                <div id="progressStage" class="progressStage"></div>
+            </div>
+
+            <div id="verifyWrap" style="display:none;">
+                <button id="verifyBtn" type="submit">Verify ID</button>
+            </div>
+
+
 
             <a href="{{ route('landlord.verify.email') }}" class="back">← Back</a>
         </form>
@@ -341,10 +409,16 @@
     const previewBox = document.getElementById('previewBox');
     const previewImage = document.getElementById('previewImage');
     const verifyBtn = document.getElementById('verifyBtn');
+    const verifyWrap = document.getElementById('verifyWrap');
     const ocrForm = document.getElementById('ocrForm');
     const overlay = document.getElementById('processingOverlay');
     const statusText = document.getElementById('status');
     const ocrField = document.getElementById('ocr_text');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressBar = document.getElementById('progressBar');
+    const progressPct = document.getElementById('progressPct');
+    const progressStage = document.getElementById('progressStage');
+
 
     async function preprocessImage(file) {
         return new Promise((resolve) => {
@@ -408,26 +482,75 @@
         statusText.textContent = 'Processing image...';
         verifyBtn.disabled = true;
         verifyBtn.classList.add('processing');
-        
+        verifyWrap.style.display = 'none';
+
 
         try {
             const processedImage = await preprocessImage(file);
 
             statusText.textContent = 'Running OCR...';
 
-            const result = await Tesseract.recognize(processedImage, 'eng');
-            const text = result.data.text || '';
+            // show progress UI
+            const progressWrap = document.getElementById('progressWrap');
+            const progressBar  = document.getElementById('progressBar');
+            const progressPct  = document.getElementById('progressPct');
+            const progressStage = document.getElementById('progressStage');
 
+            progressWrap.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressPct.textContent = '0%';
+            progressStage.textContent = 'Starting OCR...';
+
+            const result = await Tesseract.recognize(processedImage, 'eng', {
+                logger: (m) => {
+                    // m.progress is 0..1 when available
+                    if (typeof m.progress === 'number') {
+                        const pct = Math.round(m.progress * 100);
+                        progressBar.style.width = pct + '%';
+                        progressPct.textContent = pct + '%';
+                    }
+
+                    // Optional: show stage text
+                    if (m.status) {
+                        // Examples: "loading tesseract core", "initializing tesseract", "recognizing text"
+                        progressStage.textContent = m.status;
+                    }
+                }
+            });
+
+            const text = result.data.text || '';
             ocrField.value = text;
+
+            if (text.trim().length > 10) {
+                verifyBtn.disabled = false;
+            } else {
+                verifyBtn.disabled = true;
+            }
+
+
             statusText.textContent = 'OCR complete. You can now verify your ID.';
+
+            progressBar.style.width = '100%';
+            progressPct.textContent = '100%';
+            progressStage.textContent = 'Done';
+
+            verifyWrap.style.display = 'block';
             verifyBtn.disabled = false;
             verifyBtn.classList.remove('processing');
+            verifyBtn.style.background = 'var(--rc-blue)';
+            verifyBtn.style.cursor = 'pointer';
+
+
 
 
         } catch (err) {
             console.error(err);
             statusText.textContent = 'OCR failed. Please try another image.';
             verifyBtn.disabled = true;
+            progressWrap.style.display = 'none';
+            verifyWrap.style.display = 'none';
+
+
         }
     });
 

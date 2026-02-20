@@ -21,6 +21,11 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\AuthController;
 //admin controller
 use App\Http\Controllers\AdminDashboardController;
+use App\Models\Listing;
+use App\Http\Controllers\Landlord\LandlordRentalController;
+
+
+
 
 
 Route::get('/landlord/register', [LandlordRegisterController::class, 'create'])
@@ -46,6 +51,27 @@ Route::post('/landlord/verify-id', [LandlordOCRController::class, 'verify'])
 Route::post('/landlord/resend-code', [LandlordCodeVerificationController::class, 'resend'])
     ->name('landlord.verify.email.resend');
 
+
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
+
+    Route::get('/messages', fn () => view('landlord.messages'))->name('messages');
+
+    Route::get('/landlord-support', fn () => view('landlord.support'))->name('landlord.support');
+
+    // Breeze usually already has profile routes, keep as-is
+});
+
+Route::middleware(['auth', 'verified'])->prefix('landlord')->name('landlord.')->group(function () {
+    Route::get('/rentals', [LandlordRentalController::class, 'index'])->name('rentals.index');
+    Route::get('/rentals/create', [LandlordRentalController::class, 'create'])->name('rentals.create');
+    Route::post('/rentals', [LandlordRentalController::class, 'store'])->name('rentals.store');
+    Route::get('/rentals/{rental}/edit', [LandlordRentalController::class, 'edit'])->name('rentals.edit');
+    Route::put('/rentals/{rental}', [LandlordRentalController::class, 'update'])->name('rentals.update');
+    Route::delete('/rentals/{rental}', [LandlordRentalController::class, 'destroy'])->name('rentals.destroy');
+});
 
 
 
@@ -81,6 +107,12 @@ Route::get('/student/reset-password/{token}', [StudentPasswordResetController::c
 
 Route::post('/student/reset-password', [StudentPasswordResetController::class, 'resetPassword'])
     ->name('student.password.update');
+
+
+
+Route::get('/verify-email', function () {
+    return view('auth.verify-email');
+})->name('verification.notice');
 
 
 
