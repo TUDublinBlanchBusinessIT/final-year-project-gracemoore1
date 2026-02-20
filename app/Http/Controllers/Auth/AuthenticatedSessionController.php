@@ -108,6 +108,23 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('landlord.dashboard');
         }
 
+        // Check Service Provider
+        $provider = \App\Models\ServiceProviderPartnership::where('email', $request->email)->first();
+
+        if ($provider && \Illuminate\Support\Facades\Hash::check($request->password, $provider->password)) {
+
+    // Set session (same style as student/landlord)
+            $request->session()->put('serviceprovider_id', $provider->id);
+
+    // Remove the other user types from the same session
+            $request->session()->forget('student_id');
+            $request->session()->forget('landlord_id');
+            $request->session()->forget('admin_id');
+
+    // Redirect to service provider dashboard
+        return redirect()->route('serviceprovider.dashboard');
+    }
+
         // Not found or wrong password
         return back()->withErrors(['email' => 'Invalid email or password.']);
     }
