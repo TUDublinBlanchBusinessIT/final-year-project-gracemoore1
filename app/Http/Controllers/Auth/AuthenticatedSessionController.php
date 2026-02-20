@@ -83,6 +83,21 @@ class AuthenticatedSessionController extends Controller
             //}
         //}
 
+    // ✅ Check Admin via users table (role = admin)
+    $adminUser = \App\Models\User::where('email', $request->email)
+        ->where('role', 'admin')
+        ->first();
+
+    if ($adminUser && \Illuminate\Support\Facades\Hash::check($request->password, $adminUser->password)) {
+
+        // Log them in using Laravel auth (clean)
+        Auth::login($adminUser);
+        $request->session()->regenerate();
+
+        return redirect()->route('admin.dashboard');
+    }
+
+
 
     // Check Student
         $student = \App\Models\Student::where('email', $request->email)->first();

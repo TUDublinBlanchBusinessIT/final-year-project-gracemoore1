@@ -1,85 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
-use App\Models\Student;
-use App\Mail\StudentResetPasswordMail;
-
-class StudentPasswordResetController extends Controller
+return new class extends Migration
 {
-    // Show "Forgot Password" page
-    public function showForgot()
+    public function up(): void
     {
-        return view('student.forgot-password');
+        Schema::create('student_password_resets', function (Blueprint $table) {
+            $table->id();
+            $table->string('email')->index();
+            $table->string('token', 64)->index();
+            $table->timestamp('created_at')->nullable();
+            // no updated_at needed for this table
+        });
     }
 
-    // Send reset link
-    public function sendResetLink(Request $request)
+    public function down(): void
     {
-        $request->validate(['email' => 'required|email']);
-
-        $student = Student::where('email', $request->email)->first();
-
-        if (!$student) {
-            return back()->withErrors(['email' => 'No student found with that email.']);
-        }
-
-        $token = Str::random(64);
-
-        DB::table('student_password_resets')->updateOrInsert(
-            ['email' => $request->email],
-            [
-                'email' => $request->email,
-                'token' => $token,
-                'created_at' => Carbon::now()
-            ]
-        );
-
-        Mail::to($request->email)->send(new StudentResetPasswordMail($token));
-
-        return back()->with('success', 'A reset link has been sent to your email.');
+        Schema::dropIfExists('student_password_resets');
     }
-
-    // Show reset form
-    public function showResetForm($token)
-    {
-        return view('student.reset-password', ['token' => $token]);
-    }
-
-    // Handle new password submission
-    public function resetPassword(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|confirmed|min:6',
-            'token' => 'required'
-        ]);
-
-        $resetRecord = DB::table('student_password_resets')
-            ->where('email', $request->email)
-            ->where('token', $request->token)
-            ->first();
-
-        if (!$resetRecord) {
-            return back()->withErrors(['email' => 'Invalid or expired reset token.']);
-        }
-
-        $student = Student::where('email', $request->email)->first();
-        if (!$student) {
-            return back()->withErrors(['email' => 'Student not found.']);
-        }
-
-        $student->password = Hash::make($request->password);
-        $student->save();
-
-        DB::table('student_password_resets')->where('email', $request->email)->delete();
-
-        return redirect('/student/login')->with('success', 'Password updated. Please log in.');
-    }
-}
+};
