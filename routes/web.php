@@ -93,7 +93,13 @@ Route::post('/student/verify-id', [StudentRegisterController::class, 'verifyId']
 Route::get('/home', [StudentRegisterController::class, 'dashboard'])
     ->name('student.dashboard');
 
+// STUDENT LOGIN
+Route::get('/student/login', function() {
+    return view('student.login');
+})->name('student.login.form');
 
+Route::post('/student/login', [AuthenticatedSessionController::class, 'storeStudent'])
+    ->name('student.login');
 
 
 Route::get('/student/forgot-password', [StudentPasswordResetController::class, 'showForgot'])
