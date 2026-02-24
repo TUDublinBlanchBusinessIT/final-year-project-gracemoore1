@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
+use App\Models\User;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -83,7 +84,7 @@ class AuthenticatedSessionController extends Controller
             //}
         //}
 
-    // ✅ Check Admin via users table (role = admin)
+    // Check Admin via users table (role = admin)
     $adminUser = \App\Models\User::where('email', $request->email)
         ->where('role', 'admin')
         ->first();
@@ -116,10 +117,24 @@ class AuthenticatedSessionController extends Controller
 
         // Check Landlord
         $landlord = \App\Models\Landlord::where('email', $request->email)->first();
-        if ($landlord && \Illuminate\Support\Facades\Hash::check($request->password, $landlord->password)) {
-            // If you have similar verification for landlords, add here
+
+        if ($landlord && Hash::check($request->password, $landlord->password)) {
+
+            // ✅ Authenticate through Laravel using users table
+            $authUser = User::where('email', $request->email)->first();
+
+            if (!$authUser) {
+                return back()->withErrors(['email' => 'User account not found.']);
+            }
+
+            Auth::login($authUser);
+            $request->session()->regenerate();
+
             $request->session()->put('landlord_id', $landlord->id);
             $request->session()->forget('student_id');
+            $request->session()->forget('serviceprovider_id');
+            $request->session()->forget('admin_id');
+
             return redirect()->route('landlord.dashboard');
         }
 

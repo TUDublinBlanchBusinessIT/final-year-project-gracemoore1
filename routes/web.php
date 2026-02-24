@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 use App\Http\Controllers\ProfileController;
 
@@ -53,24 +55,25 @@ Route::post('/landlord/resend-code', [LandlordCodeVerificationController::class,
 
 
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['landlord'])
+    ->prefix('landlord')
+    ->name('landlord.')
+    ->group(function () {
 
-    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
+        Route::get('/dashboard', fn () => view('landlord.dashboard'))->name('dashboard');
 
-    Route::get('/messages', fn () => view('landlord.messages'))->name('messages');
+        Route::get('/rentals', [LandlordRentalController::class, 'index'])->name('rentals.index');
+        Route::get('/rentals/create', [LandlordRentalController::class, 'create'])->name('rentals.create');
+        Route::post('/rentals', [LandlordRentalController::class, 'store'])->name('rentals.store');
+        Route::get('/rentals/{rental}/edit', [LandlordRentalController::class, 'edit'])->name('rentals.edit');
+        Route::put('/rentals/{rental}', [LandlordRentalController::class, 'update'])->name('rentals.update');
+        Route::delete('/rentals/{rental}', [LandlordRentalController::class, 'destroy'])->name('rentals.destroy');
+    });
 
-    Route::get('/landlord-support', fn () => view('landlord.support'))->name('landlord.support');
 
-    // Breeze usually already has profile routes, keep as-is
-});
-
-Route::middleware(['auth', 'verified'])->prefix('landlord')->name('landlord.')->group(function () {
-    Route::get('/rentals', [LandlordRentalController::class, 'index'])->name('rentals.index');
-    Route::get('/rentals/create', [LandlordRentalController::class, 'create'])->name('rentals.create');
-    Route::post('/rentals', [LandlordRentalController::class, 'store'])->name('rentals.store');
-    Route::get('/rentals/{rental}/edit', [LandlordRentalController::class, 'edit'])->name('rentals.edit');
-    Route::put('/rentals/{rental}', [LandlordRentalController::class, 'update'])->name('rentals.update');
-    Route::delete('/rentals/{rental}', [LandlordRentalController::class, 'destroy'])->name('rentals.destroy');
+Route::middleware(['landlord'])->group(function () {
+    Route::get('/landlord/messages', fn () => view('landlord.messages'))->name('messages');
+    Route::get('/landlord/support', fn () => view('landlord.support'))->name('landlord.support');
 });
 
 
@@ -182,26 +185,48 @@ Route::get('/admin/chatbot', function () {
     return view('admin.chatbot');
 })->name('admin.chatbot');
 
-Route::get('/dashboard', function () {
+//Route::get('/dashboard', function () {
     // Admin
+    //if (session('role') === 'admin' || session('admin_id')) {
+        //return redirect()->route('admin.dashboard');
+    //}
+    // Student
+    //if (session('student_id')) {
+        //return redirect()->route('student.dashboard');
+    //}
+    // Not logged in
+    //return redirect()->route('login');
+    //})->name('dashboard');
+
+    //Route::post('/logout', function () {
+    //session()->flush();
+    //return redirect('/login');
+//})->name('logout');
+
+//Route::post('/admin/partnerships', [App\Http\Controllers\PartnershipController::class, 'store'])->name('admin.partnerships.store');
+
+//Route::get('/serviceprovider/dashboard', function () {
+    //return view('serviceprovider.dashboard');
+//})->name('serviceprovider.dashboard');
+
+
+
+Route::get('/dashboard', function () {
+    // Admin (your custom session)
     if (session('role') === 'admin' || session('admin_id')) {
         return redirect()->route('admin.dashboard');
     }
-    // Student
+
+    // Student (your custom session)
     if (session('student_id')) {
         return redirect()->route('student.dashboard');
     }
-    // Not logged in
+
+    // Breeze-authenticated user (normal user / landlord / service provider)
+    if (Auth::check()) {
+        return view('landlord.dashboard');
+    }
+
+    // Not logged in at all
     return redirect()->route('login');
-    })->name('dashboard');
-
-    Route::post('/logout', function () {
-    session()->flush();
-    return redirect('/login');
-})->name('logout');
-
-Route::post('/admin/partnerships', [App\Http\Controllers\PartnershipController::class, 'store'])->name('admin.partnerships.store');
-
-Route::get('/serviceprovider/dashboard', function () {
-    return view('serviceprovider.dashboard');
-})->name('serviceprovider.dashboard');
+})->middleware(['auth'])->name('dashboard');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\PendingLandlord;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class LandlordCodeVerificationController extends Controller
 {
@@ -32,6 +33,14 @@ class LandlordCodeVerificationController extends Controller
         
         $pending->email_verified = true;
         $pending->save();
+
+        // Mark the Breeze user as verified (required for 'verified' middleware)
+        $user = User::where('email', $pending->email)->first();
+
+        if ($user && !$user->email_verified_at) {
+            $user->email_verified_at = now();
+            $user->save();
+        }
 
         return redirect()->route('landlord.verify.id', ['email' => $pending->email]);
     }
