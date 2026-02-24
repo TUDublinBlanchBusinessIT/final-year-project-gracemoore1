@@ -16,7 +16,9 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+            @if (session('landlord_id') || Auth::check())
+                @include('layouts.navigation')
+            @endif
 
             <!-- Page Heading -->
             @isset($header)
@@ -28,19 +30,25 @@
             @endisset
 
             <!-- Page Content -->
-            <!-- <main> -->
-                <!--{{ $slot }} -->
-
-           <!-- </main> -->
-            
-
             <main class="pb-24 lg:pl-60 lg:pb-0">
-                 <div class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">    
-                    {{ $slot ?? '' }}
-                </div>
+                @if (session('student_id'))
+                    {{-- Student pages: left-aligned, full-width container --}}
+                    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+                        {{ $slot ?? '' }}
+                    </div>
+                @else
+                    {{-- Other roles: original centered container --}}
+                    <div class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        {{ $slot ?? '' }}
+                    </div>
+                @endif
             </main>
 
-            @include('partials.landlord-nav')
+            @if (session('student_id'))
+                @include('partials.student-nav')
+            @elseif (session('landlord_id'))
+                @include('partials.landlord-nav')
+            @endif
 
         </div>
     </body>
