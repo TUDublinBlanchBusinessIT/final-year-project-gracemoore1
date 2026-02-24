@@ -164,6 +164,11 @@ Route::get('/admin/chatbot', function () {
     return view('admin.chatbot');
 })->name('admin.chatbot');
 
+Route::get('/admin/profile', function () {
+    return view('admin.profile');
+})->name('admin.profile');
+
+
 Route::get('/dashboard', function () {
     // Admin
     if (session('role') === 'admin' || session('admin_id')) {
