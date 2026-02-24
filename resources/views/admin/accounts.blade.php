@@ -1,8 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Accounts Coming Soon | RentConnect</title>
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Accounts
+        </h2>
+    </x-slot>
+
     <style>
         body {
             background: #f5f7fb;
@@ -29,15 +31,11 @@
             margin-top: 18px;
         }
     </style>
-</head>
-<body>
+
     <div class="coming-soon-container">
-        <div class="coming-soon-title">
-            Accounts Coming Soon
-        </div>
+        <div class="coming-soon-title">Accounts Coming Soon</div>
         <div class="coming-soon-text">
             This feature will be available soon. Stay tuned!
         </div>
     </div>
-</body>
-</html>
+</x-app-layout>
