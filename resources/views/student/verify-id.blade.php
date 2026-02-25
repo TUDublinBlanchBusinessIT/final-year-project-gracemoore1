@@ -243,7 +243,7 @@
     </div>
 
     <div class="subtitle">
-        Please upload a clear photo of your student ID
+        Please upload a clear photo of your passport / passport card 
     </div>
 
     <form method="POST" action="/student/verify-id">
