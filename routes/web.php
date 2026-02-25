@@ -84,9 +84,6 @@ Route::get('/home', [StudentRegisterController::class, 'dashboard'])
     ->name('student.dashboard');
 
 
-
-
-
 // STUDENT LOGIN
 Route::get('/student/login', function() {
     return view('student.login');
@@ -189,9 +186,6 @@ Route::get('/dashboard', function () {
 
 Route::post('/admin/partnerships', [App\Http\Controllers\PartnershipController::class, 'store'])->name('admin.partnerships.store');
 
-Route::get('/serviceprovider/dashboard', function () {
-    return view('serviceprovider.dashboard');
-})->name('serviceprovider.dashboard');
 
 
 
@@ -212,3 +206,38 @@ Route::get('/student/support', function () {
     
    return view('student.support');
 })->name('student.support');
+
+
+/* ===========================
+   SERVICE PROVIDER ROUTES
+   =========================== */
+
+Route::get('/serviceprovider/dashboard', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.dashboard');
+})->name('serviceprovider.dashboard');
+
+Route::get('/serviceprovider/upcoming', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.upcoming');
+})->name('serviceprovider.upcoming');
+
+Route::get('/serviceprovider/completed', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.completed');
+})->name('serviceprovider.completed');
+
+Route::get('/serviceprovider/requested', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.requested');
+})->name('serviceprovider.requested');
+
+Route::get('/serviceprovider/messages', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.messages');
+})->name('serviceprovider.messages');
+
+Route::get('/serviceprovider/profile', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.profile');
+})->name('serviceprovider.profile');

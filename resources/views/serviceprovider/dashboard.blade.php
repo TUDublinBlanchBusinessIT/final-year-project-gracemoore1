@@ -1,87 +1,125 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Service Provider Dashboard | RentConnect</title>
+{{-- resources/views/serviceprovider/dashboard.blade.php --}}
+<x-app-layout>
+    @php
+        // Use the session value exactly like your Admin dashboard
+        $spName = session('serviceprovider_firstname') ?? 'Service Provider';
+    @endphp
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    {{-- ====== PAGE HEADER ====== --}}
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Welcome to RentConnect, {{ $spName }}
+        </h2>
+    </x-slot>
 
+    {{-- ====== DASHBOARD STYLES (match Admin look) ====== --}}
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f5f7fb;
-            margin: 0;
-            padding: 0;
+            background: #f5f7fb !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .header {
-            background: rgb(38, 98, 227);
-            padding: 18px 30px;
-            color: white;
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .container {
-            margin: 40px auto;
-            width: 90%;
-            max-width: 900px;
-            background: white;
-            padding: 30px;
+        .sp-dashboard-container {
+            max-width: 900px;  /* same as admin */
+            margin: 30px auto;
+            background: #fff;
             border-radius: 14px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            padding: 40px 30px;
+            text-align: center;
+            overflow: hidden;
         }
 
-        h2 {
-            font-size: 26px;
-            margin-top: 0;
-            color: rgb(38, 98, 227);
-            font-weight: 700;
+        .icon-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            row-gap: 30px;
+            column-gap: 30px;
+            margin-top: 10px;
+            justify-content: center;
+            align-items: center;
         }
 
-        p {
-            font-size: 16px;
-            color: #555;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 20px;
-            background: rgb(38, 98, 227);
-            color: white;
-            border-radius: 8px;
+        .icon-card {
+            background: #f5f7fb;
+            border-radius: 12px;
+            padding: 26px 20px;
+            width: 100%;
+            height: 130px;
+            box-shadow: 0 2px 8px rgba(38,98,227,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: box-shadow 0.2s, transform 0.2s;
+            cursor: pointer;
             text-decoration: none;
-            font-weight: 600;
-            transition: 0.2s;
         }
 
-        .btn:hover {
-            background: #1f54b8;
+        .icon-card:hover {
+            box-shadow: 0 4px 16px rgba(38,98,227,0.12);
+            background: #eaf1fc;
+            transform: translateY(-2px);
+        }
+
+        .icon-card svg {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 10px;
+            color: rgb(38, 98, 227);
+        }
+
+        .icon-label {
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 700px) {
+            .icon-row { grid-template-columns: 1fr; row-gap: 16px; }
+            .icon-card { width: 90%; height: 130px; }
         }
     </style>
 
-</head>
-<body>
+    {{-- ====== DASHBOARD CONTENT (4 redirect tiles centered) ====== --}}
+    <div class="sp-dashboard-container">
+        <div class="icon-row">
 
-    <div class="header">
-        Service Provider Dashboard
+            {{-- Upcoming Jobs --}}
+            <a href="{{ route('serviceprovider.upcoming') }}" class="icon-card">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" fill="none"/>
+                    <path d="M8 2v4M16 2v4M3 10h18" stroke="currentColor"/>
+                </svg>
+                <div class="icon-label">Upcoming Jobs</div>
+            </a>
+
+            {{-- Completed Jobs --}}
+            <a href="{{ route('serviceprovider.completed') }}" class="icon-card">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 13l4 4L19 7" stroke="currentColor"/>
+                </svg>
+                <div class="icon-label">Completed Jobs</div>
+            </a>
+
+            {{-- Requested Jobs --}}
+            <a href="{{ route('serviceprovider.requested') }}" class="icon-card">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke="currentColor"/>
+                    <path d="M9 7h6M9 11h6M9 15h4" stroke="currentColor"/>
+                </svg>
+                <div class="icon-label">Requested Jobs</div>
+            </a>
+
+            {{-- Messages --}}
+            <a href="{{ route('serviceprovider.messages') }}" class="icon-card">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v10z" stroke="currentColor"/>
+                </svg>
+                <div class="icon-label">Messages</div>
+            </a>
+
+        </div>
     </div>
-
-    <div class="container">
-        <h2>Welcome to your dashboard!</h2>
-
-        <p>
-            You are logged in as a <strong>RentConnect Service Provider</strong>.
-            This dashboard will soon display your jobs, payments, notifications and more.
-        </p>
-
-        <p>
-            For now, this is just placeholder content so you can confirm the login system
-            works correctly for service providers.
-        </p>
-
-        <a href="{{ url('/') }}" class="btn">Return to Home</a>
-    </div>
-
-</body>
-</html>
+</x-app-layout>
