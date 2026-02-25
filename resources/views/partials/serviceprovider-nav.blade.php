@@ -8,13 +8,6 @@
     // Build nav items (always show on dashboard too)
     $items = [
         [
-            'label' => 'Dashboard',
-            'route' => 'serviceprovider.dashboard',
-            'active'=> request()->routeIs('serviceprovider.dashboard'),
-            'exists'=> Route::has('serviceprovider.dashboard'),
-            'svg'   => 'home',
-        ],
-        [
             'label' => 'Upcoming Jobs',
             'route' => 'serviceprovider.upcoming',
             'active'=> request()->routeIs('serviceprovider.upcoming'),
