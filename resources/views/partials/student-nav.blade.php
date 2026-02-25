@@ -61,9 +61,9 @@
             🛟 <span class="font-semibold">Support</span>
         </a>
 
-        <a href="{{ route('student.profile') }}"
+        <a href="{{ route('student.profile.new') }}"
            class="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition
-           {{ request()->routeIs('student.profile') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+           {{ request()->routeIs('student.profile.new') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
             👤 <span class="font-semibold">Profile</span>
         </a>
 
@@ -92,9 +92,9 @@
             🛟 <span class="text-[11px] font-semibold">Support</span>
         </a>
 
-        <a href="{{ route('student.profile') }}"
+        <a href="{{ route('student.profile.new') }}"
            class="flex flex-col items-center justify-center gap-1 w-20 py-2 rounded-xl transition
-           {{ request()->routeIs('student.profile') ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:text-slate-900' }}">
+           {{ request()->routeIs('student.profile.new') ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:text-slate-900' }}">
             👤 <span class="text-[11px] font-semibold">Profile</span>
         </a>
 

@@ -292,8 +292,55 @@ class StudentRegisterController extends Controller
         $listings = [];  
         return view('student.dashboard', compact('listings'));
     }
+    public function studentProfile()
+    {
+        if (!session()->has('student_id')) return redirect('/student/login');
+        return view('student.profile-new');
+    }
+
+    public function studentProfileApplications()
+    {
+        if (!session()->has('student_id')) return redirect('/student/login');
+
+        $pending = [];
+        $accepted = [];
+        $rejected = [];
+
+        return view('student.profile-applications', compact('pending','accepted','rejected'));
+    }
+
+    public function studentProfileAccount()
+    {
+        if (!session()->has('student_id')) return redirect('/student/login');
+
+        $student = Student::find(session('student_id'));
+        return view('student.profile-account', compact('student'));
+    }
+
+    public function studentResetPassword(Request $request)
+    {
+        if (!session()->has('student_id')) return redirect('/student/login');
+
+        $request->validate([
+            'password' => 'required|confirmed|min:6'
+        ]);
+
+        $student = Student::find(session('student_id'));
+        $student->password = Hash::make($request->password);
+        $student->save();
+
+        return back()->with('success', 'Password updated.');
+    }
+
+    public function studentDeleteAccount()
+    {
+        if (!session()->has('student_id')) return redirect('/student/login');
+
+        $student = Student::find(session('student_id'));
+        $student->delete();
+
+        session()->forget('student_id');
+
+        return redirect('/')->with('success', 'Account deleted.');
+    }
 }
-
-
-
-

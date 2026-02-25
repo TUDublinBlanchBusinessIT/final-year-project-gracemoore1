@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
 
 use App\Http\Controllers\ProfileController;
 
@@ -25,11 +23,6 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Models\Listing;
 use App\Http\Controllers\Landlord\LandlordRentalController;
-use App\Http\Controllers\PartnershipController;
-
-
-
-
 
 Route::get('/landlord/register', [LandlordRegisterController::class, 'create'])
     ->name('landlord.register.show');
@@ -54,25 +47,24 @@ Route::post('/landlord/verify-id', [LandlordOCRController::class, 'verify'])
 Route::post('/landlord/resend-code', [LandlordCodeVerificationController::class, 'resend'])
     ->name('landlord.verify.email.resend');
 
-Route::middleware(['landlord'])
-    ->prefix('landlord')
-    ->name('landlord.')
-    ->group(function () {
+Route::middleware(['auth'])->group(function () {
 
-        Route::get('/dashboard', fn () => view('landlord.dashboard'))->name('dashboard');
+    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
 
-        Route::get('/rentals', [LandlordRentalController::class, 'index'])->name('rentals.index');
-        Route::get('/rentals/create', [LandlordRentalController::class, 'create'])->name('rentals.create');
-        Route::post('/rentals', [LandlordRentalController::class, 'store'])->name('rentals.store');
-        Route::get('/rentals/{rental}/edit', [LandlordRentalController::class, 'edit'])->name('rentals.edit');
-        Route::put('/rentals/{rental}', [LandlordRentalController::class, 'update'])->name('rentals.update');
-        Route::delete('/rentals/{rental}', [LandlordRentalController::class, 'destroy'])->name('rentals.destroy');
-    });
+    Route::get('/messages', fn () => view('landlord.messages'))->name('messages');
 
+    Route::get('/landlord-support', fn () => view('landlord.support'))->name('landlord.support');
 
-Route::middleware(['landlord'])->group(function () {
-    Route::get('/landlord/messages', fn () => view('landlord.messages'))->name('messages');
-    Route::get('/landlord/support', fn () => view('landlord.support'))->name('landlord.support');
+    // Breeze usually already has profile routes, keep as-is
+});
+
+Route::middleware(['auth', 'verified'])->prefix('landlord')->name('landlord.')->group(function () {
+    Route::get('/rentals', [LandlordRentalController::class, 'index'])->name('rentals.index');
+    Route::get('/rentals/create', [LandlordRentalController::class, 'create'])->name('rentals.create');
+    Route::post('/rentals', [LandlordRentalController::class, 'store'])->name('rentals.store');
+    Route::get('/rentals/{rental}/edit', [LandlordRentalController::class, 'edit'])->name('rentals.edit');
+    Route::put('/rentals/{rental}', [LandlordRentalController::class, 'update'])->name('rentals.update');
+    Route::delete('/rentals/{rental}', [LandlordRentalController::class, 'destroy'])->name('rentals.destroy');
 });
 
 Route::get('/', function () {
@@ -165,41 +157,9 @@ Route::get('/admin/partnerships', function () {
     return view('admin.partnerships');
 })->name('admin.partnerships');
 
-Route::post('/admin/partnerships', [PartnershipController::class, 'store'])
-    ->name('admin.partnerships.store');
-
 Route::get('/admin/chatbot', function () {
     return view('admin.chatbot');
 })->name('admin.chatbot');
-
-//Route::post('/admin/partnerships', [AdminDashboardController::class, 'storePartnership'])
-    //->name('admin.partnerships.store');
-
-//Route::get('/dashboard', function () {
-    // Admin
-    //if (session('role') === 'admin' || session('admin_id')) {
-        //return redirect()->route('admin.dashboard');
-    //}
-    // Student
-    //if (session('student_id')) {
-        //return redirect()->route('student.dashboard');
-    //}
-    // Not logged in
-    //return redirect()->route('login');
-    //})->name('dashboard');
-
-    //Route::post('/logout', function () {
-    //session()->flush();
-    //return redirect('/login');
-//})->name('logout');
-
-//Route::post('/admin/partnerships', [App\Http\Controllers\PartnershipController::class, 'store'])->name('admin.partnerships.store');
-
-//Route::get('/serviceprovider/dashboard', function () {
-    //return view('serviceprovider.dashboard');
-//})->name('serviceprovider.dashboard');
-
-
 
 Route::get('/admin/profile', function () {
     return view('admin.profile');
@@ -207,22 +167,16 @@ Route::get('/admin/profile', function () {
 
 
 Route::get('/dashboard', function () {
-    // Admin (your custom session)
+    // Admin
     if (session('role') === 'admin' || session('admin_id')) {
         return redirect()->route('admin.dashboard');
     }
-
-    // Student (your custom session)
+    // Student
     if (session('student_id')) {
         return redirect()->route('student.dashboard');
     }
 
-    // Breeze-authenticated user (normal user / landlord / service provider)
-    if (Auth::check()) {
-        return view('landlord.dashboard');
-    }
-
-    // Not logged in at all
+    // Not logged in
     return redirect()->route('login');
     })->name('dashboard');
 
@@ -243,16 +197,30 @@ Route::get('/student/messages', function () {
     return view('student.messages');
 })->name('student.messages');
 
-Route::get('/student/profile', function () {
-    if (!session('student_id')) return redirect('/student/login');
-    return view('student.profile');
-})->name('student.profile');
-
 Route::get('/student/support', function () {
     if (!session('student_id')) return redirect('/student/login');
     
    return view('student.support');
 })->name('student.support');
+
+// STUDENT PROFILE (ADD-ONLY, SAFE)
+Route::prefix('student/profile-new')->group(function () {
+
+    Route::get('/', [StudentRegisterController::class, 'studentProfile'])
+        ->name('student.profile.new');
+
+    Route::get('/applications', [StudentRegisterController::class, 'studentProfileApplications'])
+        ->name('student.profile.new.applications');
+
+    Route::get('/account', [StudentRegisterController::class, 'studentProfileAccount'])
+        ->name('student.profile.new.account');
+
+    Route::post('/reset-password', [StudentRegisterController::class, 'studentResetPassword'])
+        ->name('student.profile.new.resetpassword');
+
+    Route::post('/delete-account', [StudentRegisterController::class, 'studentDeleteAccount'])
+        ->name('student.profile.new.delete');
+});
 
 
 /* ===========================
