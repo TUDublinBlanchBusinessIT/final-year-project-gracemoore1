@@ -11,8 +11,8 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         .form-container {
-            max-width: 500px;
-            margin: 80px auto;
+            max-width: 1000px;
+            margin: 5px auto;
             background: #fff;
             border-radius: 14px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
@@ -53,6 +53,7 @@
         .checkbox-group label {
             margin: 0;
             font-weight: 400;
+            font-size: 12px;
             line-height: 1.35;
         }
         .btn {
@@ -80,7 +81,6 @@
     </style>
 
     <div class="form-container">
-        <div class="form-title">Add Partnership</div>
 
         @if(session('success'))
             <div class="success-popup">{{ session('success') }}</div>
@@ -174,7 +174,7 @@
             <div class="checkbox-group">
                 <input type="checkbox" name="verification" id="verification" value="1" required>
                 <label for="verification">
-                    All verification and background checks for this partnership have been successfully completed.
+                    All verification and background checks for this partnership have been successfully completed with the partnership fee structure being fully agreed upon and approved by both parties.
                     This company is now approved as an official RentConnect partner and has accepted the platform’s
                     terms and conditions.
                 </label>

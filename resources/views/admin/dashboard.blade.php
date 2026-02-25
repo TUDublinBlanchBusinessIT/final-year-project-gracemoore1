@@ -10,9 +10,10 @@
             background: #f5f7fb !important;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
+
         .admin-dashboard-container {
-            max-width: 900px;
-            margin: 40px auto;
+            max-width: 900px;               /* matches large admin card style */
+            margin: 30px auto;              /* smaller top gap as requested */
             background: #fff;
             border-radius: 14px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
@@ -20,48 +21,68 @@
             text-align: center;
             overflow: hidden;
         }
-        .dashboard-title {
-            font-size: 30px;
-            font-weight: 800;
-            color: rgb(38, 98, 227);
-            margin-bottom: 10px;
-        }
+
         .icon-row {
             display: grid;
-            grid-template-columns: repeat(2, 160px);
-            grid-template-rows: repeat(2, auto);
-            column-gap: 70px;
+            grid-template-columns: repeat(2, 1fr);   /* keeps 2x2 layout */
             row-gap: 30px;
-            margin-top: 32px;
+            column-gap: 30px;
+            margin-top: 10px;
             justify-content: center;
             align-items: center;
         }
+
+        /* 🔵 UPDATED: rectangle shape instead of square */
         .icon-card {
             background: #f5f7fb;
             border-radius: 12px;
-            padding: 32px 24px 18px 24px;
-            width: 160px;
+            padding: 26px 20px;
+            width: 100%;                     /* fills column width */
+            height: 130px;                   /* rectangle shape */
             box-shadow: 0 2px 8px rgba(38,98,227,0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: box-shadow 0.2s;
+            justify-content: center;
+            transition: box-shadow 0.2s, transform 0.2s;
             cursor: pointer;
             text-decoration: none;
         }
-        .icon-card:hover { box-shadow: 0 4px 16px rgba(38,98,227,0.12); background: #eaf1fc; }
-        .icon-card svg { width: 48px; height: 48px; margin-bottom: 16px; color: rgb(38, 98, 227); }
-        .icon-label { font-size: 17px; font-weight: 600; color: #333; margin-top: 8px; }
+
+        .icon-card:hover {
+            box-shadow: 0 4px 16px rgba(38,98,227,0.12);
+            background: #eaf1fc;
+            transform: translateY(-2px);
+        }
+
+        .icon-card svg {
+            width: 40px;     /* smaller for rectangle proportions */
+            height: 40px;
+            margin-bottom: 10px;
+            color: rgb(38, 98, 227);
+        }
+
+        .icon-label {
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 6px;
+        }
+
         @media (max-width: 700px) {
-            .icon-row { grid-template-columns: 1fr; grid-template-rows: auto; column-gap: 0; row-gap: 16px; justify-content: center; }
-            .icon-card { width: 90%; }
+            .icon-row {
+                grid-template-columns: 1fr;
+                row-gap: 16px;
+            }
+            .icon-card {
+                width: 90%;
+                height: 130px;
+            }
         }
     </style>
 
     <div class="admin-dashboard-container">
-        <div class="dashboard-title">
-            Quick actions
-        </div>
+        {{-- ⭐ User requested: REMOVE "Quick actions" title --}}
 
         <div class="icon-row">
             <a href="{{ route('admin.reports') }}" class="icon-card">
