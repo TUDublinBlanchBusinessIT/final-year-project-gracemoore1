@@ -54,8 +54,6 @@ Route::post('/landlord/verify-id', [LandlordOCRController::class, 'verify'])
 Route::post('/landlord/resend-code', [LandlordCodeVerificationController::class, 'resend'])
     ->name('landlord.verify.email.resend');
 
-
-
 Route::middleware(['landlord'])
     ->prefix('landlord')
     ->name('landlord.')
@@ -77,13 +75,9 @@ Route::middleware(['landlord'])->group(function () {
     Route::get('/landlord/support', fn () => view('landlord.support'))->name('landlord.support');
 });
 
-
-
 Route::get('/', function () {
     return view('welcome');
 });
-
-
 
 Route::get('/student/register', [StudentRegisterController::class, 'showForm']);
 Route::post('/student/register', [StudentRegisterController::class, 'register']);
@@ -97,6 +91,7 @@ Route::post('/student/verify-id', [StudentRegisterController::class, 'verifyId']
 Route::get('/home', [StudentRegisterController::class, 'dashboard'])
     ->name('student.dashboard');
 
+
 // STUDENT LOGIN
 Route::get('/student/login', function() {
     return view('student.login');
@@ -104,7 +99,6 @@ Route::get('/student/login', function() {
 
 Route::post('/student/login', [AuthenticatedSessionController::class, 'storeStudent'])
     ->name('student.login');
-
 
 Route::get('/student/forgot-password', [StudentPasswordResetController::class, 'showForgot'])
     ->name('student.password.request');
@@ -118,14 +112,9 @@ Route::get('/student/reset-password/{token}', [StudentPasswordResetController::c
 Route::post('/student/reset-password', [StudentPasswordResetController::class, 'resetPassword'])
     ->name('student.password.update');
 
-
-
 Route::get('/verify-email', function () {
     return view('auth.verify-email');
 })->name('verification.notice');
-
-
-
 
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])
     ->name('login');
@@ -133,9 +122,6 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
 require __DIR__.'/auth.php';
-
-
-
 
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
@@ -150,9 +136,6 @@ Route::get('/reset-password/{token}', function ($token) {
 
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
     ->name('password.email');
-
-
-
 
 Route::middleware('auth')->group(function () {
 
@@ -218,6 +201,11 @@ Route::get('/admin/chatbot', function () {
 
 
 
+Route::get('/admin/profile', function () {
+    return view('admin.profile');
+})->name('admin.profile');
+
+
 Route::get('/dashboard', function () {
     // Admin (your custom session)
     if (session('role') === 'admin' || session('admin_id')) {
@@ -236,4 +224,67 @@ Route::get('/dashboard', function () {
 
     // Not logged in at all
     return redirect()->route('login');
-})->middleware(['auth'])->name('dashboard');
+    })->name('dashboard');
+
+    Route::post('/logout', function () {
+    session()->flush();
+    return redirect('/login');
+})->name('logout');
+
+Route::post('/admin/partnerships', [App\Http\Controllers\PartnershipController::class, 'store'])->name('admin.partnerships.store');
+
+
+
+
+
+
+Route::get('/student/messages', function () {
+    if (!session('student_id')) return redirect('/student/login');
+    return view('student.messages');
+})->name('student.messages');
+
+Route::get('/student/profile', function () {
+    if (!session('student_id')) return redirect('/student/login');
+    return view('student.profile');
+})->name('student.profile');
+
+Route::get('/student/support', function () {
+    if (!session('student_id')) return redirect('/student/login');
+    
+   return view('student.support');
+})->name('student.support');
+
+
+/* ===========================
+   SERVICE PROVIDER ROUTES
+   =========================== */
+
+Route::get('/serviceprovider/dashboard', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.dashboard');
+})->name('serviceprovider.dashboard');
+
+Route::get('/serviceprovider/upcoming', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.upcoming');
+})->name('serviceprovider.upcoming');
+
+Route::get('/serviceprovider/completed', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.completed');
+})->name('serviceprovider.completed');
+
+Route::get('/serviceprovider/requested', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.requested');
+})->name('serviceprovider.requested');
+
+Route::get('/serviceprovider/messages', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.messages');
+})->name('serviceprovider.messages');
+
+Route::get('/serviceprovider/profile', function () {
+    if (!session('serviceprovider_id')) return redirect('/login');
+    return view('serviceprovider.profile');
+})->name('serviceprovider.profile');

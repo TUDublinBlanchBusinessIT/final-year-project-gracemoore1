@@ -1,16 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Add Partnership | RentConnect</title>
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Add Partnership
+        </h2>
+    </x-slot>
+
     <style>
         body {
             background: #f5f7fb;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         .form-container {
-            max-width: 500px;
-            margin: 80px auto;
+            max-width: 1000px;
+            margin: 5px auto;
             background: #fff;
             border-radius: 14px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
@@ -23,14 +25,8 @@
             margin-bottom: 24px;
             text-align: center;
         }
-        .form-group {
-            margin-bottom: 18px;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; }
         input, select {
             width: 100%;
             padding: 10px;
@@ -38,14 +34,27 @@
             border: 1px solid #d0d5dd;
             font-size: 16px;
         }
+        /* Checkbox alignment & visibility fix */
         .checkbox-group {
             display: flex;
-            align-items: flex-start;
-            margin-bottom: 18px;
+            align-items: center;
+            gap: 10px;
+            margin: 12px 0 18px;
         }
         .checkbox-group input[type="checkbox"] {
-            margin-right: 10px;
-            margin-top: 3px;
+            width: 18px;
+            height: 18px;
+            appearance: auto;
+            -webkit-appearance: auto;
+            accent-color: rgb(38, 98, 227);
+            flex-shrink: 0;
+            margin: 0; /* reset previous top/right margins */
+        }
+        .checkbox-group label {
+            margin: 0;
+            font-weight: 400;
+            font-size: 12px;
+            line-height: 1.35;
         }
         .btn {
             background: rgb(38, 98, 227);
@@ -59,11 +68,7 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        .error {
-            color: #d32f2f;
-            font-size: 15px;
-            margin-bottom: 10px;
-        }
+        .error { color: #d32f2f; font-size: 15px; margin-bottom: 10px; }
         .success-popup {
             background: #e6f4ea;
             color: #256029;
@@ -74,10 +79,8 @@
             text-align: center;
         }
     </style>
-</head>
-<body>
+
     <div class="form-container">
-        <div class="form-title">Add Partnership</div>
 
         @if(session('success'))
             <div class="success-popup">{{ session('success') }}</div>
@@ -167,16 +170,20 @@
                 <input type="number" name="monthly_fee" id="monthly_fee" min="0" step="0.01" placeholder="Enter monthly fee in euro">
             </div>
 
+            {{-- Checkbox correctly aligned and visible under the fee section --}}
             <div class="checkbox-group">
                 <input type="checkbox" name="verification" id="verification" value="1" required>
-                <label for="verification" style="font-weight:400;">
-                    All verification and background checks for this partnership have been successfully completed. This company is now approved as an official RentConnect partner and has accepted the platform’s terms and conditions.
+                <label for="verification">
+                    All verification and background checks for this partnership have been successfully completed with the partnership fee structure being fully agreed upon and approved by both parties.
+                    This company is now approved as an official RentConnect partner and has accepted the platform’s
+                    terms and conditions.
                 </label>
             </div>
 
             <button type="submit" class="btn">Create Account</button>
         </form>
     </div>
+
     <script>
         function toggleFeeInput() {
             var feeType = document.getElementById('fee_type').value;
@@ -184,5 +191,4 @@
             document.getElementById('monthly_fee_group').style.display = (feeType === 'monthly_fee') ? 'block' : 'none';
         }
     </script>
-</body>
-</html>
+</x-app-layout>
