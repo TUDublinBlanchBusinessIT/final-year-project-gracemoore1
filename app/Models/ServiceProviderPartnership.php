@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceProviderPartnership extends Model
 {
-    protected $table = 'serviceproviderpartnership'; // or your exact table name
+    protected $table = 'serviceproviderpartnership'; 
+    protected $guarded = [];
 
     public $timestamps = false;
 

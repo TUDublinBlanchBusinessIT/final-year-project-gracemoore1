@@ -10,4 +10,11 @@ class AdminDashboardController extends Controller
     {
         return view('admin.dashboard');
     }
+
+    public function storePartnership(Request $request)
+    {
+        // Temporary placeholder so the form submits without breaking anything
+        // Grace your logic will be here later 
+        return back()->with('success', 'Partnership submitted.');
+    }
 }

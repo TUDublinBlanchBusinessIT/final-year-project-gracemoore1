@@ -25,6 +25,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Models\Listing;
 use App\Http\Controllers\Landlord\LandlordRentalController;
+use App\Http\Controllers\PartnershipController;
 
 
 
@@ -181,9 +182,15 @@ Route::get('/admin/partnerships', function () {
     return view('admin.partnerships');
 })->name('admin.partnerships');
 
+Route::post('/admin/partnerships', [PartnershipController::class, 'store'])
+    ->name('admin.partnerships.store');
+
 Route::get('/admin/chatbot', function () {
     return view('admin.chatbot');
 })->name('admin.chatbot');
+
+//Route::post('/admin/partnerships', [AdminDashboardController::class, 'storePartnership'])
+    //->name('admin.partnerships.store');
 
 //Route::get('/dashboard', function () {
     // Admin
