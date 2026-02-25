@@ -39,7 +39,7 @@
                 </div>
             </div>
 
-            {{-- Update Password (with Current Password) --}}
+            {{-- Update Password (POST: immediate in-app change) --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium text-gray-900">Update Password</h3>
                 <p class="mt-1 text-sm text-gray-600">
@@ -48,7 +48,7 @@
 
                 <form method="post" action="{{ route('student.profile.new.resetpassword') }}" class="mt-6 space-y-4">
                     @csrf
-                    @method('patch')
+                    {{-- NO @method('patch') because the route is POST --}}
 
                     {{-- Current Password --}}
                     <div>
@@ -100,7 +100,7 @@
                         </button>
 
                         @if (session('status') === 'password-updated')
-                            <p class="text-sm text-gray-600">Saved.</p>
+                            <p class="text-sm text-green-700">Saved.</p>
                         @endif
                     </div>
                 </form>
@@ -116,7 +116,7 @@
 
                 <form method="post" action="{{ route('student.profile.new.delete') }}" class="mt-6">
                     @csrf
-                    @method('delete')
+                    {{-- NO @method('delete') because your route is POST /student/profile-new/delete-account --}}
 
                     <button type="submit"
                             onclick="return confirm('Are you sure? This cannot be undone.')"

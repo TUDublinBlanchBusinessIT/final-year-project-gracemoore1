@@ -317,28 +317,64 @@ class StudentRegisterController extends Controller
         return view('student.profile-account', compact('student'));
     }
 
+
+    
     public function studentResetPassword(Request $request)
     {
-        if (!session()->has('student_id')) return redirect('/student/login');
+        if (!session()->has('student_id')) {
+            return redirect('/student/login');
+        }
 
         $request->validate([
-            'password' => 'required|confirmed|min:6'
+            'current_password' => ['required'],
+            'password'         => ['required', 'confirmed', 'min:6'],
         ]);
 
         $student = Student::find(session('student_id'));
-        $student->password = Hash::make($request->password);
+        if (!$student) {
+            return back()->withErrors(['current_password' => 'Student not found.']);
+        }
+
+        
+        if (!Hash::check($request->input('current_password'), $student->password)) {
+            return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+        }
+
+        // Update immediately
+        $student->password = Hash::make($request->input('password'));
         $student->save();
 
-        return back()->with('success', 'Password updated.');
+        // Optional safety: rotate session ID after credential change
+        $request->session()->regenerate();
+
+        // This matches your Blade check: session('status') === 'password-updated'
+        return back()->with('status', 'password-updated');
     }
+
+
+    //public function studentResetPassword(Request $request)
+    //{
+      //  if (!session()->has('student_id')) return redirect('/student/login');
+
+        //$request->validate([
+          //  'password' => 'required|confirmed|min:6'
+        //]);
+
+        //$student = Student::find(session('student_id'));
+        //$student->password = Hash::make($request->password);
+        //$student->save();
+
+        //return back()->with('success', 'Password updated.');
+    //}
 
     public function studentDeleteAccount()
     {
         if (!session()->has('student_id')) return redirect('/student/login');
 
         $student = Student::find(session('student_id'));
-        $student->delete();
-
+        if ($student) {
+            $student->delete();
+        }
         session()->forget('student_id');
 
         return redirect('/')->with('success', 'Account deleted.');
