@@ -7,13 +7,13 @@
         RentConnect
     </div> -->
 
-    {{-- User dropdown (moved from top nav) --}}
-    <div class="mt-3">
+    {{-- User dropdown --}}
+    <div class="mt-2">
         <x-dropdown align="left" width="48">
             <x-slot name="trigger">
                 <button type="button"
-                    class="w-full flex items-center justify-between gap-2 rounded-xl px-3 py-2
-                           text-blue-600 font-semibold text-sm hover:bg-blue-50 transition">
+                    class="w-full flex items-center justify-between gap-2 rounded-xl px-3 py-1
+                           text-blue-600 font-semibold text-lg font-bold hover:bg-blue-50 transition">
                     <span class="truncate">{{ Auth::user()->name }}</span>
 
                     <svg class="h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
