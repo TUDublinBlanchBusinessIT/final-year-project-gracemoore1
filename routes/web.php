@@ -67,6 +67,11 @@ Route::middleware(['auth', 'verified'])->prefix('landlord')->name('landlord.')->
     Route::delete('/rentals/{rental}', [LandlordRentalController::class, 'destroy'])->name('rentals.destroy');
 });
 
+Route::get('/landlord/dashboard', function () {
+    if (!session('landlord_id')) return redirect('/login');
+    return view('landlord.dashboard');
+})->name('landlord.dashboard');
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -175,6 +180,12 @@ Route::get('/dashboard', function () {
     if (session('student_id')) {
         return redirect()->route('student.dashboard');
     }
+    
+    // Landlord
+    if (session('landlord_id')) {
+        return redirect()->route('landlord.dashboard');
+    }
+
 
     // Not logged in
     return redirect()->route('login');

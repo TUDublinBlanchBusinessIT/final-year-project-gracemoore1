@@ -1,25 +1,88 @@
 <x-app-layout>
-    <div class="bg-white p-6 rounded-xl shadow-sm max-w-3xl mx-auto">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        {{-- Profile heading --}}
+        <h1 class="text-2xl font-bold text-slate-900">Profile</h1>
 
-        <h2 class="text-2xl font-bold text-slate-900">Your Applications</h2>
+        {{-- Sub-nav: text links side-by-side, underline active --}}
+        <nav class="mt-3 border-b border-slate-200">
+            <ul class="flex gap-6 text-sm">
+                <li>
+                    <a href="{{ route('student.profile.new.applications') }}"
+                       class="{{ request()->routeIs('student.profile.new.applications')
+                            ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
+                            : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
+                        Applications
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('student.profile.new.account') }}"
+                       class="{{ request()->routeIs('student.profile.new.account')
+                            ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
+                            : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
+                        Account details
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-        <!-- Pending -->
-        <h3 class="text-xl font-semibold text-blue-600 mt-6">Pending</h3>
-        @if(count($pending) == 0)
-            <p class="text-gray-500">No pending applications.</p>
-        @endif
+        {{-- CONTENT: Applications (cards styled like landlord) --}}
+        <div class="mt-6 space-y-6">
+            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                <h2 class="text-lg font-medium text-gray-900">Your Applications</h2>
 
-        <!-- Accepted -->
-        <h3 class="text-xl font-semibold text-green-600 mt-6">Accepted</h3>
-        @if(count($accepted) == 0)
-            <p class="text-gray-500">No accepted applications.</p>
-        @endif
+                <div class="mt-6">
+                    {{-- Pending --}}
+                    <h3 class="text-base font-semibold text-blue-600">Pending</h3>
+                    @if(count($pending) === 0)
+                        <p class="text-gray-500 mt-1">No pending applications.</p>
+                    @else
+                        <div class="mt-3 space-y-3">
+                            @foreach($pending as $app)
+                                <div class="p-3 border rounded-lg">
+                                    <p class="font-semibold">{{ $app->title ?? 'Application' }}</p>
+                                    <p class="text-sm text-gray-600">
+                                        Submitted: {{ optional($app->created_at)->format('d M Y') }}
+                                    </p>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
 
-        <!-- Rejected -->
-        <h3 class="text-xl font-semibold text-red-600 mt-6">Rejected</h3>
-        @if(count($rejected) == 0)
-            <p class="text-gray-500">No rejected applications.</p>
-        @endif
+                    {{-- Accepted --}}
+                    <h3 class="text-base font-semibold text-green-600 mt-6">Accepted</h3>
+                    @if(count($accepted) === 0)
+                        <p class="text-gray-500 mt-1">No accepted applications.</p>
+                    @else
+                        <div class="mt-3 space-y-3">
+                            @foreach($accepted as $app)
+                                <div class="p-3 border rounded-lg">
+                                    <p class="font-semibold">{{ $app->title ?? 'Application' }}</p>
+                                    <p class="text-sm text-gray-600">
+                                        Decision date: {{ optional($app->updated_at)->format('d M Y') }}
+                                    </p>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
 
+                    {{-- Rejected --}}
+                    <h3 class="text-base font-semibold text-red-600 mt-6">Rejected</h3>
+                    @if(count($rejected) === 0)
+                        <p class="text-gray-500 mt-1">No rejected applications.</p>
+                    @else
+                        <div class="mt-3 space-y-3">
+                            @foreach($rejected as $app)
+                                <div class="p-3 border rounded-lg">
+                                    <p class="font-semibold">{{ $app->title ?? 'Application' }}</p>
+                                    <p class="text-sm text-gray-600">
+                                        Decision date: {{ optional($app->updated_at)->format('d M Y') }}
+                                    </p>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
     </div>
 </x-app-layout>
