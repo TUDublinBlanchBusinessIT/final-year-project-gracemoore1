@@ -9,16 +9,16 @@
                 <li>
                     <a href="{{ route('student.profile.new.applications') }}"
                        class="{{ request()->routeIs('student.profile.new.applications')
-                            ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
-                            : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
+                                ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
+                                : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
                         Applications
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('student.profile.new.account') }}"
                        class="{{ request()->routeIs('student.profile.new.account')
-                            ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
-                            : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
+                                ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
+                                : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
                         Account details
                     </a>
                 </li>
@@ -27,6 +27,7 @@
 
         {{-- CONTENT: Account details (landlord-style cards, only specified fields) --}}
         <div class="mt-6 space-y-6">
+
             {{-- Read-only details --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <h2 class="text-lg font-medium text-gray-900">Account details</h2>
@@ -38,29 +39,60 @@
                 </div>
             </div>
 
-            {{-- Update password --}}
+            {{-- Update Password (with Current Password) --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium text-gray-900">Update Password</h3>
                 <p class="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay secure.
+                    Enter your current password, then choose a new password.
                 </p>
 
                 <form method="post" action="{{ route('student.profile.new.resetpassword') }}" class="mt-6 space-y-4">
                     @csrf
                     @method('patch')
 
+                    {{-- Current Password --}}
+                    <div>
+                        <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
+                        <input id="current_password"
+                               name="current_password"
+                               type="password"
+                               required
+                               autocomplete="current-password"
+                               class="mt-1 block w-full border border-slate-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
+                        @error('current_password')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- New Password --}}
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">New Password</label>
-                        <input id="password" name="password" type="password" required autocomplete="new-password"
+                        <input id="password"
+                               name="password"
+                               type="password"
+                               required
+                               autocomplete="new-password"
                                class="mt-1 block w-full border border-slate-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
+                        @error('password')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
+                    {{-- Confirm New Password --}}
                     <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password"
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                        <input id="password_confirmation"
+                               name="password_confirmation"
+                               type="password"
+                               required
+                               autocomplete="new-password"
                                class="mt-1 block w-full border border-slate-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
+                        @error('password_confirmation')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
+                    {{-- Submit --}}
                     <div class="flex items-center gap-4">
                         <button type="submit"
                                 class="inline-flex items-center px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 font-semibold">
@@ -93,6 +125,7 @@
                     </button>
                 </form>
             </div>
+
         </div>
     </div>
 </x-app-layout>
