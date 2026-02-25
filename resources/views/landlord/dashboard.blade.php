@@ -2,12 +2,12 @@
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Dashboard
+            Home
         </h2>
     </x-slot>
 
     {{-- IMPORTANT: This wrapper makes the dashboard respect the landlord sidebar (lg) and bottom nav (mobile) --}}
-    <div class="pb-28 lg:pl-60">
+    <div class="pb-28 lg:pl-70">
 
 
         <div>
