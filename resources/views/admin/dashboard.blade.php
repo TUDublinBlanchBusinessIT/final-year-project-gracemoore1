@@ -1,17 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard | RentConnect</title>
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Welcome to RentConnect, {{ session('admin_firstname') ?? 'Administrator' }}
+        </h2>
+    </x-slot>
+
     <style>
         body {
-            background: #f5f7fb;
+            background: #f5f7fb !important;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         .admin-dashboard-container {
-            max-width: 900px;
-            margin: 40px auto;
+            max-width: 900px;               /* matches large admin card style */
+            margin: 30px auto;              /* smaller top gap as requested */
             background: #fff;
             border-radius: 14px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
@@ -20,35 +22,29 @@
             overflow: hidden;
         }
 
-        .dashboard-title {
-            font-size: 30px;
-            font-weight: 800;
-            color: rgb(38, 98, 227);
-            margin-bottom: 10px;
-        }
-
-/* FIXED: Even 2x2 grid layout */
         .icon-row {
             display: grid;
-            grid-template-columns: repeat(2, 160px); /* Fixed width for cards */
-            grid-template-rows: repeat(2, auto);
-            column-gap: 70px;   /* Large horizontal gap between columns */
-            row-gap: 30px;      /* Small vertical gap between rows */
-            margin-top: 32px;
-            justify-content: center; /* Centre the grid horizontally */
+            grid-template-columns: repeat(2, 1fr);   /* keeps 2x2 layout */
+            row-gap: 30px;
+            column-gap: 30px;
+            margin-top: 10px;
+            justify-content: center;
             align-items: center;
         }
 
+        /* 🔵 UPDATED: rectangle shape instead of square */
         .icon-card {
             background: #f5f7fb;
             border-radius: 12px;
-            padding: 32px 24px 18px 24px;
-            width: 160px;
+            padding: 26px 20px;
+            width: 100%;                     /* fills column width */
+            height: 130px;                   /* rectangle shape */
             box-shadow: 0 2px 8px rgba(38,98,227,0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: box-shadow 0.2s;
+            justify-content: center;
+            transition: box-shadow 0.2s, transform 0.2s;
             cursor: pointer;
             text-decoration: none;
         }
@@ -56,12 +52,13 @@
         .icon-card:hover {
             box-shadow: 0 4px 16px rgba(38,98,227,0.12);
             background: #eaf1fc;
+            transform: translateY(-2px);
         }
 
         .icon-card svg {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 16px;
+            width: 40px;     /* smaller for rectangle proportions */
+            height: 40px;
+            margin-bottom: 10px;
             color: rgb(38, 98, 227);
         }
 
@@ -69,55 +66,49 @@
             font-size: 17px;
             font-weight: 600;
             color: #333;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
-/* FIXED: Perfect mobile behaviour */
         @media (max-width: 700px) {
             .icon-row {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto;
-                column-gap: 0;
                 row-gap: 16px;
-                justify-content: center;
             }
             .icon-card {
                 width: 90%;
+                height: 130px;
             }
         }
     </style>
-</head>
-<body>
+
     <div class="admin-dashboard-container">
-        <div class="dashboard-title">
-            Welcome to RentConnect, {{ session('admin_firstname') ?? 'Administrator' }}
-        </div>
+        {{-- ⭐ User requested: REMOVE "Quick actions" title --}}
+
         <div class="icon-row">
             <a href="{{ route('admin.reports') }}" class="icon-card">
-                <!-- Reports Icon -->
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" fill="none"/>
                     <path d="M7 8h10M7 12h6M7 16h4" stroke="currentColor"/>
                 </svg>
                 <div class="icon-label">Reports</div>
             </a>
+
             <a href="{{ route('admin.accounts') }}" class="icon-card">
-                <!-- Accounts Icon -->
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <circle cx="12" cy="8" r="4" stroke="currentColor" fill="none"/>
                     <path d="M4 20c0-4 8-4 8-4s8 0 8 4" stroke="currentColor"/>
                 </svg>
                 <div class="icon-label">Accounts</div>
             </a>
+
             <a href="{{ route('admin.partnerships') }}" class="icon-card">
-                <!-- Add Partnership Icon -->
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M12 5v14M5 12h14" stroke="currentColor"/>
                 </svg>
                 <div class="icon-label">Add Partnership</div>
             </a>
+
             <a href="{{ route('admin.chatbot') }}" class="icon-card">
-                <!-- AI Chatbot Icon -->
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <ellipse cx="12" cy="12" rx="10" ry="8" stroke="currentColor" fill="none"/>
                     <circle cx="9" cy="12" r="1.5" fill="currentColor"/>
@@ -128,5 +119,4 @@
             </a>
         </div>
     </div>
-</body>
-</html>
+</x-app-layout>

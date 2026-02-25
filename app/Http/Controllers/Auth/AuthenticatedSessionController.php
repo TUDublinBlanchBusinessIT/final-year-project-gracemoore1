@@ -130,7 +130,7 @@ class AuthenticatedSessionController extends Controller
 
     // Set session (same style as student/landlord)
             $request->session()->put('serviceprovider_id', $provider->id);
-
+            $request->session()->put('serviceprovider_firstname', $provider->firstname); // ADDED: makes the name 
     // Remove the other user types from the same session
             $request->session()->forget('student_id');
             $request->session()->forget('landlord_id');
