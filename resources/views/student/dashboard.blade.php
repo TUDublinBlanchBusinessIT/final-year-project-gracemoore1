@@ -1,10 +1,22 @@
 <x-app-layout>
 
-    {{-- PAGE HEADER --}}
+    {{-- Header: hamburger left, RentConnect + Page Title right (stacked), same icon style as landlord --}}
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Dashboard
-        </h2>
+        <div class="flex items-start justify-between">
+            {{-- Hamburger (SVG, no emoji) --}}
+            <button type="button" class="text-slate-700 hover:text-slate-900" aria-label="Menu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
+            <div class="text-right">
+                <div class="text-2xl font-extrabold text-blue-600 leading-none">RentConnect</div>
+                <div class="mt-1 font-semibold text-gray-800">Dashboard</div>
+            </div>
+        </div>
     </x-slot>
 
     @php
@@ -25,8 +37,8 @@
 
     <div>
 
-        {{-- Welcome section --}}
-        <h1 class="text-2xl font-bold text-slate-900 mb-6">
+        {{-- Welcome --}}
+        <h1 class="text-2xl font-bold text-slate-900 mb-4">
             Welcome back, {{ $student->firstname ?? $student->name ?? 'Student' }}!
         </h1>
 
@@ -38,13 +50,14 @@
                       d="M21 21l-4.35-4.35M10 4a6 6 0 100 12 6 6 0 000-12z" />
             </svg>
 
-            <input type="text" placeholder="Search listings..." class="ml-3 w-full focus:ring-0 border-none focus:outline-none text-slate-800" />
+            <input type="text" placeholder="Search listings..."
+                   class="ml-3 w-full focus:ring-0 border-none focus:outline-none text-slate-800" />
 
-            {{-- Hamburger menu replaced with icon --}}
-            <button id="filterToggle" class="ml-3 text-slate-600 hover:text-blue-600">
+            {{-- Filter toggle (SVG icon, no emoji) --}}
+            <button id="filterToggle" class="ml-3 text-slate-600 hover:text-blue-600" title="Filters" aria-label="Filters">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M3 6h18M6 12h12M10 18h8" />
+                          d="M3 6h18M6 12h12M10 18h8" />
                 </svg>
             </button>
         </div>
@@ -61,13 +74,16 @@
         </div>
 
         {{-- FILTER DRAWER --}}
-        <div id="filterDrawer" class="hidden bg-white border border-slate-300 rounded-xl shadow-sm px-6 py-6 mt-4">
+        <div id="filterDrawer"
+             class="hidden bg-white border border-slate-300 rounded-xl shadow-sm px-6 py-6 mt-4">
             <form class="space-y-4">
 
                 {{-- Location --}}
                 <div>
                     <label class="font-semibold text-slate-700">Location</label>
-                    <input id="countyInput" type="text" class="w-full mt-1 rounded-lg border-slate-300" placeholder="Dublin" />
+                    <input id="countyInput" type="text"
+                           class="w-full mt-1 rounded-lg border-slate-300"
+                           placeholder="Dublin" />
                 </div>
 
                 {{-- House Type --}}
@@ -118,7 +134,6 @@
                 <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">
                     Apply Filters
                 </button>
-
             </form>
         </div>
 
@@ -154,7 +169,6 @@
                 </div>
             </div>
         @endforeach
-
     </div>
 
     <script>
@@ -169,7 +183,9 @@
             document.querySelectorAll('.county-section').forEach(section => {
                 section.classList.toggle('hidden', section.dataset.county !== county);
             });
-            document.getElementById('countyInput').value = county;
+
+            const input = document.getElementById('countyInput');
+            if (input) input.value = county;
         }
     </script>
 

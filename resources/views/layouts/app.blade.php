@@ -37,8 +37,9 @@
          Others fall back to the standard top nav --}}
     @if ($isAdmin || $isServiceProvider)
         {{-- No default top bar --}}
+    
     @elseif ($isLandlord || Auth::check())
-        @include('layouts.navigation')
+            @include('layouts.navigation')
     @endif
 
     {{-- PAGE HEADER --}}
