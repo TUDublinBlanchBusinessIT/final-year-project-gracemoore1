@@ -1,9 +1,14 @@
 <x-app-layout>
-    <div class="max-w-5xl mx-auto px-4 py-8">
-        {{-- Profile heading --}}
-        <h1 class="text-2xl font-bold text-slate-900">Profile</h1>
 
-        {{-- Sub-nav: text links side-by-side, underline active --}}
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Profile
+        </h2>
+    </x-slot>
+
+    <div class="max-w-5xl mx-auto px-4 py-8">
+
+        {{-- Sub-nav --}}
         <nav class="mt-3 border-b border-slate-200">
             <ul class="flex gap-6 text-sm">
                 <li>
@@ -25,7 +30,6 @@
             </ul>
         </nav>
 
-        {{-- CONTENT: Applications (cards styled like landlord) --}}
         <div class="mt-6 space-y-6">
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <h2 class="text-lg font-medium text-gray-900">Your Applications</h2>
@@ -85,4 +89,5 @@
             </div>
         </div>
     </div>
+
 </x-app-layout>

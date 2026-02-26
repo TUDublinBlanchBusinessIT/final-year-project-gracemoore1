@@ -1,9 +1,14 @@
 <x-app-layout>
-    <div class="max-w-5xl mx-auto px-4 py-8">
-        {{-- Profile heading --}}
-        <h1 class="text-2xl font-bold text-slate-900">Profile</h1>
 
-        {{-- Sub-nav: text links side-by-side, underline active --}}
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Profile
+        </h2>
+    </x-slot>
+
+    <div class="max-w-5xl mx-auto px-4 py-8">
+
+        {{-- Sub-nav --}}
         <nav class="mt-3 border-b border-slate-200">
             <ul class="flex gap-6 text-sm">
                 <li>
@@ -25,7 +30,6 @@
             </ul>
         </nav>
 
-        {{-- CONTENT: Account details (landlord-style cards, only specified fields) --}}
         <div class="mt-6 space-y-6">
 
             {{-- Read-only details --}}
@@ -39,63 +43,43 @@
                 </div>
             </div>
 
-            {{-- Update Password (POST: immediate in-app change) --}}
+            {{-- Update Password --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium text-gray-900">Update Password</h3>
-                <p class="mt-1 text-sm text-gray-600">
-                    Enter your current password, then choose a new password.
-                </p>
+                <p class="mt-1 text-sm text-gray-600">Enter your current password, then choose a new password.</p>
 
                 <form method="post" action="{{ route('student.profile.new.resetpassword') }}" class="mt-6 space-y-4">
                     @csrf
-                    {{-- NO @method('patch') because the route is POST --}}
 
                     {{-- Current Password --}}
                     <div>
                         <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
-                        <input id="current_password"
-                               name="current_password"
-                               type="password"
-                               required
-                               autocomplete="current-password"
-                               class="mt-1 block w-full border border-slate-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
+                        <input id="current_password" name="current_password" type="password"
+                                required autocomplete="current-password"
+                               class="mt-1 block w-full border border-slate-300 rounded-lg p-2">
                         @error('current_password')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     {{-- New Password --}}
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">New Password</label>
-                        <input id="password"
-                               name="password"
-                               type="password"
-                               required
-                               autocomplete="new-password"
-                               class="mt-1 block w-full border border-slate-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
-                        @error('password')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                        <input id="password" name="password" type="password"
+                                required autocomplete="new-password"
+                               class="mt-1 block w-full border border-slate-300 rounded-lg p-2">
                     </div>
 
-                    {{-- Confirm New Password --}}
+                    {{-- Confirm --}}
                     <div>
                         <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
-                        <input id="password_confirmation"
-                               name="password_confirmation"
-                               type="password"
-                               required
-                               autocomplete="new-password"
-                               class="mt-1 block w-full border border-slate-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
-                        @error('password_confirmation')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                        <input id="password_confirmation" name="password_confirmation" type="password"
+                                required autocomplete="new-password"
+                               class="mt-1 block w-full border border-slate-300 rounded-lg p-2">
                     </div>
 
-                    {{-- Submit --}}
                     <div class="flex items-center gap-4">
-                        <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 font-semibold">
+                        <button class="px-4 py-2 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800">
                             Save
                         </button>
 
@@ -106,21 +90,18 @@
                 </form>
             </div>
 
-            {{-- Delete account --}}
+            {{-- Delete Account --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium text-gray-900">Delete Account</h3>
                 <p class="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data will be permanently deleted.
-                    Before deleting your account, please download any data or information that you wish to retain.
+                    Once your account is deleted, all of its resources will be permanently removed.
                 </p>
 
                 <form method="post" action="{{ route('student.profile.new.delete') }}" class="mt-6">
                     @csrf
-                    {{-- NO @method('delete') because your route is POST /student/profile-new/delete-account --}}
 
-                    <button type="submit"
-                            onclick="return confirm('Are you sure? This cannot be undone.')"
-                            class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold">
+                    <button onclick="return confirm('Are you sure? This cannot be undone.')"
+                            class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700">
                         Delete Account
                     </button>
                 </form>
@@ -128,4 +109,5 @@
 
         </div>
     </div>
+
 </x-app-layout>
