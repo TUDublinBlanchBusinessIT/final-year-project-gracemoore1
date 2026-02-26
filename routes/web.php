@@ -240,7 +240,7 @@ Route::prefix('student/profile-new')->group(function () {
 
 Route::get('/serviceprovider/dashboard', function () {
     if (!session('serviceprovider_id')) return redirect('/login');
-    return view('serviceprovider.dashboard');
+    return redirect()->route('serviceprovider.upcoming');
 })->name('serviceprovider.dashboard');
 
 Route::get('/serviceprovider/upcoming', function () {
