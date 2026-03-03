@@ -45,95 +45,121 @@
                             @csrf
 
                             {{-- Images --}}
+                            {{-- Images (CHANGED: supports adding in multiple selections) --}}
                             <section class="space-y-3">
                                 <div class="flex items-center justify-between">
                                     <h2 class="text-lg font-bold text-slate-900">Images</h2>
                                     <span id="imgCountBadge"
-                                          class="hidden text-xs font-bold bg-blue-600 text-white px-2 py-1 rounded-full">
+                                        class="hidden text-xs font-bold bg-blue-600 text-white px-2 py-1 rounded-full">
                                         0
                                     </span>
                                 </div>
 
-                                <label class="block">
-                                    <div class="rounded-2xl border border-dashed border-slate-300 p-6 hover:border-blue-400 transition cursor-pointer">
+    {{-- Upload area acts as an "Add more" trigger --}}
+                                <label class="block cursor-pointer" id="addMoreImagesBtn">
+                                    <div class="rounded-2xl border border-dashed border-slate-300 p-6 hover:border-blue-400 transition">
                                         <div class="flex items-center gap-4">
                                             <div class="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-                                                <svg class="w-7 h-7 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16l4-4a3 3 0 014 0l2 2a3 3 0 004 0l4-4M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                <svg class="w-7 h-7 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M3 16l4-4a3 3 0 014 0l2 2a3 3 0 004 0l4-4M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2z"/>
                                                 </svg>
                                             </div>
 
                                             <div class="flex-1">
                                                 <div class="font-semibold text-slate-900">Upload images of your listing</div>
-                                                <div class="text-sm text-slate-600">PNG/JPG, up to 5 images recommended.</div>
+                                                <div class="text-sm text-slate-600">PNG/JPG/WebP, up to 5 images recommended.</div>
+                                                <div class="text-xs text-slate-500 mt-1">You can add images in multiple picks.</div>
                                             </div>
 
                                             <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-bold">
                                                 +
                                             </div>
                                         </div>
-
-                                        <input id="imagesInput"
-                                               name="images[]"
-                                               type="file"
-                                               accept="image/*"
-                                               multiple
-                                               class="hidden" />
                                     </div>
                                 </label>
 
+    {{-- Where we keep all file inputs (one per pick) --}}
+                                <div id="imagesInputs" class="hidden"></div>
+
+    {{-- Previews --}}
                                 <div id="previewGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3"></div>
                             </section>
 
-                            {{-- Location + Basics --}}
+                            <!-- Listing Details (FULL RESTORED + UPDATED DROPDOWNS) -->
                             <section class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">House Number (optional)</label>
                                     <input name="housenumber" value="{{ old('housenumber') }}"
-                                           class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                                           placeholder="e.g. 14" />
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="e.g. 14" />
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Street</label>
                                     <input name="street" value="{{ old('street') }}" required
-                                           class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                                           placeholder="e.g. The Green" />
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="e.g. The Green" />
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">County</label>
                                     <input name="county" value="{{ old('county') }}" required
-                                           class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                                           placeholder="e.g. Dublin" />
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="e.g. Dublin" />
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Postcode (optional)</label>
                                     <input name="postcode" value="{{ old('postcode') }}"
-                                           class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                                           placeholder="e.g. D14" />
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="e.g. D14" />
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Measurement (optional)</label>
                                     <input name="measurement" value="{{ old('measurement') }}"
-                                           class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                                           placeholder="e.g. 15sqm" />
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="e.g. 15sqm" />
+                                </div>
+
+                                <!-- NEW: House Type -->
+                                <div>
+                                    <label class="text-sm font-semibold text-slate-700">House Type</label>
+                                    <select name="housetype"
+                                            class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="Any">Any</option>
+                                        <option value="Single room in private home">Single room in private home</option>
+                                        <option value="Private room in shared house">Private room in shared house</option>
+                                    </select>
+                                </div>
+
+                                <!-- UPDATED: Nights Per Week -->
+                                <div>
+                                    <label class="text-sm font-semibold text-slate-700">Nights per Week</label>
+                                    <select name="nightsperweek"
+                                            class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="Any">Any</option>
+                                        <option value="1–3 nights">1–3 nights</option>
+                                        <option value="4–5 nights">4–5 nights</option>
+                                        <option value="Full week">Full week</option>
+                                    </select>
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Rent per month (€)</label>
                                     <input name="rentpermonth" value="{{ old('rentpermonth') }}" required type="number" step="0.01" min="0"
-                                           class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                                           placeholder="e.g. 850" />
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="e.g. 850" />
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Status</label>
                                     <select name="status" class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                                        <option value="available" @selected(old('status') === 'available')>Available</option>
-                                        <option value="occupied" @selected(old('status') === 'occupied')>Occupied</option>
+                                        <option value="available" @selected(old('status')==='available')>Available</option>
+                                        <option value="occupied" @selected(old('status')==='occupied')>Occupied</option>
                                     </select>
                                 </div>
 
@@ -141,24 +167,24 @@
                                     <div>
                                         <label class="text-sm font-semibold text-slate-700">Available from</label>
                                         <input name="availablefrom" value="{{ old('availablefrom') }}" type="date" required
-                                               class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500" />
+                                            class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500" />
                                     </div>
                                     <div>
                                         <label class="text-sm font-semibold text-slate-700">Available until</label>
                                         <input name="availableuntil" value="{{ old('availableuntil') }}" type="date" required
-                                               class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500" />
+                                            class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500" />
                                     </div>
                                 </div>
+
                             </section>
 
-                            {{-- Description --}}
+                            <!-- Description -->
                             <section>
                                 <label class="text-sm font-semibold text-slate-700">Description</label>
                                 <textarea name="description" rows="5" required
-                                          class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                                          placeholder="Brief description about the accommodation...">{{ old('description') }}</textarea>
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="Brief description about the accommodation...">{{ old('description') }}</textarea>
                             </section>
-
                             {{-- Actions --}}
                             <div class="flex items-center justify-end gap-3 pt-2">
                                 <a href="{{ route('dashboard') }}"
@@ -181,32 +207,89 @@
     </div>
 
     {{-- Image preview script --}}
-    <script>
-        const input = document.getElementById('imagesInput');
-        const grid = document.getElementById('previewGrid');
-        const badge = document.getElementById('imgCountBadge');
+{{-- Image picker script (NEW: supports multiple selections, max 5) --}}
+<script>
+    const inputsContainer = document.getElementById('imagesInputs');
+    const previewGrid     = document.getElementById('previewGrid');
+    const badge           = document.getElementById('imgCountBadge');
+    const addMoreBtn      = document.getElementById('addMoreImagesBtn');
 
-        input?.addEventListener('change', () => {
-            grid.innerHTML = '';
-            const files = Array.from(input.files || []);
+    // Track how many files have been selected (across all inputs)
+    let totalSelected = 0;
+    const MAX_FILES = 5;
 
-            if (files.length) {
-                badge.classList.remove('hidden');
-                badge.textContent = files.length;
-            } else {
-                badge.classList.add('hidden');
-            }
+    function updateBadge() {
+        if (totalSelected > 0) {
+            badge.classList.remove('hidden');
+            badge.textContent = totalSelected;
+        } else {
+            badge.classList.add('hidden');
+            badge.textContent = '0';
+        }
+    }
 
-            files.slice(0, 10).forEach(file => {
-                const url = URL.createObjectURL(file);
-                const wrap = document.createElement('div');
-                wrap.className = 'relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50';
+    function createInput() {
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.name = 'images[]';
+        inp.accept = 'image/*';
+        inp.multiple = true;  // user can pick several in one go
+        inp.className = 'hidden';
 
-                wrap.innerHTML = `
-                    <img src="${url}" class="w-full h-24 object-cover" />
+        inp.addEventListener('change', () => {
+            const files = Array.from(inp.files || []);
+            if (!files.length) return;
+
+            // Enforce MAX_FILES across all inputs
+            let remaining = MAX_FILES - totalSelected;
+            const toUse = files.slice(0, Math.max(0, remaining));
+
+            toUse.forEach(file => {
+                totalSelected++;
+                const url  = URL.createObjectURL(file);
+                const tile = document.createElement('div');
+                tile.className = 'relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50';
+
+                tile.innerHTML = `
+                    <img src="${url}" class="w-full h-24 object-cover" alt="preview" />
                 `;
-                grid.appendChild(wrap);
+                previewGrid.appendChild(tile);
             });
+
+            updateBadge();
+
+            if (totalSelected >= MAX_FILES) {
+                // Reached limit; prevent creating more inputs
+                addMoreBtn.style.pointerEvents = 'none';
+                addMoreBtn.style.opacity = '0.6';
+            }
         });
-    </script>
+
+        inputsContainer.appendChild(inp);
+        return inp;
+    }
+
+    // First input at load (kept hidden)
+    let currentInput = createInput();
+
+    // Clicking the "Add" area triggers a NEW input each time
+    addMoreBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (totalSelected >= MAX_FILES) return;
+
+        // Create a fresh input so previous selection remains intact
+        currentInput = createInput();
+        currentInput.click();
+    });
+
+    // Optional: also open the picker on pressing Enter when focused
+    addMoreBtn?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (totalSelected >= MAX_FILES) return;
+            currentInput = createInput();
+            currentInput.click();
+        }
+    });
+</script>
 </x-app-layout>
