@@ -214,6 +214,12 @@ Route::get('/student/support', function () {
    return view('student.support');
 })->name('student.support');
 
+// ===============================
+// STUDENT: VIEW A SINGLE LISTING
+// ===============================
+Route::get('/listing/{id}', [App\Http\Controllers\StudentRegisterController::class, 'showListing'])
+    ->name('listing.show');
+
 // STUDENT PROFILE (ADD-ONLY, SAFE)
 Route::prefix('student/profile-new')->group(function () {
 

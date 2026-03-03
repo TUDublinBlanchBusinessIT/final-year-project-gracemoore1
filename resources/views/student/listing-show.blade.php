@@ -1,0 +1,171 @@
+<x-app-layout>
+
+    {{-- Header --}}
+    <x-slot name="header">
+        <h2 class="font-bold text-xl text-gray-800">
+            Listing Details
+        </h2>
+    </x-slot>
+
+    <div class="max-w-5xl mx-auto mt-6 px-4 sm:px-6 lg:px-8">
+
+        @php
+            // Images are stored as JSON array like: ["rentals/abc.jpg", "rentals/def.jpg"]
+            $images = json_decode($rental->images ?? '[]', true) ?? [];
+            $imgCount = count($images);
+        @endphp
+
+        {{-- IMAGE GALLERY (LARGE) --}}
+        <div class="relative bg-white rounded-xl border border-slate-200 shadow overflow-hidden">
+            <div id="detail-track-{{ $rental->id }}" class="flex transition-transform duration-300 ease-out">
+                @forelse ($images as $img)
+                    <div class="w-full shrink-0">
+                        <div class="w-full h-72 sm:h-80 md:h-[28rem] bg-slate-100">
+                            <img
+                                src="{{ asset('storage/' . $img) }}"
+                                alt="Listing photo {{ $loop->iteration }}"
+                                class="w-full h-full object-cover" />
+                        </div>
+                    </div>
+                @empty
+                    <div class="w-full shrink-0">
+                        <div class="w-full h-72 sm:h-80 md:h-[28rem] bg-slate-100 flex items-center justify-center text-slate-500">
+                            No images available
+                        </div>
+                    </div>
+                @endforelse
+            </div>
+
+            @if ($imgCount > 1)
+                {{-- Prev/Next controls --}}
+                <button
+                    type="button"
+                    onclick="detailPrev({{ $rental->id }})"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-slate-700 px-3 py-2 rounded-full shadow">
+                    ‹
+                </button>
+
+                <button
+                    type="button"
+                    onclick="detailNext({{ $rental->id }})"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-slate-700 px-3 py-2 rounded-full shadow">
+                    ›
+                </button>
+            @endif
+        </div>
+
+        {{-- DETAILS CARD --}}
+        <div class="bg-white border border-slate-200 rounded-xl p-6 mt-6 shadow space-y-4">
+
+            {{-- Full Address (house number optional) --}}
+            <h1 class="text-2xl font-bold text-slate-900">
+                {{ $rental->housenumber ? $rental->housenumber . ' ' : '' }}
+                {{ $rental->street }}, {{ $rental->county }}
+                @if(!empty($rental->postcode))
+                    , {{ $rental->postcode }}
+                @endif
+            </h1>
+
+            {{-- Size & Status --}}
+            <div class="flex flex-wrap items-center gap-3 text-slate-700">
+                @if(!empty($rental->measurement))
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm">
+                        Size: {{ $rental->measurement }}
+                    </span>
+                @endif
+
+                @if(!empty($rental->status))
+                    <span class="inline-flex items-center rounded-full border px-3 py-1 text-sm
+                        {{ $rental->status === 'available'
+                            ? 'bg-green-50 text-green-700 border-green-200'
+                            : 'bg-slate-100 text-slate-700 border-slate-200' }}">
+                        {{ ucfirst($rental->status) }}
+                    </span>
+                @endif
+            </div>
+
+            {{-- Availability --}}
+            <div class="text-slate-700">
+                <span class="font-semibold">Availability:</span>
+                {{ $rental->availablefrom }} → {{ $rental->availableuntil }}
+            </div>
+
+            {{-- Rent --}}
+            <div class="text-slate-900 font-bold text-xl">
+                €{{ number_format($rental->rentpermonth, 2) }} / month
+            </div>
+
+            {{-- Description --}}
+            @if(!empty($rental->description))
+                <div class="pt-2">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-1">Description</h2>
+                    <p class="text-slate-700 leading-relaxed">
+                        {{ $rental->description }}
+                    </p>
+                </div>
+            @endif
+
+            {{-- Apply button (no action yet) --}}
+            <div class="pt-2">
+                <button type="button"
+                        class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold">
+                    Apply Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- GALLERY SCRIPT (per-listing state) --}}
+    <script>
+        // Maintain per-listing gallery state in a simple map.
+        const detailState = {}; // key: rentalId -> { index, count }
+
+        function ensureDetailState(id) {
+            if (!detailState[id]) {
+                const track = document.getElementById(`detail-track-${id}`);
+                const count = track ? track.children.length : 0;
+                detailState[id] = { index: 0, count: count };
+                // Make each slide fill container width
+                if (track) {
+                    Array.from(track.children).forEach(child => {
+                        child.style.width = '100%';
+                    });
+                }
+            }
+            return detailState[id];
+        }
+
+        function detailUpdate(id) {
+            const track = document.getElementById(`detail-track-${id}`);
+            if (!track) return;
+            const state = ensureDetailState(id);
+            const translate = -state.index * 100;
+            track.style.transform = `translateX(${translate}%)`;
+        }
+
+        function detailNext(id) {
+            const state = ensureDetailState(id);
+            if (state.count <= 1) return;
+            state.index = (state.index + 1) % state.count;
+            detailUpdate(id);
+        }
+
+        function detailPrev(id) {
+            const state = ensureDetailState(id);
+            if (state.count <= 1) return;
+
+            state.index = (state.index - 1 + state.count) % state.count;
+            detailUpdate(id);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const track = document.getElementById('detail-track-{{ $rental->id }}');
+            if (track) {
+                ensureDetailState({{ $rental->id }});
+                detailUpdate({{ $rental->id }});
+            }
+        });
+    </script>
+
+</x-app-layout>
