@@ -15,6 +15,8 @@ class LandlordRental extends Model
         'postcode',
         'description',
         'measurement',
+        'housetype',
+        'nightsperweek',
         'rentpermonth',
         'images',
         'status',
