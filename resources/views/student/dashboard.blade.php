@@ -129,38 +129,82 @@
         </div>
 
         {{-- COUNTY SECTIONS --}}
-        @php
-            $counties = ['Dublin', 'Galway', 'Limerick', 'Cork', 'Kildare'];
-        @endphp
+       {{-- COUNTY SECTIONS --}}
+@php
+    $counties = ['Dublin', 'Galway', 'Limerick', 'Cork', 'Kildare'];
+@endphp
 
-        @foreach ($counties as $county)
-            <div class="mt-10 county-section" data-county="{{ $county }}">
-                <h2 class="text-xl font-bold text-slate-900 mb-3">{{ $county }}</h2>
+@foreach ($counties as $county)
 
-                {{-- MOBILE SWIPE --}}
-                <div class="flex gap-4 overflow-x-auto pb-2 lg:hidden">
+    @php
+        $countyListings = collect($listings)->where('county', $county);
+    @endphp
+
+    <div class="mt-10 county-section" data-county="{{ $county }}">
+        <h2 class="text-xl font-bold text-slate-900 mb-3">{{ $county }}</h2>
+
+        @if ($countyListings->count() > 0)
+
+            {{-- MOBILE LISTINGS --}}
+            <div class="flex gap-4 overflow-x-auto pb-2 lg:hidden">
+                @foreach ($countyListings as $rental)
                     <div class="min-w-[260px] bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-                        <div class="font-semibold text-slate-700">No listings available yet</div>
-                        <div class="text-slate-500 text-sm mt-1">
-                            Listings in {{ $county }} will appear here.
+                        <div class="font-semibold text-slate-800">
+                            {{ $rental->street }}, {{ $rental->county }}
+                        </div>
+                        <div class="text-sm text-slate-600 mt-1">
+                            €{{ number_format($rental->rentpermonth, 2) }} / month
+                        </div>
+                        <div class="text-xs text-slate-500 mt-2">
+                            Available: {{ $rental->availablefrom }} → {{ $rental->availableuntil }}
                         </div>
                     </div>
-                </div>
+                @endforeach
+            </div>
 
-                {{-- DESKTOP --}}
-                <div class="hidden lg:grid lg:grid-cols-3 lg:gap-4">
-                    @for ($i = 0; $i < 3; $i++)
-                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-                            <div class="font-semibold text-slate-700">No listings available yet</div>
-                            <div class="text-slate-500 text-sm mt-1">
-                                Listings in {{ $county }} will appear here.
-                            </div>
+            {{-- DESKTOP LISTINGS --}}
+            <div class="hidden lg:grid lg:grid-cols-3 lg:gap-4">
+                @foreach ($countyListings as $rental)
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                        <div class="font-semibold text-slate-800">
+                            {{ $rental->street }}, {{ $rental->county }}
                         </div>
-                    @endfor
+                        <div class="text-sm text-slate-600 mt-1">
+                            €{{ number_format($rental->rentpermonth, 2) }} / month
+                        </div>
+                        <div class="text-xs text-slate-500 mt-2">
+                            Available: {{ $rental->availablefrom }} → {{ $rental->availableuntil }}
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+        @else
+
+            {{-- MOBILE NO-LISTINGS --}}
+            <div class="flex gap-4 overflow-x-auto pb-2 lg:hidden">
+                <div class="min-w-[260px] bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <div class="font-semibold text-slate-700">No listings available yet</div>
+                    <div class="text-slate-500 text-sm mt-1">
+                        Listings in {{ $county }} will appear here.
+                    </div>
                 </div>
             </div>
-        @endforeach
+
+            {{-- DESKTOP NO-LISTINGS --}}
+            <div class="hidden lg:grid lg:grid-cols-3 lg:gap-4">
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <div class="font-semibold text-slate-700">No listings available yet</div>
+                    <div class="text-slate-500 text-sm mt-1">
+                        Listings in {{ $county }} will appear here.
+                    </div>
+                </div>
+            </div>
+
+        @endif
     </div>
+
+@endforeach
 
     <script>
         const filterBtn = document.getElementById('filterToggle');

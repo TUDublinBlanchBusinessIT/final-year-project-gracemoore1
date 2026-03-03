@@ -8,6 +8,7 @@ use App\Models\Student;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentCodeMail;
+use App\Models\LandlordRental;
 
 class StudentRegisterController extends Controller
 {
@@ -289,9 +290,12 @@ class StudentRegisterController extends Controller
         if (!session()->has('student_id')) {
             return redirect('/login');
         }
-        $listings = [];  
+
+        $listings = LandlordRental::where('status', 'available')->get();
+
         return view('student.dashboard', compact('listings'));
     }
+    
     public function studentProfile()
     {
         if (!session()->has('student_id')) return redirect('/student/login');
