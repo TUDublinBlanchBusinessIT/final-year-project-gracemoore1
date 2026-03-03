@@ -6,7 +6,7 @@
     </x-slot>
 
     {{-- Push content away from landlord sidebar + leave room for mobile bottom nav --}}
-    <div class="pb-28 lg:pl-60">
+    <div class="pb-28 lg:pl-70">
         <div class="py-10">
             <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
 
