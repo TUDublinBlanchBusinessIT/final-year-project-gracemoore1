@@ -17,7 +17,7 @@ class StudentRegisterController extends Controller
     }
 
     public function register(Request $request) {
-        // ✅ Allowlist of Irish HEI domains (annotated with institution names)
+        //  Allowlist of Irish HEI domains (annotated with institution names)
         $allowedEduDomainsIE = [
             'ucd.ie',               // University College Dublin (UCD)
             'ucdconnect.ie',        // University College Dublin — Student Email
@@ -76,7 +76,7 @@ class StudentRegisterController extends Controller
             'firstname' => 'required',
             'surname' => 'required',
             'dateofbirth' => 'required|date',
-            // ✅ College email check — ONLY affects validation; no other behavior changes
+            //  College email check — ONLY affects validation; no other behavior changes
             'email' => ['required','email', function($attribute, $value, $fail) use ($allowedEduDomainsIE) {
                 $domain = strtolower(substr(strrchr($value, "@"), 1) ?: '');
                 // Reduce to base (eTLD+1) simply: e.g. "mail.tcd.ie" -> "tcd.ie"
@@ -103,7 +103,7 @@ class StudentRegisterController extends Controller
         ]);
 
         Mail::to($data['email'])->send(new StudentCodeMail($code));
-        // ⬆️ END DEBUG BLOCK
+        //  END DEBUG BLOCK
 
         return redirect('/student/verify-email');
     }
@@ -169,7 +169,7 @@ class StudentRegisterController extends Controller
             str_contains($text, $surname_nospace) ||
             str_contains($text_clean, $surname_nospace);
 
-        // ✅ Minimal MRZ-based matching (first given-name token only; middle name optional)
+        // Minimal MRZ-based matching (first given-name token only; middle name optional)
         // This augments your existing checks; it doesn't replace them.
         $mrzFirstMatches = false;
         $mrzSurnameMatches = false;

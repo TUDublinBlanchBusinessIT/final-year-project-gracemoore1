@@ -112,40 +112,54 @@
                                 </div>
 
                                 <div>
-                                    <label class="text-sm font-semibold text-slate-700">Postcode (optional)</label>
+                                    <label class="text-sm font-semibold text-slate-700">Postcode</label>
                                     <input name="postcode" value="{{ old('postcode') }}"
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g. D14" />
                                 </div>
 
                                 <div>
-                                    <label class="text-sm font-semibold text-slate-700">Measurement (optional)</label>
+                                    <label class="text-sm font-semibold text-slate-700">Measurement</label>
                                     <input name="measurement" value="{{ old('measurement') }}"
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g. 15sqm" />
                                 </div>
 
-                                <!-- NEW: House Type -->
-                                <div>
-                                    <label class="text-sm font-semibold text-slate-700">House Type</label>
+                                <!-- House Type -->
+                                <!-- <div>
+                                 <label class="text-sm font-semibold text-slate-700">House Type</label>
                                     <select name="housetype"
                                             class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                                         <option value="Any">Any</option>
-                                        <option value="Single room in private home">Single room in private home</option>
-                                        <option value="Private room in shared house">Private room in shared house</option>
+                                        <option value="Single room in private home">Single room in private home (E.g., In a family home)</option>
+                                        <option value="Private room in shared house">Private room in shared house (E.g., House is shared with other tenants)</option>
+                                    </select>
+                                </div> -->
+
+                                <!-- House Type -->
+                                <div>
+                                    <label class="text-sm font-semibold text-slate-700">House Type</label>
+                                    <select name="housetype" class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="any" @selected(old('housetype') === 'any')>Any</option>
+                                        <option value="single_private" @selected(old('housetype') === 'single_private')>Single room in private home (e.g. in a family home)</option>
+                                        <option value="private_shared" @selected(old('housetype') === 'private_shared')>Private room in shared house (e.g. shared with other tenants)</option>
                                     </select>
                                 </div>
 
                                 <!-- UPDATED: Nights Per Week -->
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Nights per Week</label>
-                                    <select name="nightsperweek"
-                                            class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                                        <option value="Any">Any</option>
-                                        <option value="1–3 nights">1–3 nights</option>
-                                        <option value="4–5 nights">4–5 nights</option>
-                                        <option value="Full week">Full week</option>
-                                    </select>
+                                    <input
+                                        type="number"
+                                        name="nightsperweek"
+                                        value="{{ old('nightsperweek') }}"
+                                        min="0"
+                                        max="7"
+                                        step="1"
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="e.g. 5"
+                                    />
+                                    <p class="mt-1 text-xs text-slate-500">Enter a number from 0 to 7</p>
                                 </div>
 
                                 <div>
