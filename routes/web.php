@@ -153,6 +153,33 @@ Route::get('/admin/reports', function () {
     return view('admin.reports');
 })->name('admin.reports');
 
+// ADMIN ACCOUNT MANAGEMENT ROUTES
+Route::prefix('admin/accounts')->group(function () {
+
+    // Default → Students tab
+    Route::get('/', fn() => redirect()->route('admin.accounts.students'))
+        ->name('admin.accounts');
+
+    // Students
+    Route::get('/students', function () {
+        $students = \App\Models\Student::all();
+        return view('admin.student-accounts', compact('students'));
+    })->name('admin.accounts.students');
+
+    // Landlords
+    Route::get('/landlords', function () {
+        $landlords = \App\Models\Landlord::all();
+        return view('admin.landlord-accounts', compact('landlords'));
+    })->name('admin.accounts.landlords');
+
+    // Service Providers
+    Route::get('/service-providers', function () {
+        $providers = \App\Models\ServiceProvider::all();
+        return view('admin.serviceprovider-accounts', compact('providers'));
+    })->name('admin.accounts.serviceproviders');
+
+});
+
 Route::get('/admin/accounts', function () {
     return view('admin.accounts');
 })->name('admin.accounts');
