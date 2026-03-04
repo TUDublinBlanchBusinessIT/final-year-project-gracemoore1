@@ -198,6 +198,11 @@ Route::get('/landlords/{id}', function ($id) {
     return view('admin.view-landlord', compact('landlord', 'currentListings'));
 })->name('admin.accounts.landlord.view');
 
+Route::get('/listing/{id}', function ($id) {
+    $rental = \App\Models\LandlordRental::findOrFail($id);
+    $landlord = \App\Models\Landlord::findOrFail($rental->landlordid);
+    return view('admin.view-listing', compact('rental', 'landlord'));
+})->name('admin.listing.view');
 
 // =======================
 // VIEW SERVICE PROVIDER DETAILS
@@ -208,6 +213,7 @@ Route::get('/service-providers/{id}', function ($id) {
 
     return view('admin.view-serviceprovider', compact('provider', 'admin'));
 })->name('admin.accounts.serviceprovider.view');
+
 
 });
 

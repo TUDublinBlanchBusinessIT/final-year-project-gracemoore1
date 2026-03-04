@@ -49,7 +49,7 @@
                     @endphp
 
                     @if($firstImage)
-                        <img src="{{ asset('storage/' . $firstImage) }}" class="w-full h-40 object-cover mt-2 rounded-lg">
+                        <img src="{{ asset('storage/' . $img) }}" class="w-full h-48 object-cover rounded-lg" />
                     @endif
                 </div>
             @endforeach
