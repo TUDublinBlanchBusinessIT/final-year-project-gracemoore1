@@ -10,7 +10,8 @@
                     <th class="py-2">Full Name</th>
                     <th class="py-2">Company Name</th>
                     <th class="py-2">Email</th>
-                    <th class="py-2">Created By (Admin)</th>
+                    <th class="py-2">Created By</th>
+                    <th class="py-2">Actions</th>
                 </tr>
             </thead>
 
@@ -23,7 +24,6 @@
                     @endphp
 
                     <tr class="border-b">
-
                         <td class="py-2">{{ $p->id }}</td>
 
                         <td class="py-2">
@@ -42,6 +42,12 @@
                             @endif
                         </td>
 
+                        <td class="py-2">
+                            <a href="{{ route('admin.accounts.serviceprovider.view', $p->id) }}"
+                               class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
+                                View
+                            </a>
+                        </td>
                     </tr>
 
                 @endforeach

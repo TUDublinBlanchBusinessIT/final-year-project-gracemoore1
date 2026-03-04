@@ -10,12 +10,12 @@
                     <th class="py-2">Full Name</th>
                     <th class="py-2">Email</th>
                     <th class="py-2">Listings</th>
+                    <th class="py-2">Actions</th>
                 </tr>
             </thead>
 
             <tbody class="text-gray-800">
                 @foreach ($landlords as $l)
-
                     <tr class="border-b">
                         <td class="py-2">{{ $l->id }}</td>
                         <td class="py-2">{{ $l->firstname }} {{ $l->surname }}</td>
@@ -23,8 +23,14 @@
                         <td class="py-2">
                             {{ \App\Models\LandlordRental::where('landlordid', $l->id)->count() }}
                         </td>
-                    </tr>
 
+                        <td class="py-2">
+                            <a href="{{ route('admin.accounts.landlord.view', $l->id) }}"
+                               class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
+                                View
+                            </a>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>

@@ -172,11 +172,42 @@ Route::prefix('admin/accounts')->group(function () {
         return view('admin.landlord-accounts', compact('landlords'));
     })->name('admin.accounts.landlords');
 
-    // Service Providers
-    Route::get('/service-providers', function () {
-        $providers = \App\Models\ServiceProviderPartnership::all();
-        return view('admin.serviceprovider-accounts', compact('providers'));
-    })->name('admin.accounts.serviceproviders');
+// Service Providers
+Route::get('/service-providers', function () {
+    $providers = \App\Models\ServiceProviderPartnership::all();
+    return view('admin.serviceprovider-accounts', compact('providers'));
+})->name('admin.accounts.serviceproviders');
+
+
+// =======================
+// VIEW STUDENT DETAILS
+// =======================
+Route::get('/students/{id}', function ($id) {
+    $student = \App\Models\Student::findOrFail($id);
+    return view('admin.view-student', compact('student'));
+})->name('admin.accounts.student.view');
+
+
+// =======================
+// VIEW LANDLORD DETAILS
+// =======================
+Route::get('/landlords/{id}', function ($id) {
+    $landlord = \App\Models\Landlord::findOrFail($id);
+    $currentListings = \App\Models\LandlordRental::where('landlordid', $id)->get();
+
+    return view('admin.view-landlord', compact('landlord', 'currentListings'));
+})->name('admin.accounts.landlord.view');
+
+
+// =======================
+// VIEW SERVICE PROVIDER DETAILS
+// =======================
+Route::get('/service-providers/{id}', function ($id) {
+    $provider = \App\Models\ServiceProviderPartnership::findOrFail($id);
+    $admin = \App\Models\Staff::find($provider->administratorid);
+
+    return view('admin.view-serviceprovider', compact('provider', 'admin'));
+})->name('admin.accounts.serviceprovider.view');
 
 });
 
