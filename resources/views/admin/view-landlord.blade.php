@@ -95,7 +95,7 @@
                     </div>
 
                     {{-- VIEW FULL DETAILS (ADMIN VERSION) --}}
-                    {{ route('admin.listing.view', $rental->id) }}
+                    <a href="{{ route('admin.listing.view', $rental->id) }}">
                         <button class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
                             View Details
                         </button>
