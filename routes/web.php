@@ -174,15 +174,12 @@ Route::prefix('admin/accounts')->group(function () {
 
     // Service Providers
     Route::get('/service-providers', function () {
-        $providers = \App\Models\ServiceProvider::all();
+        $providers = \App\Models\ServiceProviderPartnership::all();
         return view('admin.serviceprovider-accounts', compact('providers'));
     })->name('admin.accounts.serviceproviders');
 
 });
 
-Route::get('/admin/accounts', function () {
-    return view('admin.accounts');
-})->name('admin.accounts');
 
 Route::get('/admin/partnerships', function () {
     return view('admin.partnerships');
