@@ -21,7 +21,7 @@
                         <td class="py-2">{{ $l->firstname }} {{ $l->surname }}</td>
                         <td class="py-2">{{ $l->email }}</td>
                         <td class="py-2">
-                            {{ \App\Models\LandlordRental::where('landlord_id', $l->id)->count() }}
+                            {{ \App\Models\LandlordRental::where('landlordid', $l->id)->count() }}
                         </td>
                     </tr>
 
