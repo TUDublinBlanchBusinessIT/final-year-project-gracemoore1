@@ -41,6 +41,15 @@
                                 : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
                         Service Providers
                     </a>
+                </li>#
+
+                <li>
+                    <a href="{{ route('admin.accounts.suspended') }}"
+                    class="{{ request()->routeIs('admin.accounts.suspended')
+                                    ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
+                                    : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
+                        Suspended Accounts
+                    </a>
                 </li>
 
             </ul>

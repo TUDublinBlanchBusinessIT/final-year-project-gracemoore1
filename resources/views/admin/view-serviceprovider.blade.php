@@ -28,10 +28,16 @@
     </div>
 
     <div class="mt-8 flex gap-4">
-        <button class="px-4 py-2 bg-red-600 text-white rounded-lg">Suspend Account</button>
-        <button class="px-4 py-2 bg-green-600 text-white rounded-lg">Reactivate Account</button>
-    </div>
+        <form method="POST" action="{{ route('admin.accounts.suspend', ['type'=>'serviceprovider','id'=>$provider->id]) }}">
+            @csrf
+            <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Suspend Account</button>
+        </form>
 
+        <form method="POST" action="{{ route('admin.accounts.reactivate', ['type'=>'serviceprovider','id'=>$provider->id]) }}">
+            @csrf
+            <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Reactivate Account</button>
+        </form>
+    </div>
 </div>
 
 </x-admin.accounts>

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\ProfileController;
 
@@ -160,60 +161,94 @@ Route::prefix('admin/accounts')->group(function () {
     Route::get('/', fn() => redirect()->route('admin.accounts.students'))
         ->name('admin.accounts');
 
-    // Students
+    // Students (ACTIVE only)
     Route::get('/students', function () {
-        $students = \App\Models\Student::all();
+        $students = \App\Models\Student::where('status', 'active')->get();
         return view('admin.student-accounts', compact('students'));
     })->name('admin.accounts.students');
 
-    // Landlords
+    // Landlords (ACTIVE only)
     Route::get('/landlords', function () {
-        $landlords = \App\Models\Landlord::all();
+        $landlords = \App\Models\Landlord::where('status', 'active')->get();
         return view('admin.landlord-accounts', compact('landlords'));
     })->name('admin.accounts.landlords');
 
-// Service Providers
-Route::get('/service-providers', function () {
-    $providers = \App\Models\ServiceProviderPartnership::all();
-    return view('admin.serviceprovider-accounts', compact('providers'));
-})->name('admin.accounts.serviceproviders');
+    // Service Providers (ACTIVE only)
+    Route::get('/service-providers', function () {
+        $providers = \App\Models\ServiceProviderPartnership::where('status', 'active')->get();
+        return view('admin.serviceprovider-accounts', compact('providers'));
+    })->name('admin.accounts.serviceproviders');
 
+    // Suspended Accounts (ALL types shown here)
+    Route::get('/suspended', function () {
+        $students  = \App\Models\Student::where('status', 'suspended')->get();
+        $landlords = \App\Models\Landlord::where('status', 'suspended')->get();
+        $providers = \App\Models\ServiceProviderPartnership::where('status', 'suspended')->get();
+        return view('admin.suspended-accounts', compact('students','landlords','providers'));
+    })->name('admin.accounts.suspended');
 
-// =======================
-// VIEW STUDENT DETAILS
-// =======================
-Route::get('/students/{id}', function ($id) {
-    $student = \App\Models\Student::findOrFail($id);
-    return view('admin.view-student', compact('student'));
-})->name('admin.accounts.student.view');
+    // ===========
+    // VIEW PAGES
+    // ===========
+    Route::get('/students/{id}', function ($id) {
+        $student = \App\Models\Student::findOrFail($id);
+        return view('admin.view-student', compact('student'));
+    })->name('admin.accounts.student.view');
 
+    Route::get('/landlords/{id}', function ($id) {
+        $landlord = \App\Models\Landlord::findOrFail($id);
+        // Show their current listings (admin still sees even if suspended)
+        $currentListings = \App\Models\LandlordRental::where('landlordid', $id)->get();
+        return view('admin.view-landlord', compact('landlord','currentListings'));
+    })->name('admin.accounts.landlord.view');
 
-// =======================
-// VIEW LANDLORD DETAILS
-// =======================
-Route::get('/landlords/{id}', function ($id) {
-    $landlord = \App\Models\Landlord::findOrFail($id);
-    $currentListings = \App\Models\LandlordRental::where('landlordid', $id)->get();
+    Route::get('/service-providers/{id}', function ($id) {
+        $provider = \App\Models\ServiceProviderPartnership::findOrFail($id);
+        $admin = \App\Models\Staff::find($provider->administratorid);
+        return view('admin.view-serviceprovider', compact('provider','admin'));
+    })->name('admin.accounts.serviceprovider.view');
 
-    return view('admin.view-landlord', compact('landlord', 'currentListings'));
-})->name('admin.accounts.landlord.view');
+    // Listing detail page (admin)
+    Route::get('/listing/{id}', function ($id) {
+        $rental    = \App\Models\LandlordRental::findOrFail($id);
+        $landlord  = \App\Models\Landlord::find($rental->landlordid);
+        return view('admin.view-listing', compact('rental','landlord'));
+    })->name('admin.listing.view');
 
-Route::get('/listing/{id}', function ($id) {
-    $rental = \App\Models\LandlordRental::findOrFail($id);
-    $landlord = \App\Models\Landlord::findOrFail($rental->landlordid);
-    return view('admin.view-listing', compact('rental', 'landlord'));
-})->name('admin.listing.view');
+    // ==========================
+    // SUSPEND / REACTIVATE (RAW SQL)
+    // ==========================
+    Route::post('/suspend/{type}/{id}', function ($type, $id) {
+        if ($type === 'student') {
+            DB::update("UPDATE `student` SET `status` = 'suspended' WHERE `id` = ?", [$id]);
+            return back();
+        }
+        if ($type === 'landlord') {
+            DB::update("UPDATE `landlord` SET `status` = 'suspended' WHERE `id` = ?", [$id]);
+            return back();
+        }
+        if ($type === 'serviceprovider') {
+            DB::update("UPDATE `serviceproviderpartnership` SET `status` = 'suspended' WHERE `id` = ?", [$id]);
+            return back();
+        }
+        abort(404);
+    })->name('admin.accounts.suspend');
 
-// =======================
-// VIEW SERVICE PROVIDER DETAILS
-// =======================
-Route::get('/service-providers/{id}', function ($id) {
-    $provider = \App\Models\ServiceProviderPartnership::findOrFail($id);
-    $admin = \App\Models\Staff::find($provider->administratorid);
-
-    return view('admin.view-serviceprovider', compact('provider', 'admin'));
-})->name('admin.accounts.serviceprovider.view');
-
+    Route::post('/reactivate/{type}/{id}', function ($type, $id) {
+        if ($type === 'student') {
+            DB::update("UPDATE `student` SET `status` = 'active' WHERE `id` = ?", [$id]);
+            return back();
+        }
+        if ($type === 'landlord') {
+            DB::update("UPDATE `landlord` SET `status` = 'active' WHERE `id` = ?", [$id]);
+            return back();
+        }
+        if ($type === 'serviceprovider') {
+            DB::update("UPDATE `serviceproviderpartnership` SET `status` = 'active' WHERE `id` = ?", [$id]);
+            return back();
+        }
+        abort(404);
+    })->name('admin.accounts.reactivate');
 
 });
 
