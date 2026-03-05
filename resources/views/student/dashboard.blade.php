@@ -117,7 +117,7 @@
                         <option>Any</option>
                         <option>1–3 nights</option>
                         <option>4–5 nights</option>
-                        <option>Full week</option>
+                        <option>6-7 nights</option>
                     </select>
                 </div>
 

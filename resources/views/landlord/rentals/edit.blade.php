@@ -95,6 +95,21 @@
                     </div>
 
                     <div>
+                        <label class="text-sm font-semibold text-slate-700">Nights per Week</label>
+                        <input
+                            type="number"
+                            name="nightsperweek"
+                            value="{{ old('nightsperweek') }}"
+                            min="0"
+                            max="7"
+                            step="1"
+                            class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                            placeholder="e.g. 5"
+                        />
+                        <p class="mt-1 text-xs text-slate-500">Enter a number from 0 to 7</p>
+                    </div>
+
+                    <div>
                         <label class="text-sm font-semibold text-gray-700">Description *</label>
                         <textarea name="description" rows="5" required
                                   class="mt-2 w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
