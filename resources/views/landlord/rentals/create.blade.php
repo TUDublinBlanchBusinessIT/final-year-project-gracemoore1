@@ -136,13 +136,27 @@
                                     </select>
                                 </div> -->
 
-                                <!-- House Type -->
+                                <!-- House Type-->
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">House Type</label>
                                     <select name="housetype" class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                                         <option value="any" @selected(old('housetype') === 'any')>Any</option>
                                         <option value="single_private" @selected(old('housetype') === 'single_private')>Single room in private home (e.g. in a family home)</option>
                                         <option value="private_shared" @selected(old('housetype') === 'private_shared')>Private room in shared house (e.g. shared with other tenants)</option>
+                                        <option value="whole_property_group" @selected(old('housetype') === 'whole_property_group')>
+                                            Whole property (group application only)
+                                        </option>
+                                    </select>
+                                </div> 
+
+                                <!-- Accommodation Type -->
+                                <div>
+                                    <label class="text-sm font-semibold text-slate-700">Accommodation Type</label>
+                                    <select name="accommodation_type"
+                                            class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="" @selected(old('accommodation_type') === null)>Select</option>
+                                        <option value="house" @selected(old('accommodation_type') === 'house')>House</option>
+                                        <option value="apartment" @selected(old('accommodation_type') === 'apartment')>Apartment</option>
                                     </select>
                                 </div>
 

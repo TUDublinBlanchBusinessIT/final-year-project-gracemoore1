@@ -16,6 +16,7 @@ class LandlordRental extends Model
         'description',
         'measurement',
         'housetype',
+        'accommodation_type',
         'nightsperweek',
         'rentpermonth',
         'images',

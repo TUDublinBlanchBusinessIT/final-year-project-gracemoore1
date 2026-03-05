@@ -77,6 +77,15 @@
                 </div>
 
                 {{-- House Type --}}
+                <!--<p class="text-sm text-slate-600">
+                    {{ [
+                        'any' => 'Any',
+                        'single_private' => 'Single room in private home',
+                        'private_shared' => 'Private room in shared house',
+                        'whole_property_group' => 'Whole property (group application only)',
+                    ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
+                </p> -->
+
                 <div>
                     <label class="font-semibold text-slate-700">House Type</label>
                     <select class="w-full mt-1 rounded-lg border-slate-300">
@@ -193,11 +202,21 @@
                                     </div>
 
                                     {{-- House Type --}}
-                                    @if ($rental->housetype)
+                                     <p class="text-sm text-slate-600">
+                                        {{ [
+                                            'any' => 'Any',
+                                            'single_private' => 'Single room in private home',
+                                            'private_shared' => 'Private room in shared house',
+                                            'whole_property_group' => 'Whole property (group application only)',
+                                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
+                                    </p>   
+
+                                    
+                                    <!-- @if ($rental->housetype)
                                         <div class="text-sm text-slate-700 mt-1">
                                             {{ $rental->housetype }}
                                         </div>
-                                    @endif
+                                    @endif -->
 
                                     {{-- Nights per Week --}}
                                     @if ($rental->nightsperweek)
@@ -271,11 +290,19 @@
                                     </div>
 
                                     {{-- House Type --}}
-                                    @if ($rental->housetype)
+                                    <!--@if ($rental->housetype)
                                         <div class="text-sm text-slate-700 mt-1">
                                             {{ $rental->housetype }}
                                         </div>
-                                    @endif
+                                    @endif -->
+                                     <p class="text-sm text-slate-600">
+                                        {{ [
+                                            'any' => 'Any',
+                                            'single_private' => 'Single room in private home',
+                                            'private_shared' => 'Private room in shared house',
+                                            'whole_property_group' => 'Whole property (group application only)',
+                                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
+                                    </p>                                       
 
                                     {{-- Nights per Week --}}
                                     @if ($rental->nightsperweek)
