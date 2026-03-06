@@ -128,7 +128,7 @@ class LandlordRentalController extends Controller
 
     private function getCurrentLandlordId(): int
     {
-        // ✅ BEST CASE:
+    
         // if your landlords table has user_id and your logged in user is a landlord
         // return \App\Models\Landlord::where('user_id', auth()->id())->value('id');
 
@@ -140,6 +140,13 @@ class LandlordRentalController extends Controller
         $id = \App\Models\Landlord::where('email', auth()->user()->email)->value('id');
         if (!$id) abort(403, 'Landlord record not found for this user.');
         return (int) $id;
+    }
+
+    public function applications($rental)
+    {
+        $rental = \App\Models\LandlordRental::findOrFail($rental);
+
+        return view('landlord.applications', compact('rental'));
     }
 
 }

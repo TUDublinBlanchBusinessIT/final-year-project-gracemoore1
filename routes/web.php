@@ -11,6 +11,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\LandlordRegisterController;
 use App\Http\Controllers\Auth\LandlordCodeVerificationController; 
 use App\Http\Controllers\Auth\LandlordOCRController;
+use App\Http\Controllers\LandlordController;
+
 
 // Student controllers
 use App\Http\Controllers\StudentRegisterController;
@@ -65,6 +67,8 @@ Route::middleware(['landlord'])
         Route::delete('/rentals/{rental}', [LandlordRentalController::class, 'destroy'])->name('rentals.destroy');
     });
 
+Route::get('/landlord/applications/{rental}', [LandlordRentalController::class, 'applications'])
+    ->name('landlord.applications.index');
 
 Route::middleware(['landlord'])->group(function () {
     Route::get('/landlord/messages', fn () => view('landlord.messages'))->name('messages');
