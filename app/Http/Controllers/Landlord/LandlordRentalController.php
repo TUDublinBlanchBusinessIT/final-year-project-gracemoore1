@@ -146,7 +146,9 @@ class LandlordRentalController extends Controller
     {
         $rental = \App\Models\LandlordRental::findOrFail($rental);
 
-        return view('landlord.applications', compact('rental'));
+        return view('landlord.rentals.applications', compact('rental'));
     }
+
+
 
 }
