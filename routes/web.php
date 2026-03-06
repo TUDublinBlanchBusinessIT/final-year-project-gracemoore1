@@ -75,6 +75,9 @@ Route::middleware(['landlord'])->group(function () {
     Route::get('/landlord/support', fn () => view('landlord.support'))->name('landlord.support');
 });
 
+Route::get('/landlord/rentals/{rental}/applications', [LandlordRentalController::class, 'applications'])
+    ->name('landlord.applications.index');
+
 Route::get('/', function () {
     return view('welcome');
 });
