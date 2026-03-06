@@ -7,8 +7,18 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" class="text-xl font-bold text-blue-600">
                         RentConnect
+                        {{-- SUSPENSION BANNER BELOW NAV --}}
+                    @if($isSuspendedBanner)
+                        <div class="{{ $hasFixedSidebar ? 'lg:pl-60' : '' }}">
+                            <div class="bg-red-600 text-white px-4 py-3 rounded-md mt-4 mx-4 text-center font-semibold">
+                                Your {{ ucfirst($currentRole) }} account is suspended — 
+                                contact <strong>rentconnect.app@gmail.com</strong>
+                            </div>
+                        </div>
+                    @endif
                     </a>
                 </div>
+            </div>
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
@@ -37,8 +47,8 @@
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name ?? '' }}</div>
+                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email ?? '' }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
@@ -49,9 +59,8 @@
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault(); this.closest('form').submit();">
+                        onclick="event.preventDefault(); this.closest('form').submit();">
                         Log Out
                     </x-responsive-nav-link>
                 </form>

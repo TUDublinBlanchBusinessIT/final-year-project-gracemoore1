@@ -28,10 +28,44 @@
     if ($isLandlord)        $hasFixedSidebar = true;
     if ($isServiceProvider) $hasFixedSidebar = true; // ✅ include SP like Admin
 @endphp
+@php
+    // Load the correct user model based on session
+    $currentUser = null;
+    $currentRole = null;
 
+    if ($isStudent) {
+        $currentRole = 'student';
+        $currentUser = \App\Models\Student::find($isStudent);
+    }
+
+    if ($isLandlord) {
+        $currentRole = 'landlord';
+        $currentUser = \App\Models\Landlord::find($isLandlord);
+    }
+
+    if ($isServiceProvider) {
+        $currentRole = 'serviceprovider';
+        // YOUR ACTUAL MODEL NAME:
+        $currentUser = \App\Models\Serviceproviderpartnership::find($isServiceProvider);
+    }
+
+    if ($isAdmin) {
+        $currentRole = 'admin';
+        $currentUser = \App\Models\Admin::find($isAdmin);
+    }
+
+    // Normalize suspension
+    $status = strtolower(trim(
+        (string)($currentUser->status ?? $currentUser->account_status ?? '')
+    ));
+
+    $isSuspendedBanner = $currentUser && (
+        $status === 'suspended' ||
+        ($currentUser->is_suspended ?? false)
+    );
+@endphp
 <body class="font-sans antialiased">
 <div class="min-h-screen bg-gray-100">
-
     {{-- Top nav:
          Admin + ServiceProvider use their own sidebars/bottom navs (no default top bar)
          Others fall back to the standard top nav --}}
@@ -41,6 +75,7 @@
     @elseif ($isLandlord || Auth::check())
             @include('layouts.navigation')
     @endif
+
 
     {{-- PAGE HEADER --}}
     @isset($header)
@@ -54,6 +89,16 @@
                 py-6 px-4 sm:px-6 lg:px-8
             ">
                 {{ $header }}
+
+                {{-- SUSPENSION BANNER BELOW NAV --}}
+                @if($isSuspendedBanner)
+                    <div class="{{ $hasFixedSidebar ? 'lg:pl-60' : '' }} w-full px-0 mx-0">
+                        <div class="bg-red-600 text-white px-4 py-3 rounded-md mt-4 text-center font-semibold align-left">
+                            Your {{ ucfirst($currentRole) }} account is suspended — 
+                            contact <strong>rentconnect.app@gmail.com</strong>
+                        </div>
+                    </div>
+                @endif
             </div>
         </header>
     @endisset
@@ -85,3 +130,4 @@
 </div>
 </body>
 </html>
+
