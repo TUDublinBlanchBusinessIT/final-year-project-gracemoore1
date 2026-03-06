@@ -84,6 +84,43 @@
                 @endif
             </div>
 
+
+                        {{-- Additional Listing Details --}}
+            <div class="space-y-2 text-slate-700">
+
+                {{-- House Type --}}
+                @if(!empty($rental->housetype))
+                    <div>
+                        <span class="font-semibold">House Type:</span>
+                        {{ $rental->housetype }}
+                    </div>
+                @endif
+
+                {{-- Accommodation Type --}}
+                @if(!empty($rental->accommodation_type))
+                    <div>
+                        <span class="font-semibold">Accommodation Type:</span>
+                        {{ ucfirst($rental->accommodation_type) }}
+                    </div>
+                @endif
+
+                {{-- Nights Per Week --}}
+                @if(!empty($rental->nightsperweek))
+                    <div>
+                        <span class="font-semibold">Nights per Week:</span>
+                        {{ $rental->nightsperweek }}
+                    </div>
+                @endif
+
+                {{-- Measurement (already present but you can move it here if you want) --}}
+                @if(!empty($rental->measurement))
+                    <div>
+                        <span class="font-semibold">Size:</span>
+                        {{ $rental->measurement }}
+                    </div>
+                @endif
+
+            </div>
             {{-- Availability --}}
             <div class="text-slate-700">
                 <span class="font-semibold">Availability:</span>
@@ -104,6 +141,8 @@
                     </p>
                 </div>
             @endif
+
+
 
             {{-- Apply button (no action yet) --}}
             <div class="pt-2">
