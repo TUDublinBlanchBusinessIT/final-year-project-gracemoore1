@@ -7,15 +7,6 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" class="text-xl font-bold text-blue-600">
                         RentConnect
-                        {{-- SUSPENSION BANNER BELOW NAV --}}
-                    @if($isSuspendedBanner)
-                        <div class="{{ $hasFixedSidebar ? 'lg:pl-60' : '' }}">
-                            <div class="bg-red-600 text-white px-4 py-3 rounded-md mt-4 mx-4 text-center font-semibold">
-                                Your {{ ucfirst($currentRole) }} account is suspended — 
-                                contact <strong>rentconnect.app@gmail.com</strong>
-                            </div>
-                        </div>
-                    @endif
                     </a>
                 </div>
             </div>

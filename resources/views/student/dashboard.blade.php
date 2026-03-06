@@ -33,20 +33,6 @@
             Welcome back, {{ $student->firstname ?? $student->name ?? 'Student' }}!
         </h1>
 
-        @if(isset($student) && strtolower(trim($student->status)) === 'suspended')
-            <div style="
-                background:#c0392b;
-                color:white;
-                padding:20px;
-                border-radius:10px;
-                margin-bottom:30px;
-                font-size:17px;
-                font-weight:600;
-                text-align:center;">
-                Your account is currently suspended – for enquiries contact 
-                <strong>rentconnect.app@gmail.com</strong>
-            </div>
-        @endif
         {{-- SEARCH BAR --}}
         <div class="flex items-center bg-white border border-slate-300 rounded-xl px-4 py-3 shadow-sm">
             <svg class="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2"

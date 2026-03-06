@@ -22,14 +22,9 @@
     $isServiceProvider = session('serviceprovider_id');
 
     // Roles with a FIXED left sidebar on desktop:
-    $hasFixedSidebar = false;
-    if ($isStudent)         $hasFixedSidebar = true;
-    if ($isAdmin)           $hasFixedSidebar = true;
-    if ($isLandlord)        $hasFixedSidebar = true;
-    if ($isServiceProvider) $hasFixedSidebar = true; // ✅ include SP like Admin
-@endphp
-@php
-    // Load the correct user model based on session
+    $hasFixedSidebar = $isStudent || $isAdmin || $isLandlord || $isServiceProvider;
+
+    // Load current user model
     $currentUser = null;
     $currentRole = null;
 
@@ -45,7 +40,6 @@
 
     if ($isServiceProvider) {
         $currentRole = 'serviceprovider';
-        // YOUR ACTUAL MODEL NAME:
         $currentUser = \App\Models\Serviceproviderpartnership::find($isServiceProvider);
     }
 
@@ -64,43 +58,44 @@
         ($currentUser->is_suspended ?? false)
     );
 @endphp
+
 <body class="font-sans antialiased">
 <div class="min-h-screen bg-gray-100">
+
     {{-- Top nav:
          Admin + ServiceProvider use their own sidebars/bottom navs (no default top bar)
          Others fall back to the standard top nav --}}
     @if ($isAdmin || $isServiceProvider)
         {{-- No default top bar --}}
-    
     @elseif ($isLandlord || Auth::check())
-            @include('layouts.navigation')
+        @include('layouts.navigation')
     @endif
 
 
     {{-- PAGE HEADER --}}
     @isset($header)
-        <header class="bg-white shadow {{ $hasFixedSidebar ? 'lg:pl-60' : '' }}">
-            <div class="
-                @if ($isStudent || $isAdmin || $isServiceProvider)
-                    w-full
-                @else
-                    max-w-5xl mx-auto
-                @endif
-                py-6 px-4 sm:px-6 lg:px-8
-            ">
-                {{ $header }}
+    <header class="bg-white shadow {{ $hasFixedSidebar ? 'lg:pl-60' : '' }}">
 
-                {{-- SUSPENSION BANNER BELOW NAV --}}
-                @if($isSuspendedBanner)
-                    <div class="{{ $hasFixedSidebar ? 'lg:pl-60' : '' }} w-full px-0 mx-0">
-                        <div class="bg-red-600 text-white px-4 py-3 rounded-md mt-4 text-center font-semibold align-left">
-                            Your {{ ucfirst($currentRole) }} account is suspended — 
-                            contact <strong>rentconnect.app@gmail.com</strong>
-                        </div>
-                    </div>
-                @endif
+        {{-- FULL-WIDTH SUSPENSION BANNER (below RentConnect, but before header content) --}}
+        @if($isSuspendedBanner)
+            <div class="bg-red-600 text-white px-4 py-3 w-full text-center font-semibold">
+                Your {{ ucfirst($currentRole) }} account is suspended —
+                contact <strong>rentconnect.app@gmail.com</strong>
             </div>
-        </header>
+        @endif
+
+        {{-- Original header content --}}
+        <div class="
+            @if ($isStudent || $isAdmin || $isServiceProvider)
+                w-full
+            @else
+                max-w-5xl mx-auto
+            @endif
+            py-6 px-4 sm:px-6 lg:px-8
+        ">
+            {{ $header }}
+        </div>
+    </header>
     @endisset
 
     {{-- MAIN CONTENT --}}
@@ -124,7 +119,7 @@
     @elseif ($isAdmin)
         @include('partials.admin-nav')
     @elseif ($isServiceProvider)
-        @include('partials.serviceprovider-nav') {{-- ✅ correct include --}}
+        @include('partials.serviceprovider-nav')
     @endif
 
 </div>
