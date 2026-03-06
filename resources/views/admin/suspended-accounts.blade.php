@@ -44,7 +44,7 @@
         </div>
     @empty
         <div class="text-slate-500 text-sm">No suspended service providers.</div>
-    @endforelse>
+    @endforelse
 
 </div>
 

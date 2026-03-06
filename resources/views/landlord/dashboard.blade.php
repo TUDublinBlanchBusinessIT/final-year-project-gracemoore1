@@ -10,25 +10,40 @@
     <div class="pb-28 lg:pl-70">
 
 
-        <div>
+                <div>
 
-                {{-- Welcome card --}}
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-8 text-gray-900">
+                    {{-- Welcome card --}}
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-8 text-gray-900">
 
-                        <h1 class="text-3xl font-bold text-blue-600 mb-4">
-                            Welcome back, {{ Auth::user()->name }}!
-                        </h1>
+                            <h1 class="text-3xl font-bold text-blue-600 mb-10">
+                                Welcome back, {{ Auth::user()->name }}!
+                            </h1>
 
-                        <p class="text-gray-700 text-lg">
-                            This is your dashboard.
-                            You can manage your account, update your profile, and access new features as they’re added.
-                        </p>
+                            {{-- ⭐ SUSPENDED ACCOUNT WARNING --}}
+                            @if(isset($landlord) && strtolower(trim($landlord->status)) === 'suspended')
+                                <div style="
+                                    background:#c0392b;
+                                    color:white;
+                                    padding:22px;
+                                    border-radius:10px;
+                                    margin-bottom:35px;
+                                    font-size:17px;
+                                    font-weight:600;
+                                    text-align:center;">
+                                    Your landlord account is currently suspended —
+                                    for enquiries contact <strong>rentconnect.app@gmail.com</strong>.
+                                </div>
+                            @endif
 
+                            <p class="text-gray-700 text-lg">
+                                This is your dashboard.
+                                You can manage your account, update your profile, and access new features as they are added.
+                            </p>
+
+                        </div>
                     </div>
                 </div>
-        </div>
-
                 {{-- YOUR LISTINGS SECTION --}}
                 @php
                     $landlordId = \App\Models\Landlord::where('email', Auth::user()->email)->value('id');

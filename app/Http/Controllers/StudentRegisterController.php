@@ -291,9 +291,18 @@ class StudentRegisterController extends Controller
             return redirect('/login');
         }
 
-        $listings = LandlordRental::where('status', 'available')->get();
+        // Load the logged-in student
+        $student = \App\Models\Student::find(session('student_id'));
 
-        return view('student.dashboard', compact('listings'));
+        // Only show listings from ACTIVE landlords
+        $listings = \App\Models\LandlordRental::query()
+            ->join('landlord', 'landlord.id', '=', 'rental.landlordid')
+            ->where('landlord.status', 'active')    // ← FILTER OUT SUSPENDED LANDLORDS
+            ->where('rental.status', 'available')   // ← Keep your existing filter
+            ->select('rental.*')                    // ← Ensure only rental columns returned
+            ->get();
+
+        return view('student.dashboard', compact('listings', 'student'));
     }
 
     

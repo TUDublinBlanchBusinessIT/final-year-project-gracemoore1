@@ -41,7 +41,7 @@
                                 : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
                         Service Providers
                     </a>
-                </li>#
+                </li>
 
                 <li>
                     <a href="{{ route('admin.accounts.suspended') }}"

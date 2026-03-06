@@ -9,6 +9,22 @@
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Welcome to RentConnect, {{ $spName }}
+            {{-- ⭐ SUSPENDED ACCOUNT WARNING --}}
+            @if(isset($provider) && strtolower(trim($provider->status)) === 'suspended')
+                <div style="
+                    background:#c0392b;
+                    color:white;
+                    padding:22px;
+                    border-radius:10px;
+                    margin:30px auto 40px auto;
+                    max-width:900px;
+                    font-size:17px;
+                    font-weight:600;
+                    text-align:center;">
+                    Your service provider account is currently suspended —
+                    for enquiries contact <strong>rentconnect.app@gmail.com</strong>.
+                </div>
+            @endif
         </h2>
     </x-slot>
 
