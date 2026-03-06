@@ -45,7 +45,7 @@
 
     if ($isAdmin) {
         $currentRole = 'admin';
-        $currentUser = \App\Models\Admin::find($isAdmin);
+        $currentUser = \App\Models\Administrator::find($isAdmin);
     }
 
     // Normalize suspension
