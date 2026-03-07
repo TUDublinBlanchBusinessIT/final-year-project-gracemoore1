@@ -70,11 +70,6 @@ class ApplicationController extends Controller
 
     /**
      * Store Group Application
-     *
-     * - Creates ONE leader application row (for the logged-in student)
-     * - Saves all tenants into group_members JSON (your current pattern)
-     * - Emails each additional tenant to notify them they were included
-     * - NO extra DB columns, NO invite flow
      */
     public function submitGroup(Request $request, $rentalId)
     {
@@ -96,12 +91,11 @@ class ApplicationController extends Controller
 
         $tenants = $request->tenants;
 
-        // (Safety) Force the first tenant to be the logged-in student data,
-        // in case a client tries to tamper with hidden fields.
+        // Always force tenant 1 to be the creator
         $tenants[0]['full_name'] = trim($student->firstname . ' ' . $student->surname);
         $tenants[0]['email']     = $student->email;
 
-        // Create the single leader application row
+        // Create the single group application row
         Application::create([
             'applicationtype'    => 'group',
             'status'             => 'pending',
@@ -112,27 +106,22 @@ class ApplicationController extends Controller
             'group_members'      => json_encode($tenants),
         ]);
 
-        // Email each additional tenant to notify them they were added
+        // Email all other tenants
         $rentalAddress = trim(($listing->housenumber ? $listing->housenumber . ' ' : '') . $listing->street . ', ' . $listing->county);
-        $leaderName    = $tenants[0]['full_name'];
+        $creatorName   = $tenants[0]['full_name'];
 
         foreach (array_slice($tenants, 1) as $member) {
-            $inviteeName  = $member['full_name'] ?? '';
-            $inviteeEmail = $member['email']     ?? '';
-            if (!$inviteeEmail) {
-                continue;
-            }
+            $name  = $member['full_name'] ?? '';
+            $email = $member['email'] ?? '';
+            if (!$email) continue;
 
-            // Simple, dependency-free mail (no new Mailable class required)
             Mail::raw(
-                "Hello {$inviteeName},\n\n" .
-                "{$leaderName} included you as a tenant on a group application for {$rentalAddress}.\n\n" .
-                "If this application is unwanted on your behalf, you can withdraw it on your profile (Applications).\n\n" .
-                "If you do not yet have an account, register with your university email and you will see it under Applications.\n\n" .
+                "Hello {$name},\n\n".
+                "{$creatorName} included you in a group application for {$rentalAddress}.\n\n".
+                "If you do not have an account yet, register with your university email to see it.\n\n".
                 "Thanks,\nRentConnect",
-                function ($message) use ($inviteeEmail, $rentalAddress) {
-                    $message->to($inviteeEmail)
-                            ->subject("You were added to a group application – {$rentalAddress}");
+                function ($m) use ($email, $rentalAddress) {
+                    $m->to($email)->subject("You were added to a group application – {$rentalAddress}");
                 }
             );
         }
@@ -142,20 +131,22 @@ class ApplicationController extends Controller
             ->with('success', 'Group application submitted.');
     }
 
+    /**
+     * Delete ENTIRE application (creator or any group member)
+     */
     public function withdraw($id)
     {
         if (!session()->has('student_id')) {
             return redirect('/student/login');
         }
 
-        $app = Application::where('id', $id)
-            ->where('studentid', session('student_id'))
-            ->firstOrFail();
+        $app = Application::findOrFail($id);
 
+        // Anyone listed can delete the entire group application
         $app->delete();
 
         return redirect()
             ->route('student.profile.new.applications')
-            ->with('success', 'Application withdrawn successfully.');
+            ->with('success', 'Group application deleted for all tenants.');
     }
 }

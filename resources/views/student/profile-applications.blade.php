@@ -213,7 +213,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button class="px-3 py-1 rounded text-xs bg-red-100 text-red-700 hover:bg-red-200">
-                                            Withdraw
+                                            Withdraw 
                                         </button>
                                     </form>
 

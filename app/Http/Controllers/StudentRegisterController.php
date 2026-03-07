@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentCodeMail;
 use App\Models\LandlordRental;
+use App\Models\Application;
+
 
 class StudentRegisterController extends Controller
 {
@@ -410,48 +412,48 @@ class StudentRegisterController extends Controller
         return view('student.profile-new');
     }
 
-    public function studentProfileApplications()
-    {
-        if (!session()->has('student_id')) return redirect('/student/login');
+        public function studentProfileApplications()
+        {
+            if (!session()->has('student_id')) {
+                return redirect('/student/login');
+            }
 
-        // Current student
-        $student   = \App\Models\Student::find(session('student_id'));
-        $myId      = $student->id;
-        $myEmail   = $student->email;
+            $student = Student::find(session('student_id'));
+            $myId    = $student->id;
+            $myEmail = strtolower(trim($student->email));
 
-        // We search for the exact JSON pattern "email":"<their email>"
-        // so we don't accidentally match a substring of another address.
-        $needle = '"email":"' . addslashes($myEmail) . '"';
+            // JSON pattern for matching email (case + whitespace tolerant)
+            $pattern = '"email"[[:space:]]*:[[:space:]]*"'.$myEmail.'"';
 
-        $pending = \App\Models\Application::with('rental')
-            ->where(function ($q) use ($myId, $needle) {
-                $q->where('studentid', $myId)
-                ->orWhere('group_members', 'like', '%' . $needle . '%');
-            })
-            ->where('status', 'pending')
-            ->orderByDesc('dateapplied')
-            ->get();
+            $pending = Application::with('rental')
+                ->where(function ($q) use ($myId, $pattern) {
+                    $q->where('studentid', $myId)
+                    ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
+                })
+                ->where('status','pending')
+                ->orderByDesc('dateapplied')
+                ->get();
 
-        $accepted = \App\Models\Application::with('rental')
-            ->where(function ($q) use ($myId, $needle) {
-                $q->where('studentid', $myId)
-                ->orWhere('group_members', 'like', '%' . $needle . '%');
-            })
-            ->where('status', 'accepted')
-            ->orderByDesc('dateapplied')
-            ->get();
+            $accepted = Application::with('rental')
+                ->where(function ($q) use ($myId, $pattern) {
+                    $q->where('studentid', $myId)
+                    ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
+                })
+                ->where('status','accepted')
+                ->orderByDesc('dateapplied')
+                ->get();
 
-        $rejected = \App\Models\Application::with('rental')
-            ->where(function ($q) use ($myId, $needle) {
-                $q->where('studentid', $myId)
-                ->orWhere('group_members', 'like', '%' . $needle . '%');
-            })
-            ->where('status', 'rejected')
-            ->orderByDesc('dateapplied')
-            ->get();
+            $rejected = Application::with('rental')
+                ->where(function ($q) use ($myId, $pattern) {
+                    $q->where('studentid', $myId)
+                    ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
+                })
+                ->where('status','rejected')
+                ->orderByDesc('dateapplied')
+                ->get();
 
-        return view('student.profile-applications', compact('pending', 'accepted', 'rejected'));
-    }
+            return view('student.profile-applications', compact('pending','accepted','rejected'));
+        }
 
     public function studentProfileAccount()
     {
