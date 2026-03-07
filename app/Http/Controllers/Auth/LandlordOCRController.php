@@ -100,12 +100,14 @@ class LandlordOCRController extends Controller
                 'password' => $pending->password,
                 'email_verified_at' => now(),
                 'ocr_verified' => 1,
+                'role' => 'landlord',
             ]);
 
         } else {
             $user->update([
                 'email_verified_at' => now(),
                 'ocr_verified' => 1,
+                'role' => 'landlord',
             ]);
         }
 

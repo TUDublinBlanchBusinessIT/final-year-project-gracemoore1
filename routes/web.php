@@ -35,9 +35,13 @@ Route::get('/landlord/register', [LandlordRegisterController::class, 'create'])
 Route::post('/landlord/register', [LandlordRegisterController::class, 'store'])
     ->name('landlord.register.store');
 
-Route::get('/landlord/verify-email', function () {
-    return view('landlord.verify-email');
-})->name('landlord.verify.email');
+Route::get('/landlord/verify-email', function (Request $request) {
+    return view('landlord.verify-email', ['email' => $request->email]);
+})->name('landlord.verify.email');  
+
+//Route::get('/landlord/verify-email', function () {
+    //return view('landlord.verify-email');
+//})->name('landlord.verify.email');
 
 Route::post('/landlord/verify-email', [LandlordCodeVerificationController::class, 'verify'])
     ->name('landlord.verify.email.submit');
