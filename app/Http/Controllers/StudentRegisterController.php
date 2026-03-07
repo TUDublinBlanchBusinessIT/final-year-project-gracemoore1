@@ -416,23 +416,25 @@ class StudentRegisterController extends Controller
 
         $studentId = session('student_id');
 
-        // Load with rental relation
         $pending = \App\Models\Application::with('rental')
             ->where('studentid', $studentId)
             ->where('status', 'pending')
+            ->orderByDesc('dateapplied')
             ->get();
 
         $accepted = \App\Models\Application::with('rental')
             ->where('studentid', $studentId)
             ->where('status', 'accepted')
+            ->orderByDesc('dateapplied')
             ->get();
 
         $rejected = \App\Models\Application::with('rental')
             ->where('studentid', $studentId)
             ->where('status', 'rejected')
+            ->orderByDesc('dateapplied')
             ->get();
 
-        return view('student.profile-applications', compact('pending','accepted','rejected'));
+        return view('student.profile-applications', compact('pending', 'accepted', 'rejected'));
     }
 
     public function studentProfileAccount()
