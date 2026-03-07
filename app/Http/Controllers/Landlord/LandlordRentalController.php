@@ -46,6 +46,7 @@ class LandlordRentalController extends Controller
             'availablefrom'  => ['required','date'],
             'availableuntil' => ['required','date','after_or_equal:availablefrom'],
             'images.*'       => ['nullable','image','mimes:jpg,jpeg,png,webp','max:4096'],
+            'application_type' => ['required', 'in:single,group'],
         ]);
 
         $landlordId = $this->getCurrentLandlordId();
@@ -67,13 +68,15 @@ class LandlordRentalController extends Controller
             'description'   => $request->description,
             'measurement'   => $request->measurement,
             'housetype'     => $request->housetype,
-             'accommodation_type' => $request->accommodation_type,
+            'accommodation_type' => $request->accommodation_type,
             'nightsperweek' => $request->nightsperweek,
             'rentpermonth'  => $request->rentpermonth,
             'images'        => json_encode($imagePaths),
             'status'        => $request->status,
             'availablefrom' => $request->availablefrom,
             'availableuntil'=> $request->availableuntil,
+            'application_type' => $request->string('application_type'),
+
         ]);
 
         return redirect()->route('dashboard')->with('status', 'Listing created!');

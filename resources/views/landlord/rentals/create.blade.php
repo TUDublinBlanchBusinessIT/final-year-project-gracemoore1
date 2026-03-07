@@ -160,6 +160,25 @@
                                     </select>
                                 </div>
 
+                                <!---Application Type -->
+                                <div>
+                                    <label for="application_type" class="text-sm font-semibold text-slate-700">Application Type</label>
+                                    <select
+                                        id="application_type"
+                                        name="application_type"
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        required
+                                    >
+                                        <option value="" @selected(old('application_type') === null)>Select</option>
+                                        <option value="single" @selected(old('application_type') === 'single')>Single Applications</option>
+                                        <option value="group" @selected(old('application_type') === 'group')>Group Applications</option>
+                                    </select>
+
+                                    @error('application_type')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
                                 <!-- UPDATED: Nights Per Week -->
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Nights per Week</label>
