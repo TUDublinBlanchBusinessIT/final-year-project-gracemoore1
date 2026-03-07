@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-800">
-            Group Application – {{ $listing->street }}, {{ $listing->county }}
+            Group Application – {{ $rental->street }}, {{ $rental->county }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,7 @@
 
         <h3 class="text-lg font-semibold mb-4">Group Application Form</h3>
 
-        <form method="POST" action="{{ route('applications.submit.group', $listing->id) }}">
+        <form method="POST" action="{{ route('applications.submit.group', $rental->id) }}">
             @csrf
 
             <div id="tenant-container" class="space-y-6">

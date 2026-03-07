@@ -2,7 +2,7 @@
 
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-800">
-            Apply for {{ $listing->street }}, {{ $listing->county }}
+            Apply for {{ $rental->street }}, {{ $rental->county }}
         </h2>
     </x-slot>
 
@@ -10,7 +10,7 @@
 
         <h3 class="text-lg font-semibold mb-4">Single Application</h3>
 
-        <form method="POST" action="{{ route('applications.submit.single', $listing->id) }}">
+        <form method="POST" action="{{ route('applications.submit.single', $rental->id) }}">
             @csrf
 
             {{-- Full Name --}}
@@ -20,7 +20,7 @@
                        class="w-full bg-slate-100 border rounded-lg px-3 py-2" 
                        value="{{ $student->firstname }} {{ $student->surname }}"
                        disabled>
-            </div
+            </div>
             <div class="mb-4">
                 <label class="font-semibold">Email</label>
                 <input type="email" 
