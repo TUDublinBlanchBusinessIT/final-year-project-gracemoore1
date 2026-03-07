@@ -10,7 +10,11 @@
     </x-slot>
 
     <div class="max-w-5xl mx-auto px-4 py-8">
-
+        @if(session('success'))
+            <div class="mb-4 p-3 rounded-lg bg-green-100 border border-green-300 text-green-800">
+                {{ session('success') }}
+            </div>
+        @endif
         {{-- Sub-nav --}}
         <nav class="mt-3 border-b border-slate-200">
             <ul class="flex gap-6 text-sm">
@@ -47,7 +51,41 @@
                         <div class="mt-3 space-y-3">
                             @foreach($pending as $app)
                                 <div class="p-3 border rounded-lg">
-                                    <p class="font-semibold">{{ $app->title ?? 'Application' }}</p>
+                                    {{-- PENDING --}}
+                                        <h3 class="text-base font-semibold text-blue-600">Pending</h3>
+
+                                        @if(count($pending) === 0)
+                                            <p class="text-gray-500 mt-1">No pending applications.</p>
+                                        @else
+                                            <div class="mt-4 space-y-4">
+                                                @foreach($pending as $app)
+                                                    <div class="p-4 border rounded-lg bg-white shadow flex gap-4">
+
+                                                        {{-- Rental Image --}}
+                                                        {{ asset('uploads/' . $app->rental->image) }}
+
+                                                        <div class="flex-1">
+                                                            <div class="font-bold text-lg">
+                                                                {{ $app->rental->street }}, {{ $app->rental->county }}
+                                                            </div>
+
+                                                            <div class="text-gray-700 text-sm mt-1">
+                                                                <strong>House type:</strong> {{ $app->rental->housetype }} <br>
+                                                                <strong>Nights per week:</strong> {{ $app->rental->nights }} <br>
+                                                                <strong>Available from:</strong> {{ $app->rental->availablefrom }} <br>
+                                                                <strong>Available to:</strong> {{ $app->rental->availableto }} <br>
+                                                                <strong>Rent:</strong> €{{ $app->rental->rent }} per week
+                                                            </div>
+
+                                                            <div class="mt-2 inline-block px-2 py-1 rounded text-xs bg-yellow-200 text-yellow-800">
+                                                                Pending
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     <p class="text-sm text-gray-600">
                                         Submitted: {{ optional($app->created_at)->format('d M Y') }}
                                     </p>

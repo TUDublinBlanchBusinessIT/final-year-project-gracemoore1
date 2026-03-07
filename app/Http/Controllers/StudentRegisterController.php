@@ -414,9 +414,23 @@ class StudentRegisterController extends Controller
     {
         if (!session()->has('student_id')) return redirect('/student/login');
 
-        $pending = [];
-        $accepted = [];
-        $rejected = [];
+        $studentId = session('student_id');
+
+        // Load with rental relation
+        $pending = \App\Models\Application::with('rental')
+            ->where('studentid', $studentId)
+            ->where('status', 'pending')
+            ->get();
+
+        $accepted = \App\Models\Application::with('rental')
+            ->where('studentid', $studentId)
+            ->where('status', 'accepted')
+            ->get();
+
+        $rejected = \App\Models\Application::with('rental')
+            ->where('studentid', $studentId)
+            ->where('status', 'rejected')
+            ->get();
 
         return view('student.profile-applications', compact('pending','accepted','rejected'));
     }

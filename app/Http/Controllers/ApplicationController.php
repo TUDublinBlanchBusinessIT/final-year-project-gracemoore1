@@ -62,8 +62,9 @@ class ApplicationController extends Controller
             'group_members'      => null,
         ]);
 
-        return redirect('/dashboard')
-            ->with('success', 'Your application has been submitted.');
+        return redirect()
+            ->route('student.profile.new.applications')
+            ->with('success', 'Application created successfully');
     }
 
     /**
@@ -97,7 +98,8 @@ class ApplicationController extends Controller
             'group_members'      => json_encode($request->tenants),
         ]);
 
-        return redirect('/dashboard')
-            ->with('success', 'Group application submitted.');
+        return redirect()
+            ->route('student.profile.new.applications')
+            ->with('success', 'Application created successfully');
     }
 }

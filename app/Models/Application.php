@@ -28,6 +28,7 @@ class Application extends Model
 
     public function rental()
     {
-        return $this->belongsTo(LandlordRental::class, 'rentalid');
+        return $this->belongsTo(\App\Models\LandlordRental::class, 'rentalid');
     }
+
 }
