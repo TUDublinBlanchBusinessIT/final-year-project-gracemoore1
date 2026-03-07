@@ -24,7 +24,8 @@ class StudentRegisterController extends Controller
 
             'mu.ie',                // Maynooth University (MU)
 
-            'dcu.ie',               // Dublin City University (DCU)
+            'dcu.ie',
+            'mail.dcu.ir',               // Dublin City University (DCU)
 
             'ul.ie',                // University of Limerick (UL)
 
