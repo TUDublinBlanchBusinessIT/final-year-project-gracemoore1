@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentCodeMail;
 use App\Models\LandlordRental;
-use App\Models\Application;
 
+use App\Models\Application;
+use Illuminate\Support\Facades\Log;
 
 class StudentRegisterController extends Controller
 {
@@ -26,7 +27,8 @@ class StudentRegisterController extends Controller
 
             'mu.ie',                // Maynooth University (MU)
 
-            'dcu.ie',               // Dublin City University (DCU)
+            'dcu.ie',
+            'mail.dcu.ie',               // Dublin City University (DCU)
 
             'ul.ie',                // University of Limerick (UL)
 
@@ -92,6 +94,12 @@ class StudentRegisterController extends Controller
         ]);
 
         $code = rand(1000, 9999);
+        
+        // Log the code for debugging
+        Log::info('Student email verification code generated', [
+            'email' => $data['email'],
+            'code' => $code,
+        ]);
 
         session([
             'registration_data' => [
@@ -234,17 +242,43 @@ class StudentRegisterController extends Controller
         $year = date('Y', $dob);
         $month = date('M', $dob); // e.g. JAN
 
-        $possibleMonths = [
-            strtolower($month), // jan
-            strtolower(date('F', $dob)), // january
-            strtolower(substr($month, 0, 2)), // ja
-            'ean', // common OCR error for JAN
-            'ian',
-            'jan.',
-            'janua',
-            'january',
+        // Normalize helper (remove accents + punctuation)
+        function norm($s) {
+            $s = strtolower($s);
+            $s = iconv('UTF-8','ASCII//TRANSLIT',$s); // lún → lun
+            return preg_replace('/[^a-z]/','', $s);
+        }
+
+        // Dictionary of month variations (English + Irish + OCR variants)
+        $monthDictionary = [
+            'january'   => ['jan','ja','janu','janua','ian','ean','january'],
+            'february'  => ['feb','fe','febr','feabh','feabhra','february'],
+            'march'     => ['mar','ma','már','marc','march'],
+            'april'     => ['apr','ap','aib','aibrean','aibreán','april'],
+            'may'       => ['may','ma','beal','bealtaine'],
+            'june'      => ['jun','ju','meith','meitheamh','june'],
+            'july'      => ['jul','ju','iuil','iúil','july'],
+            'august'    => ['aug','au','lun','lún','lunas','lunasa','lúnasa','august'],
+            'september' => ['sep','se','sept','mean','meán','meánfomhair','september'],
+            'october'   => ['oct','oc','deir','deireadhfomhair','october'],
+            'november'  => ['nov','no','samh','samhain','november'],
+            'december'  => ['dec','de','noll','nollaig','december'],
         ];
 
+        // Find real month being checked
+        $englishMonth = strtolower(date('F', $dob)); // "august"
+
+        // Start your original structure
+        $possibleMonths = [
+            strtolower($month),                    // "aug"
+            strtolower($englishMonth),             // "august"
+            strtolower(substr($month, 0, 2)),      // "au"
+        ];
+
+        // Add all normalized dictionary variants for that month
+        foreach ($monthDictionary[$englishMonth] as $variant) {
+            $possibleMonths[] = norm($variant);
+        }
         $dayFound = stripos($text, ltrim($day, '0')) !== false || stripos($text, $day) !== false;
         $yearFound = stripos($text, $year) !== false;
 
