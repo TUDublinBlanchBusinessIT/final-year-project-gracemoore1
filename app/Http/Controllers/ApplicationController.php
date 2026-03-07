@@ -13,6 +13,7 @@ class ApplicationController extends Controller
      */
     public function start($listingId, $type)
     {
+        $student = \App\Models\Student::find(session('student_id'));
         if (!session('student_id')) {
             return redirect('/student/login');
         }
@@ -26,6 +27,7 @@ class ApplicationController extends Controller
         return view('applications.start-' . $type, [
             'listing' => $listing,
             'type' => $type,
+            'student' => $student
         ]);
     }
 
@@ -34,6 +36,7 @@ class ApplicationController extends Controller
      */
     public function submitSingle(Request $request, $listingId)
     {
+        $student = \App\Models\Student::find(session('student_id'));
         if (!session('student_id')) {
             return redirect('/student/login');
         }
@@ -68,6 +71,7 @@ class ApplicationController extends Controller
      */
     public function submitGroup(Request $request, $listingId)
     {
+        $student = \App\Models\Student::find(session('student_id'));
         if (!session('student_id')) {
             return redirect('/student/login');
         }

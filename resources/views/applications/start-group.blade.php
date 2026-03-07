@@ -18,25 +18,25 @@
                 <div class="tenant-card p-4 border rounded-lg bg-slate-50">
                     <h4 class="font-semibold mb-2">Tenant 1 (You)</h4>
 
-                    {{-- Hidden values passed to controller --}}
+                    {{-- Hidden values passed --}}
                     <input type="hidden" name="tenants[0][full_name]"
-                           value="{{ auth()->user()->firstname }} {{ auth()->user()->surname }}">
+                           value="{{ $student->firstname }} {{ $student->surname }}">
 
                     <input type="hidden" name="tenants[0][email]"
-                           value="{{ auth()->user()->email }}">
+                           value="{{ $student->email }}">
 
                     {{-- Display full name --}}
                     <label class="block mb-1 font-medium">Full Name</label>
                     <input type="text"
                            class="w-full bg-slate-100 rounded-lg px-3 py-2"
-                           value="{{ auth()->user()->firstname }} {{ auth()->user()->surname }}"
+                           value="{{ $student->firstname }} {{ $student->surname }}"
                            disabled>
 
                     {{-- Display email --}}
                     <label class="block mt-3 mb-1 font-medium">Email</label>
                     <input type="email"
                            class="w-full bg-slate-100 rounded-lg px-3 py-2"
-                           value="{{ auth()->user()->email }}"
+                           value="{{ $student->email }}"
                            disabled>
 
                     {{-- Age --}}
@@ -45,7 +45,7 @@
                            class="w-full border rounded-lg px-3 py-2">
 
                     {{-- Gender --}}
-                    <label class="block mt-3 mb-1 font-medium">Gender</label>
+                    font-medium">Gender</label>
                     <select name="tenants[0][gender]" required
                             class="w-full border rounded-lg px-3 py-2">
                         <option value="">Select…</option>
@@ -65,7 +65,7 @@
                 + Add Another Tenant
             </button>
 
-            {{-- Additional details for the whole group --}}
+            {{-- Additional details --}}
             <div class="mt-6">
                 <label class="block font-medium mb-1">Additional Details (optional)</label>
                 <textarea name="additional_details" rows="4"
@@ -81,7 +81,6 @@
         </form>
     </div>
 
-    {{-- JavaScript for adding tenants --}}
     <script>
         let tenantIndex = 1;
 

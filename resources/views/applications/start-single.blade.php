@@ -1,115 +1,69 @@
 <x-app-layout>
+
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-800">
-            Group Application – {{ $listing->street }}, {{ $listing->county }}
+            Apply for {{ $listing->street }}, {{ $listing->county }}
         </h2>
     </x-slot>
 
-    <div class="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-xl shadow">
+    <div class="max-w-2xl mx-auto bg-white shadow border rounded-xl p-6 mt-6">
 
-        <h3 class="text-lg font-semibold mb-4">Tenant Information</h3>
+        <h3 class="text-lg font-semibold mb-4">Single Application</h3>
 
-        <form method="POST" 
-              action="{{ route('applications.submit.group', $listing->id) }}">
+        <form method="POST" action="{{ route('applications.submit.single', $listing->id) }}">
             @csrf
 
-            <div id="tenant-container" class="space-y-6">
-
-                {{-- Tenant 1 - auto-filled --}}
-                <div class="tenant-card p-4 border rounded-lg bg-slate-50">
-                    <h4 class="font-semibold mb-2">Tenant 1 (You)</h4>
-
-                    <input type="hidden" name="tenants[0][full_name]"
-                           value="{{ auth()->user()->firstname }} {{ auth()->user()->surname }}">
-
-                    <input type="hidden" name="tenants[0][email]"
-                           value="{{ auth()->user()->email }}">
-
-                    <label class="block mb-1 font-medium">Full Name</label>
-                    <input type="text" disabled
-                           class="w-full bg-slate-100 rounded-lg px-3 py-2"
-                           value="{{ auth()->user()->firstname }} {{ auth()->user()->surname }}">
-
-                    <label class="block mt-3 mb-1 font-medium">Email</label>
-                    <input type="text" disabled class="w-full bg-slate-100 rounded-lg px-3 py-2"
-                           value="{{ auth()->user()->email }}">
-
-                    <label class="block mt-3 mb-1 font-medium">Age</label>
-                    <input name="tenants[0][age]" type="number" required
-                           class="w-full border rounded-lg px-3 py-2">
-
-                    <label class="block mt-3 mb-1 font-medium">Gender</label>
-                    <select name="tenants[0][gender]" required
-                            class="w-full border rounded-lg px-3 py-2">
-                        <option>Select…</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="nonbinary">Non-binary</option>
-                        <option value="prefer_not_say">Prefer not to say</option>
-                    </select>
-                </div>
-
+            {{-- Full Name --}}
+            <div class="mb-4">
+                <label class="font-semibold">Full Name</label>
+                <input type="text" 
+                       class="w-full bg-slate-100 border rounded-lg px-3 py-2" 
+                       value="{{ $student->firstname }} {{ $student->surname }}"
+                       disabled>
+            </div
+            <div class="mb-4">
+                <label class="font-semibold">Email</label>
+                <input type="email" 
+                       class="w-full bg-slate-100 border rounded-lg px-3 py-2" 
+                       value="{{ $student->email }}"
+                       disabled>
             </div>
 
-            {{-- Add another tenant button --}}
-            <button type="button"
-                    onclick="addTenant()"
-                    class="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
-                + Add Another Tenant
-            </button>
+            <input type="hidden" name="applicationtype" value="single">
 
-            {{-- Additional Details --}}
-            <div class="mt-6">
-                <label class="block font-medium mb-1">Additional Details (optional)</label>
-                <textarea name="additional_details" rows="4"
-                          class="w-full border rounded-lg px-3 py-2"></textarea>
+            {{-- Age --}}
+            <div class="mb-4">
+                <label class="font-semibold">Age</label>
+                <input type="number" name="age" required
+                       class="w-full border rounded-lg px-3 py-2">
             </div>
 
-            <button type="submit"
-                    class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">
-                Submit Group Application
-            </button>
-
-        </form>
-    </div>
-
-    <script>
-        let tenantIndex = 1;
-
-        function addTenant() {
-            if (tenantIndex >= 6) return alert("Maximum 6 tenants allowed.");
-
-            const container = document.getElementById('tenant-container');
-
-            const card = document.createElement('div');
-            card.className = "tenant-card p-4 border rounded-lg bg-white";
-
-            card.innerHTML = `
-                <h4 class="font-semibold mb-2">Tenant ${tenantIndex + 1}</h4>
-
-                <label class="block mb-1 font-medium">Full Name</label>
-                <input name="tenants[${tenantIndex}][full_name]" required
-                       class="w-full border rounded-lg px-3 py-2">
-
-                <label class="block mt-3 mb-1 font-medium">Email</label>
-                <input name="tenants[${tenantIndex}][email]" type="email" required
-                       class="w-full border rounded-lg px-3 py-2">
-
-                <label class="block mt-3 mb-1 font-medium">Age</label>
-                <input name="tenants[${tenantIndex}][age]" type="number" required
-                       class="w-full border rounded-lg pxk mt-3 mb-1 font-medium">Gender</label>
-                <select name="tenants[${tenantIndex}][gender]" required
-                        class="w-full border rounded-lg px-3 py-2">
-                    <option>Select…</option>
+            {{-- Gender --}}
+            <div class="mb-4">
+                <label class="font-semibold">Gender</label>
+                <select name="gender" required class="w-full border rounded-lg px-3 py-2">
+                    <option value="">Select…</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="nonbinary">Non-binary</option>
                     <option value="prefer_not_say">Prefer not to say</option>
                 </select>
-            `;
+            </div>
 
-            container.appendChild(card);
-            tenantIndex++;
-        }
-    </script>
+            {{-- Additional Details --}}
+            <div class="mb-4">
+                <label class="font-semibold">Additional Details (optional)</label>
+                <textarea name="additional_details" rows="4"
+                          class="w-full border rounded-lg px-3 py-2"></textarea>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">
+                Submit Application
+            </button>
+
+        </form>
+
+    </div>
+
 </x-app-layout>
