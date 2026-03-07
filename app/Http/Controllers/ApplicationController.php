@@ -102,4 +102,21 @@ class ApplicationController extends Controller
             ->route('student.profile.new.applications')
             ->with('success', 'Application created successfully');
     }
+
+    public function withdraw($id)
+    {
+        if (!session()->has('student_id')) {
+            return redirect('/student/login');
+        }
+
+        $app = \App\Models\Application::where('id', $id)
+            ->where('studentid', session('student_id'))
+            ->firstOrFail();
+
+        $app->delete();
+
+        return redirect()
+            ->route('student.profile.new.applications')
+            ->with('success', 'Application withdrawn successfully.');
+    }
 }

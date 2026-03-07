@@ -339,6 +339,8 @@ Route::post('/applications/submit/group/{listing}',
     ->name('applications.submit.group');
 
      
+Route::delete('/applications/{id}/withdraw', [\App\Http\Controllers\ApplicationController::class, 'withdraw'])
+    ->name('applications.withdraw');
 // STUDENT PROFILE (ADD-ONLY, SAFE)
 Route::prefix('student/profile-new')->group(function () {
 
