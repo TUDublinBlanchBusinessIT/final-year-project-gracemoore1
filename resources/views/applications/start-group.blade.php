@@ -7,41 +7,48 @@
 
     <div class="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-xl shadow">
 
-        <h3 class="text-lg font-semibold mb-4">Tenant Information</h3>
+        <h3 class="text-lg font-semibold mb-4">Group Application Form</h3>
 
-        <form method="POST" 
-              action="{{ route('applications.submit.group', $listing->id) }}">
+        <form method="POST" action="{{ route('applications.submit.group', $listing->id) }}">
             @csrf
 
             <div id="tenant-container" class="space-y-6">
 
-                {{-- Tenant 1 - auto-filled --}}
+                {{-- Tenant 1 (auto-filled) --}}
                 <div class="tenant-card p-4 border rounded-lg bg-slate-50">
                     <h4 class="font-semibold mb-2">Tenant 1 (You)</h4>
 
+                    {{-- Hidden values passed to controller --}}
                     <input type="hidden" name="tenants[0][full_name]"
                            value="{{ auth()->user()->firstname }} {{ auth()->user()->surname }}">
 
                     <input type="hidden" name="tenants[0][email]"
                            value="{{ auth()->user()->email }}">
 
+                    {{-- Display full name --}}
                     <label class="block mb-1 font-medium">Full Name</label>
-                    <input type="text" disabled
+                    <input type="text"
                            class="w-full bg-slate-100 rounded-lg px-3 py-2"
-                           value="{{ auth()->user()->firstname }} {{ auth()->user()->surname }}">
+                           value="{{ auth()->user()->firstname }} {{ auth()->user()->surname }}"
+                           disabled>
 
+                    {{-- Display email --}}
                     <label class="block mt-3 mb-1 font-medium">Email</label>
-                    <input type="text" disabled class="w-full bg-slate-100 rounded-lg px-3 py-2"
-                           value="{{ auth()->user()->email }}">
+                    <input type="email"
+                           class="w-full bg-slate-100 rounded-lg px-3 py-2"
+                           value="{{ auth()->user()->email }}"
+                           disabled>
 
+                    {{-- Age --}}
                     <label class="block mt-3 mb-1 font-medium">Age</label>
                     <input name="tenants[0][age]" type="number" required
                            class="w-full border rounded-lg px-3 py-2">
 
+                    {{-- Gender --}}
                     <label class="block mt-3 mb-1 font-medium">Gender</label>
                     <select name="tenants[0][gender]" required
                             class="w-full border rounded-lg px-3 py-2">
-                        <option>Select…</option>
+                        <option value="">Select…</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
                         <option value="nonbinary">Non-binary</option>
@@ -51,20 +58,21 @@
 
             </div>
 
-            {{-- Add another tenant button --}}
+            {{-- Add tenant button --}}
             <button type="button"
                     onclick="addTenant()"
                     class="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
                 + Add Another Tenant
             </button>
 
-            {{-- Additional Details --}}
+            {{-- Additional details for the whole group --}}
             <div class="mt-6">
                 <label class="block font-medium mb-1">Additional Details (optional)</label>
                 <textarea name="additional_details" rows="4"
                           class="w-full border rounded-lg px-3 py-2"></textarea>
             </div>
 
+            {{-- Submit button --}}
             <button type="submit"
                     class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">
                 Submit Group Application
@@ -73,11 +81,15 @@
         </form>
     </div>
 
+    {{-- JavaScript for adding tenants --}}
     <script>
         let tenantIndex = 1;
 
         function addTenant() {
-            if (tenantIndex >= 6) return alert("Maximum 6 tenants allowed.");
+            if (tenantIndex >= 6) {
+                alert("You can add up to 6 tenants only.");
+                return;
+            }
 
             const container = document.getElementById('tenant-container');
 
@@ -97,10 +109,12 @@
 
                 <label class="block mt-3 mb-1 font-medium">Age</label>
                 <input name="tenants[${tenantIndex}][age]" type="number" required
-                       class="w-full border rounded-lg pxk mt-3 mb-1 font-medium">Gender</label>
+                       class="w-full border rounded-lg px-3 py-2">
+
+                <label class="block mt-3 mb-1 font-medium">Gender</label>
                 <select name="tenants[${tenantIndex}][gender]" required
                         class="w-full border rounded-lg px-3 py-2">
-                    <option>Select…</option>
+                    <option value="">Select…</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="nonbinary">Non-binary</option>
@@ -109,6 +123,7 @@
             `;
 
             container.appendChild(card);
+
             tenantIndex++;
         }
     </script>

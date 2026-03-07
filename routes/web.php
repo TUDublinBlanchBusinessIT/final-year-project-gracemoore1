@@ -323,6 +323,22 @@ Route::get('/student/support', function () {
 Route::get('/listing/{id}', [App\Http\Controllers\StudentRegisterController::class, 'showListing'])
     ->name('listing.show');
 
+// ===============================
+// APPLICATION ROUTES (SINGLE/GROUP)
+// ===============================
+Route::get('/applications/start/{listing}/{type}', 
+    [App\Http\Controllers\ApplicationController::class, 'start'])
+    ->name('applications.start');
+
+Route::post('/applications/submit/single/{listing}', 
+    [App\Http\Controllers\ApplicationController::class, 'submitSingle'])
+    ->name('applications.submit.single');
+
+Route::post('/applications/submit/group/{listing}',
+    [App\Http\Controllers\ApplicationController::class, 'submitGroup'])
+    ->name('applications.submit.group');
+
+     
 // STUDENT PROFILE (ADD-ONLY, SAFE)
 Route::prefix('student/profile-new')->group(function () {
 
