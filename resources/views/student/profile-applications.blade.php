@@ -126,15 +126,23 @@
                                         Pending
                                     </span>
 
-                                    {{-- Withdraw button RIGHT --}}
                                     <form action="{{ route('applications.withdraw', $app->id) }}"
-                                          method="POST"
-                                          onsubmit="return confirm('Are you sure you want to withdraw this application?');">
+                                        method="POST"
+                                        onsubmit="return confirm('Are you sure you want to delete this application? This cannot be undone.');">
+
                                         @csrf
                                         @method('DELETE')
-                                        <button class="px-3 py-1 rounded text-xs bg-red-100 text-red-700 hover:bg-red-200">
-                                            Withdraw
-                                        </button>
+
+                                        @if($app->applicationtype === 'group')
+                                            <button class="px-3 py-1 rounded text-xs bg-red-100 text-red-700 hover:bg-red-200">
+                                                Delete Group Application
+                                            </button>
+                                        @else
+                                            <button class="px-3 py-1 rounded text-xs bg-red-100 text-red-700 hover:bg-red-200">
+                                                Withdraw
+                                            </button>
+                                        @endif
+
                                     </form>
 
                                 </div>
@@ -208,13 +216,22 @@
                                     </span>
 
                                     <form action="{{ route('applications.withdraw', $app->id) }}"
-                                          method="POST"
-                                          onsubmit="return confirm('Are you sure you want to withdraw this application?');">
+                                        method="POST"
+                                        onsubmit="return confirm('Are you sure you want to delete this application? This cannot be undone.');">
+
                                         @csrf
                                         @method('DELETE')
-                                        <button class="px-3 py-1 rounded text-xs bg-red-100 text-red-700 hover:bg-red-200">
-                                            Withdraw 
-                                        </button>
+
+                                        @if($app->applicationtype === 'group')
+                                            <button class="px-3 py-1 rounded text-xs bg-red-100 text-red-700 hover:bg-red-200">
+                                                Delete Group Application
+                                            </button>
+                                        @else
+                                            <button class="px-3 py-1 rounded text-xs bg-red-100 text-red-700 hover:bg-red-200">
+                                                Withdraw
+                                            </button>
+                                        @endif
+
                                     </form>
 
                                 </div>
