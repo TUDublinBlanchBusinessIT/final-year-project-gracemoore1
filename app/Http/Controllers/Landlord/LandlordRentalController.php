@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Landlord;
 
 use App\Http\Controllers\Controller;
 use App\Models\LandlordRental;
+use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,6 @@ class LandlordRentalController extends Controller
 {
     public function index()
     {
-        // If you have landlord linked to the user, we’ll filter properly in step 3.
         $rentals = LandlordRental::where('landlordid', $this->getCurrentLandlordId())
             ->orderByDesc('id')
             ->get();
@@ -97,7 +97,6 @@ class LandlordRentalController extends Controller
             'description'         => ['required','string','max:2000'],
             'measurement'         => ['nullable','string','max:50'],
 
-            // ✅ Added fields for edit
             'housetype'           => ['required','in:any,single_private,private_shared,whole_property_group'],
             'accommodation_type'  => ['required','in:house,apartment'],
             'application_type'    => ['required','in:single,group'],
@@ -107,7 +106,6 @@ class LandlordRentalController extends Controller
             'status'              => ['required','in:available,occupied'],
             'availablefrom'       => ['required','date'],
             'availableuntil'      => ['required','date','after_or_equal:availablefrom'],
-            // ❌ No images in edit as requested
         ]);
 
         $rental->update([
@@ -118,7 +116,6 @@ class LandlordRentalController extends Controller
             'description'        => $data['description'],
             'measurement'        => $data['measurement'] ?? null,
 
-            // ✅ Newly added editable fields
             'housetype'          => $data['housetype'],
             'accommodation_type' => $data['accommodation_type'],
             'application_type'   => $data['application_type'],
@@ -151,17 +148,68 @@ class LandlordRentalController extends Controller
 
     private function getCurrentLandlordId(): int
     {
-        // For now, make this explicit so you don't accidentally save wrong:
-        $id = \App\Models\Landlord::where('email', auth()->user()->email)->value('id');
+        $id = Landlord::where('email', auth()->user()->email)->value('id');
         if (!$id) abort(403, 'Landlord record not found for this user.');
         return (int) $id;
     }
 
-    public function applications($rental)
+    /** ----------------------------------------------------
+     *   LANDLORD VIEW APPLICATIONS (Pending Only)
+     *  ---------------------------------------------------- */
+    public function applications($rentalId)
     {
-        $rental = \App\Models\LandlordRental::findOrFail($rental);
+        $landlordId = $this->getCurrentLandlordId();
 
-        return view('landlord.rentals.applications', compact('rental'));
+        $rental = LandlordRental::where('id', $rentalId)
+            ->where('landlordid', $landlordId)
+            ->firstOrFail();
+
+        // Load only pending applications (accepted/rejected disappear)
+        $applications = Application::with('student')
+            ->where('rentalid', $rentalId)
+            ->where('status', 'pending')
+            ->orderBy('dateapplied', 'desc')
+            ->get();
+
+        return view('landlord.rentals.applications', compact('rental', 'applications'));
+    }
+
+    /** ----------------------------------------------------
+     *   ACCEPT APPLICATION
+     *  ---------------------------------------------------- */
+    public function acceptApplication($applicationId)
+    {
+        $landlordId = $this->getCurrentLandlordId();
+
+        $app = Application::with('rental')->findOrFail($applicationId);
+
+        // Only the owner of the listing can accept
+        if (!$app->rental || (int)$app->rental->landlordid !== (int)$landlordId) {
+            abort(403);
+        }
+
+        $app->update(['status' => 'accepted']);
+
+        return back()->with('success', 'Application accepted.');
+    }
+
+    /** ----------------------------------------------------
+     *   REJECT APPLICATION
+     *  ---------------------------------------------------- */
+    public function rejectApplication($applicationId)
+    {
+        $landlordId = $this->getCurrentLandlordId();
+
+        $app = Application::with('rental')->findOrFail($applicationId);
+
+        // Only the owner can reject
+        if (!$app->rental || (int)$app->rental->landlordid !== (int)$landlordId) {
+            abort(403);
+        }
+
+        $app->update(['status' => 'rejected']);
+
+        return back()->with('success', 'Application rejected.');
     }
 }
 

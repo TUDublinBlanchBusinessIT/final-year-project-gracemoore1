@@ -338,7 +338,27 @@ Route::post('/applications/submit/group/{listing}',
     [App\Http\Controllers\ApplicationController::class, 'submitGroup'])
     ->name('applications.submit.group');
 
-     
+
+Route::get('/landlord/listing/{id}/applications',
+    [\App\Http\Controllers\LandlordController::class, 'viewApplications'])
+    ->name('landlord.listing.applications');
+
+
+Route::get('/landlord/rentals/{rental}/applications',
+    [\App\Http\Controllers\Landlord\LandlordRentalController::class, 'applications'])
+    ->name('landlord.applications.index');
+
+
+Route::get('/landlord/rentals/{rental}/applications', [LandlordRentalController::class, 'applications'])
+    ->name('landlord.applications.index');
+
+Route::post('/landlord/applications/{application}/accept', [LandlordRentalController::class, 'acceptApplication'])
+    ->name('landlord.applications.accept');
+
+Route::post('/landlord/applications/{application}/reject', [LandlordRentalController::class, 'rejectApplication'])
+    ->name('landlord.applications.reject');
+
+
 Route::delete('/applications/{id}/withdraw', [\App\Http\Controllers\ApplicationController::class, 'withdraw'])
     ->name('applications.withdraw');
 // STUDENT PROFILE (ADD-ONLY, SAFE)
