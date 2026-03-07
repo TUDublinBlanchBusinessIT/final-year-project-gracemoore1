@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentCodeMail;
 use App\Models\LandlordRental;
 
+use App\Models\Application;
+use Illuminate\Support\Facades\Log;
+
 class StudentRegisterController extends Controller
 {
     public function showForm() {
@@ -24,7 +27,8 @@ class StudentRegisterController extends Controller
 
             'mu.ie',                // Maynooth University (MU)
 
-            'dcu.ie',               // Dublin City University (DCU)
+            'dcu.ie',
+            'mail.dcu.ie',               // Dublin City University (DCU)
 
             'ul.ie',                // University of Limerick (UL)
 
@@ -90,6 +94,12 @@ class StudentRegisterController extends Controller
         ]);
 
         $code = rand(1000, 9999);
+        
+        // Log the code for debugging
+        Log::info('Student email verification code generated', [
+            'email' => $data['email'],
+            'code' => $code,
+        ]);
 
         session([
             'registration_data' => [
@@ -232,17 +242,43 @@ class StudentRegisterController extends Controller
         $year = date('Y', $dob);
         $month = date('M', $dob); // e.g. JAN
 
-        $possibleMonths = [
-            strtolower($month), // jan
-            strtolower(date('F', $dob)), // january
-            strtolower(substr($month, 0, 2)), // ja
-            'ean', // common OCR error for JAN
-            'ian',
-            'jan.',
-            'janua',
-            'january',
+        // Normalize helper (remove accents + punctuation)
+        function norm($s) {
+            $s = strtolower($s);
+            $s = iconv('UTF-8','ASCII//TRANSLIT',$s); // lún → lun
+            return preg_replace('/[^a-z]/','', $s);
+        }
+
+        // Dictionary of month variations (English + Irish + OCR variants)
+        $monthDictionary = [
+            'january'   => ['jan','ja','janu','janua','ian','ean','january'],
+            'february'  => ['feb','fe','febr','feabh','feabhra','february'],
+            'march'     => ['mar','ma','már','marc','march'],
+            'april'     => ['apr','ap','aib','aibrean','aibreán','april'],
+            'may'       => ['may','ma','beal','bealtaine'],
+            'june'      => ['jun','ju','meith','meitheamh','june'],
+            'july'      => ['jul','ju','iuil','iúil','july'],
+            'august'    => ['aug','au','lun','lún','lunas','lunasa','lúnasa','august'],
+            'september' => ['sep','se','sept','mean','meán','meánfomhair','september'],
+            'october'   => ['oct','oc','deir','deireadhfomhair','october'],
+            'november'  => ['nov','no','samh','samhain','november'],
+            'december'  => ['dec','de','noll','nollaig','december'],
         ];
 
+        // Find real month being checked
+        $englishMonth = strtolower(date('F', $dob)); // "august"
+
+        // Start your original structure
+        $possibleMonths = [
+            strtolower($month),                    // "aug"
+            strtolower($englishMonth),             // "august"
+            strtolower(substr($month, 0, 2)),      // "au"
+        ];
+
+        // Add all normalized dictionary variants for that month
+        foreach ($monthDictionary[$englishMonth] as $variant) {
+            $possibleMonths[] = norm($variant);
+        }
         $dayFound = stripos($text, ltrim($day, '0')) !== false || stripos($text, $day) !== false;
         $yearFound = stripos($text, $year) !== false;
 
@@ -286,7 +322,7 @@ class StudentRegisterController extends Controller
         return back()->withErrors(['ocr_text' => 'ID verification failed. Make sure your details are clearly visible.']);
     }
 
-    public function dashboard() {
+    public function dashboard(Request $request) {
         if (!session()->has('student_id')) {
             return redirect('/login');
         }
@@ -294,17 +330,103 @@ class StudentRegisterController extends Controller
         // Load the logged-in student
         $student = \App\Models\Student::find(session('student_id'));
 
-        // Only show listings from ACTIVE landlords
-        $listings = \App\Models\LandlordRental::query()
+        // ——— FILTER INPUTS (GET) ———
+        $q                  = trim((string) $request->query('q', ''));
+        $county             = trim((string) $request->query('county', ''));
+        $housetype          = $request->query('housetype');                 // any | single_private | private_shared | whole_property_group
+        $accommodationType  = $request->query('accommodation_type');        // house | apartment
+        $applicationType    = $request->query('application_type');          // single | group
+        $fromDate           = $request->query('from');                      // YYYY-MM-DD
+        $untilDate          = $request->query('until');                     // YYYY-MM-DD
+        $minRent            = $request->query('min_rent');                  // numeric
+        $maxRent            = $request->query('max_rent');                  // numeric
+        $nightsBucket       = $request->query('nights_bucket');             // any | 1-3 | 4-5 | 6-7
+
+        $query = \App\Models\LandlordRental::query()
             ->join('landlord', 'landlord.id', '=', 'rental.landlordid')
-            ->where('landlord.status', 'active')    // ← FILTER OUT SUSPENDED LANDLORDS
-            ->where('rental.status', 'available')   // ← Keep your existing filter
-            ->select('rental.*')                    // ← Ensure only rental columns returned
-            ->get();
+            ->where('landlord.status', 'active')   // only active landlords
+            ->where('rental.status', 'available')  // only available listings
+            ->select('rental.*');
+
+        // TEXT SEARCH (street, county, postcode, description)
+        if ($q !== '') {
+            $like = '%' . str_replace('%', '\%', $q) . '%';
+            $query->where(function ($sub) use ($like) {
+                $sub->where('rental.street', 'like', $like)
+                    ->orWhere('rental.county', 'like', $like)
+                    ->orWhere('rental.postcode', 'like', $like)
+                    ->orWhere('rental.description', 'like', $like);
+            });
+        }
+
+        // COUNTY
+        if ($county !== '') {
+            $query->where('rental.county', $county);
+        }
+
+        // HOUSETYPE
+        if ($housetype !== null && $housetype !== '' && $housetype !== 'any') {
+            $allowed = ['any','single_private','private_shared','whole_property_group'];
+            if (in_array($housetype, $allowed, true)) {
+                $query->where('rental.housetype', $housetype);
+            }
+        }
+
+        // ACCOMMODATION TYPE
+        if ($accommodationType !== null && $accommodationType !== '') {
+            $allowed = ['house','apartment'];
+            if (in_array($accommodationType, $allowed, true)) {
+                $query->where('rental.accommodation_type', $accommodationType);
+            }
+        }
+
+        // APPLICATION TYPE
+        if ($applicationType !== null && $applicationType !== '') {
+            $allowed = ['single','group'];
+            if (in_array($applicationType, $allowed, true)) {
+                $query->where('rental.application_type', $applicationType);
+            }
+        }
+
+        // DATE OVERLAP:
+        // Overlap condition: listing_from <= filter_until AND listing_until >= filter_from
+        if ($fromDate && $untilDate) {
+            $query->whereDate('rental.availablefrom', '<=', $untilDate)
+                ->whereDate('rental.availableuntil', '>=', $fromDate);
+        } elseif ($fromDate) {
+            $query->whereDate('rental.availableuntil', '>=', $fromDate);
+        } elseif ($untilDate) {
+            $query->whereDate('rental.availablefrom', '<=', $untilDate);
+        }
+
+        // RENT RANGE
+        if ($minRent !== null && $minRent !== '') {
+            $query->where('rental.rentpermonth', '>=', (float)$minRent);
+        }
+        if ($maxRent !== null && $maxRent !== '') {
+            $query->where('rental.rentpermonth', '<=', (float)$maxRent);
+        }
+
+        // NIGHTS PER WEEK (buckets)
+        if ($nightsBucket && $nightsBucket !== 'any') {
+            switch ($nightsBucket) {
+                case '1-3':
+                    $query->whereRaw('CAST(rental.nightsperweek AS UNSIGNED) BETWEEN 1 AND 3');
+                    break;
+                case '4-5':
+                    $query->whereRaw('CAST(rental.nightsperweek AS UNSIGNED) BETWEEN 4 AND 5');
+                    break;
+                case '6-7':
+                    $query->whereRaw('CAST(rental.nightsperweek AS UNSIGNED) BETWEEN 6 AND 7');
+                    break;
+            }
+        }
+
+        // ORDER newest first
+        $listings = $query->orderByDesc('rental.id')->get();
 
         return view('student.dashboard', compact('listings', 'student'));
     }
-
     
     public function showListing($id)
     {
@@ -324,16 +446,48 @@ class StudentRegisterController extends Controller
         return view('student.profile-new');
     }
 
-    public function studentProfileApplications()
-    {
-        if (!session()->has('student_id')) return redirect('/student/login');
+        public function studentProfileApplications()
+        {
+            if (!session()->has('student_id')) {
+                return redirect('/student/login');
+            }
 
-        $pending = [];
-        $accepted = [];
-        $rejected = [];
+            $student = Student::find(session('student_id'));
+            $myId    = $student->id;
+            $myEmail = strtolower(trim($student->email));
 
-        return view('student.profile-applications', compact('pending','accepted','rejected'));
-    }
+            // JSON pattern for matching email (case + whitespace tolerant)
+            $pattern = '"email"[[:space:]]*:[[:space:]]*"'.$myEmail.'"';
+
+            $pending = Application::with('rental')
+                ->where(function ($q) use ($myId, $pattern) {
+                    $q->where('studentid', $myId)
+                    ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
+                })
+                ->where('status','pending')
+                ->orderByDesc('dateapplied')
+                ->get();
+
+            $accepted = Application::with('rental')
+                ->where(function ($q) use ($myId, $pattern) {
+                    $q->where('studentid', $myId)
+                    ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
+                })
+                ->where('status','accepted')
+                ->orderByDesc('dateapplied')
+                ->get();
+
+            $rejected = Application::with('rental')
+                ->where(function ($q) use ($myId, $pattern) {
+                    $q->where('studentid', $myId)
+                    ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
+                })
+                ->where('status','rejected')
+                ->orderByDesc('dateapplied')
+                ->get();
+
+            return view('student.profile-applications', compact('pending','accepted','rejected'));
+        }
 
     public function studentProfileAccount()
     {

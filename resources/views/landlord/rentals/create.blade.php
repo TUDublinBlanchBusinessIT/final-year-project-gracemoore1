@@ -9,7 +9,7 @@
     <div class="pb-28 lg:pl-70">
         <div class="py-10">
             <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-
+            
                 @if ($errors->any())
                     <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
                         <div class="font-semibold">Please fix the following:</div>
@@ -158,6 +158,25 @@
                                         <option value="house" @selected(old('accommodation_type') === 'house')>House</option>
                                         <option value="apartment" @selected(old('accommodation_type') === 'apartment')>Apartment</option>
                                     </select>
+                                </div>
+
+                                <!---Application Type -->
+                                <div>
+                                    <label for="application_type" class="text-sm font-semibold text-slate-700">Application Type</label>
+                                    <select
+                                        id="application_type"
+                                        name="application_type"
+                                        class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                        required
+                                    >
+                                        <option value="" @selected(old('application_type') === null)>Select</option>
+                                        <option value="single" @selected(old('application_type') === 'single')>Single Applications</option>
+                                        <option value="group" @selected(old('application_type') === 'group')>Group Applications</option>
+                                    </select>
+
+                                    @error('application_type')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 <!-- UPDATED: Nights Per Week -->

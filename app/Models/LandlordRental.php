@@ -24,7 +24,9 @@ class LandlordRental extends Model
         'availablefrom',
         'availableuntil',
         'landlordid',
+        'application_type',
         // 'studentid',
         // 'propertyid',
+
     ];
 }

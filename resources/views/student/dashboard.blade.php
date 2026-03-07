@@ -11,6 +11,7 @@
     </x-slot>
 
     @php
+        /** @var \App\Models\Student|null $student */
         $student = \App\Models\Student::find(session('student_id'));
 
         $collegeToCounty = [
@@ -24,74 +25,122 @@
             'CIT' => 'Cork',
             'RCSI' => 'Dublin',
         ];
+
+        // Fixed order, Dublin first:
+        $counties = ['Dublin', 'Galway', 'Limerick', 'Cork', 'Kildare'];
     @endphp
 
     <div>
-
-                {{-- Welcome --}}
+        {{-- Welcome --}}
         <h1 class="text-2xl font-bold text-slate-900 mb-8">
             Welcome back, {{ $student->firstname ?? $student->name ?? 'Student' }}!
         </h1>
 
-        {{-- SEARCH BAR --}}
-        <div class="flex items-center bg-white border border-slate-300 rounded-xl px-4 py-3 shadow-sm">
+        {{-- ========================= --}}
+        {{-- SEARCH BAR (now in a GET form so Enter works) --}}
+        {{-- ========================= --}}
+        <form id="searchForm" method="GET" action="{{ route('student.dashboard') }}" class="flex items-center bg-white border border-slate-300 rounded-xl px-4 py-3 shadow-sm">
             <svg class="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
+                 viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
                       d="M21 21l-4.35-4.35M10 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12z" />
             </svg>
 
-            <input type="text" placeholder="Search listings..."
+            <input type="text"
+                   name="q"
+                   value="{{ request('q') }}"
+                   placeholder="Search listings..."
                    class="ml-3 w-full focus:ring-0 border-none focus:outline-none text-slate-800" />
 
-            <button id="filterToggle" class="ml-3 text-slate-600 hover:text-blue-600" title="Filters" aria-label="Filters">
+            {{-- Preserve existing filters when searching --}}
+            <input type="hidden" name="county"              value="{{ request('county') }}">
+            <input type="hidden" name="housetype"           value="{{ request('housetype') }}">
+            <input type="hidden" name="accommodation_type"  value="{{ request('accommodation_type') }}">
+            <input type="hidden" name="application_type"    value="{{ request('application_type') }}">
+            <input type="hidden" name="from"                value="{{ request('from') }}">
+            <input type="hidden" name="until"               value="{{ request('until') }}">
+            <input type="hidden" name="min_rent"            value="{{ request('min_rent') }}">
+            <input type="hidden" name="max_rent"            value="{{ request('max_rent') }}">
+            <input type="hidden" name="nights_bucket"       value="{{ request('nights_bucket','any') }}">
+
+            <button type="submit" class="ml-3 text-slate-600 hover:text-blue-600" title="Search" aria-label="Search">
+                Search
+            </button>
+
+            <button id="filterToggle" type="button" class="ml-3 text-slate-600 hover:text-blue-600" title="Filters" aria-label="Filters">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M3 6h18M6 12h12M10 18h8" />
                 </svg>
             </button>
-        </div>
+        </form>
 
-        {{-- COLLEGE CHIPS --}}
+        {{-- ========================= --}}
+        {{-- COLLEGE CHIPS (now submit county filter) --}}
+        {{-- ========================= --}}
         <div class="mt-4 flex gap-2 overflow-x-auto pb-2">
             @foreach ($collegeToCounty as $college => $county)
                 <button
+                    type="button"
                     onclick="filterCounty('{{ $county }}')"
                     class="shrink-0 px-3 py-2 rounded-full border border-blue-500 text-blue-600 bg-white text-sm font-semibold hover:bg-blue-50">
                     {{ $college }}
                 </button>
             @endforeach
+
+            {{-- Clear all filters --}}
+            <a href="{{ route('student.dashboard') }}"
+               class="shrink-0 px-3 py-2 rounded-full border border-slate-300 text-slate-700 bg-white text-sm font-semibold hover:bg-slate-50">
+                Clear
+            </a>
         </div>
 
-        {{-- FILTER DRAWER --}}
+        {{-- ========================= --}}
+        {{-- FILTER DRAWER (GET) --}}
+        {{-- ========================= --}}
         <div id="filterDrawer"
              class="hidden bg-white border border-slate-300 rounded-xl shadow-sm px-6 py-6 mt-4">
-            <form class="space-y-4">
+            <form method="GET" action="{{ route('student.dashboard') }}" class="space-y-4">
+                {{-- Keep the current search term in filter submit --}}
+                <input type="hidden" name="q" value="{{ request('q') }}">
 
-                {{-- Location --}}
+                {{-- Location / County --}}
                 <div>
-                    <label class="font-semibold text-slate-700">Location</label>
-                    <input id="countyInput" type="text"
+                    <label class="font-semibold text-slate-700">Location (County)</label>
+                    <input id="countyInput" name="county" type="text"
+                           value="{{ request('county') }}"
                            class="w-full mt-1 rounded-lg border-slate-300"
                            placeholder="Dublin" />
                 </div>
 
                 {{-- House Type --}}
-                <!--<p class="text-sm text-slate-600">
-                    {{ [
-                        'any' => 'Any',
-                        'single_private' => 'Single room in private home',
-                        'private_shared' => 'Private room in shared house',
-                        'whole_property_group' => 'Whole property (group application only)',
-                    ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
-                </p> -->
-
                 <div>
                     <label class="font-semibold text-slate-700">House Type</label>
-                    <select class="w-full mt-1 rounded-lg border-slate-300">
-                        <option>Any</option>
-                        <option>Single Room in Private Home</option>
-                        <option>Shared Student House</option>
+                    <select name="housetype" class="w-full mt-1 rounded-lg border-slate-300">
+                        <option value="">Any</option>
+                        <option value="single_private"       @selected(request('housetype')==='single_private')>Single room in private home</option>
+                        <option value="private_shared"       @selected(request('housetype')==='private_shared')>Private room in shared house</option>
+                        <option value="whole_property_group" @selected(request('housetype')==='whole_property_group')>Whole property (group-only)</option>
+                    </select>
+                </div>
+
+                {{-- Accommodation Type --}}
+                <div>
+                    <label class="font-semibold text-slate-700">Accommodation Type</label>
+                    <select name="accommodation_type" class="w-full mt-1 rounded-lg border-slate-300">
+                        <option value="">Any</option>
+                        <option value="house"     @selected(request('accommodation_type')==='house')>House</option>
+                        <option value="apartment" @selected(request('accommodation_type')==='apartment')>Apartment</option>
+                    </select>
+                </div>
+
+                {{-- Application Type --}}
+                <div>
+                    <label class="font-semibold text-slate-700">Application Type</label>
+                    <select name="application_type" class="w-full mt-1 rounded-lg border-slate-300">
+                        <option value="">Any</option>
+                        <option value="single" @selected(request('application_type')==='single')>Single Applications</option>
+                        <option value="group"  @selected(request('application_type')==='group')>Group Applications</option>
                     </select>
                 </div>
 
@@ -99,11 +148,11 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="font-semibold text-slate-700">Available From</label>
-                        <input type="date" class="w-full mt-1 rounded-lg border-slate-300" />
+                        <input type="date" name="from" value="{{ request('from') }}" class="w-full mt-1 rounded-lg border-slate-300" />
                     </div>
                     <div>
                         <label class="font-semibold text-slate-700">Until</label>
-                        <input type="date" class="w-full mt-1 rounded-lg border-slate-300" />
+                        <input type="date" name="until" value="{{ request('until') }}" class="w-full mt-1 rounded-lg border-slate-300" />
                     </div>
                 </div>
 
@@ -111,22 +160,22 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="font-semibold text-slate-700">Min Rent (€)</label>
-                        <input type="number" class="w-full mt-1 rounded-lg border-slate-300" />
+                        <input type="number" name="min_rent" value="{{ request('min_rent') }}" class="w-full mt-1 rounded-lg border-slate-300" />
                     </div>
                     <div>
                         <label class="font-semibold text-slate-700">Max Rent (€)</label>
-                        <input type="number" class="w-full mt-1 rounded-lg border-slate-300" />
+                        <input type="number" name="max_rent" value="{{ request('max_rent') }}" class="w-full mt-1 rounded-lg border-slate-300" />
                     </div>
                 </div>
 
-                {{-- Nights --}}
+                {{-- Nights per Week --}}
                 <div>
                     <label class="font-semibold text-slate-700">Nights per Week</label>
-                    <select class="w-full mt-1 rounded-lg border-slate-300">
-                        <option>Any</option>
-                        <option>1–3 nights</option>
-                        <option>4–5 nights</option>
-                        <option>6-7 nights</option>
+                    <select name="nights_bucket" class="w-full mt-1 rounded-lg border-slate-300">
+                        <option value="any" @selected(request('nights_bucket','any')==='any')>Any</option>
+                        <option value="1-3" @selected(request('nights_bucket')==='1-3')>1–3 nights</option>
+                        <option value="4-5" @selected(request('nights_bucket')==='4-5')>4–5 nights</option>
+                        <option value="6-7" @selected(request('nights_bucket')==='6-7')>6–7 nights</option>
                     </select>
                 </div>
 
@@ -137,12 +186,8 @@
         </div>
 
         {{-- ========================= --}}
-        {{-- COUNTY SECTIONS --}}
+        {{-- COUNTY SECTIONS (fixed order, Dublin first) --}}
         {{-- ========================= --}}
-        @php
-            $counties = ['Dublin', 'Galway', 'Limerick', 'Cork', 'Kildare'];
-        @endphp
-
         @foreach ($counties as $county)
             @php
                 $countyListings = collect($listings)->where('county', $county);
@@ -152,19 +197,16 @@
                 <h2 class="text-xl font-bold text-slate-900 mb-3">{{ $county }}</h2>
 
                 @if ($countyListings->count() > 0)
-
                     {{-- ============= --}}
                     {{-- MOBILE CARDS --}}
                     {{-- ============= --}}
                     <div class="flex gap-4 overflow-x-auto pb-2 lg:hidden">
                         @foreach ($countyListings as $rental)
-
                             @php
                                 $images = json_decode($rental->images ?? '[]', true) ?? [];
                                 $imgCount = count($images);
                             @endphp
 
-                            {{-- 50% WIDER: min-w-[390px] --}}
                             <div class="min-w-[390px] bg-white rounded-xl border border-slate-200 shadow-sm p-4 hover:shadow-md transition">
 
                                 {{-- Carousel --}}
@@ -173,7 +215,7 @@
                                         <div id="track-mobile-{{ $rental->id }}" class="flex transition-transform duration-300 ease-out">
                                             @forelse ($images as $img)
                                                 <div class="w-full shrink-0">
-                                                    <img src="{{ asset('storage/' . $img) }}" class="w-full h-40 object-cover rounded-lg" />
+                                                    <img src="{{ asset('storage/' . $img) }}" class="w-full h-40 object-cover rounded-lg" alt="Listing image" />
                                                 </div>
                                             @empty
                                                 <div class="w-full h-40 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
@@ -185,38 +227,32 @@
 
                                     @if ($imgCount > 1)
                                         <button onclick="prevImage('mobile', {{ $rental->id }})"
-                                            class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">‹</button>
+                                                class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">‹</button>
 
                                         <button onclick="nextImage('mobile', {{ $rental->id }})"
-                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">›</button>
+                                                class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">›</button>
                                     @endif
                                 </div>
 
                                 {{-- CLICKABLE DETAILS --}}
                                 <a href="{{ route('listing.show', $rental->id) }}" class="block mt-3">
-
                                     {{-- Address --}}
                                     <div class="font-semibold text-slate-900">
                                         {{ $rental->housenumber ? $rental->housenumber . ' ' : '' }}
                                         {{ $rental->street }}, {{ $rental->county }}
                                     </div>
 
-                                    {{-- House Type --}}
-                                     <p class="text-sm text-slate-600">
-                                        {{ [
-                                            'any' => 'Any',
-                                            'single_private' => 'Single room in private home',
-                                            'private_shared' => 'Private room in shared house',
-                                            'whole_property_group' => 'Whole property (group application only)',
-                                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
-                                    </p>   
-
-                                    
-                                    <!-- @if ($rental->housetype)
-                                        <div class="text-sm text-slate-700 mt-1">
-                                            {{ $rental->housetype }}
-                                        </div>
-                                    @endif -->
+                                    {{-- House Type (label mapping) --}}
+                                    <p class="text-sm text-slate-600">
+                                        {{
+                                            [
+                                                'any' => 'Any',
+                                                'single_private' => 'Single room in private home',
+                                                'private_shared' => 'Private room in shared house',
+                                                'whole_property_group' => 'Whole property (group application only)',
+                                            ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '')
+                                        }}
+                                    </p>
 
                                     {{-- Nights per Week --}}
                                     @if ($rental->nightsperweek)
@@ -234,20 +270,16 @@
                                     <div class="text-base text-slate-800 font-bold mt-2">
                                         €{{ number_format($rental->rentpermonth, 2) }} / month
                                     </div>
-
                                 </a>
                             </div>
                         @endforeach
                     </div>
 
-
                     {{-- ============== --}}
                     {{-- DESKTOP CARDS --}}
                     {{-- ============== --}}
-                    {{-- 50% WIDER: 2 columns --}}
                     <div class="hidden lg:grid lg:grid-cols-2 lg:gap-6">
                         @foreach ($countyListings as $rental)
-
                             @php
                                 $images = json_decode($rental->images ?? '[]', true) ?? [];
                                 $imgCount = count($images);
@@ -261,7 +293,7 @@
                                         <div id="track-desktop-{{ $rental->id }}" class="flex transition-transform duration-300 ease-out">
                                             @forelse ($images as $img)
                                                 <div class="w-full shrink-0">
-                                                    <img src="{{ asset('storage/' . $img) }}" class="w-full h-48 object-cover rounded-lg" />
+                                                    <img src="{{ asset('storage/' . $img) }}" class="w-full h-48 object-cover rounded-lg" alt="Listing image" />
                                                 </div>
                                             @empty
                                                 <div class="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
@@ -273,36 +305,32 @@
 
                                     @if ($imgCount > 1)
                                         <button onclick="prevImage('desktop', {{ $rental->id }})"
-                                            class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">‹</button>
+                                                class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">‹</button>
 
                                         <button onclick="nextImage('desktop', {{ $rental->id }})"
-                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">›</button>
+                                                class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">›</button>
                                     @endif
                                 </div>
 
                                 {{-- CLICKABLE DETAILS --}}
                                 <a href="{{ route('listing.show', $rental->id) }}" class="block mt-3">
-
                                     {{-- Address --}}
                                     <div class="font-semibold text-slate-900">
                                         {{ $rental->housenumber ? $rental->housenumber . ' ' : '' }}
                                         {{ $rental->street }}, {{ $rental->county }}
                                     </div>
 
-                                    {{-- House Type --}}
-                                    <!--@if ($rental->housetype)
-                                        <div class="text-sm text-slate-700 mt-1">
-                                            {{ $rental->housetype }}
-                                        </div>
-                                    @endif -->
-                                     <p class="text-sm text-slate-600">
-                                        {{ [
-                                            'any' => 'Any',
-                                            'single_private' => 'Single room in private home',
-                                            'private_shared' => 'Private room in shared house',
-                                            'whole_property_group' => 'Whole property (group application only)',
-                                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
-                                    </p>                                       
+                                    {{-- House Type (label mapping) --}}
+                                    <p class="text-sm text-slate-600">
+                                        {{
+                                            [
+                                                'any' => 'Any',
+                                                'single_private' => 'Single room in private home',
+                                                'private_shared' => 'Private room in shared house',
+                                                'whole_property_group' => 'Whole property (group application only)',
+                                            ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '')
+                                        }}
+                                    </p>
 
                                     {{-- Nights per Week --}}
                                     @if ($rental->nightsperweek)
@@ -320,14 +348,10 @@
                                     <div class="text-base text-slate-800 font-bold mt-2">
                                         €{{ number_format($rental->rentpermonth, 2) }} / month
                                     </div>
-
                                 </a>
-
                             </div>
                         @endforeach
                     </div>
-
-
                 @else
                     {{-- NO LISTINGS UI --}}
                     <div class="flex gap-4 overflow-x-auto pb-2 lg:hidden">
@@ -347,29 +371,39 @@
                             </div>
                         </div>
                     </div>
-
                 @endif
             </div>
         @endforeach
     </div>
 
-    {{-- CAROUSEL SCRIPT --}}
+    {{-- ========================= --}}
+    {{-- SCRIPT (Filter toggle, chips submit, carousel) --}}
+    {{-- ========================= --}}
     <script>
-        const filterBtn = document.getElementById('filterToggle');
-        const drawer = document.getElementById('filterDrawer');
+        // Filter drawer open/close
+        (function() {
+            const btn = document.getElementById('filterToggle');
+            const drawer = document.getElementById('filterDrawer');
+            if (btn && drawer) {
+                btn.addEventListener('click', () => drawer.classList.toggle('hidden'));
+            }
+        })();
 
-        if (filterBtn && drawer) {
-            filterBtn.addEventListener('click', () => drawer.classList.toggle('hidden'));
-        }
-
+        // College chips: set county and submit search form
         function filterCounty(county) {
-            document.querySelectorAll('.county-section').forEach(section => {
-                section.classList.toggle('hidden', section.dataset.county !== county);
-            });
-            const input = document.getElementById('countyInput');
-            if (input) input.value = county;
+            const form = document.getElementById('searchForm');
+            if (!form) return;
+            const hiddenCounty = form.querySelector('input[name="county"]');
+            if (hiddenCounty) hiddenCounty.value = county;
+
+            // Mirror into the visible county field in the drawer if present
+            const countyInput = document.getElementById('countyInput');
+            if (countyInput) countyInput.value = county;
+
+            form.submit();
         }
 
+        // --- Carousel as you had it originally ---
         const carouselState = {};
 
         function stateKey(view, id) {
@@ -386,6 +420,7 @@
             const translate = -state.index * 100;
             track.style.transform = `translateX(${translate}%)`;
 
+            // Ensure each slide takes full width
             Array.from(track.children).forEach(child => child.style.width = "100%");
         }
 
