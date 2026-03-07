@@ -1,3 +1,4 @@
+
 <x-app-layout>
 
     {{-- Header --}}
@@ -104,6 +105,14 @@
                     </div>
                 @endif
 
+                                {{-- Application Type --}}
+                @if(!empty($rental->application_type))
+                    <div>
+                        <span class="font-semibold">Application Type:</span>
+                        {{ ucfirst($rental->application_type) }}
+                    </div>
+                @endif
+
                 {{-- Nights Per Week --}}
                 @if(!empty($rental->nightsperweek))
                     <div>
@@ -145,12 +154,11 @@
 
 
             {{-- Apply button (no action yet) --}}
-            <div class="pt-2">
                 <button type="button"
+                        onclick="openApplyModal()"
                         class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold">
                     Apply Now
                 </button>
-            </div>
         </div>
     </div>
 
@@ -206,5 +214,48 @@
             }
         });
     </script>
+        <!-- Application Modal -->
+        <div id="applyModal"
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden justify-center items-center p-4">
+            <div class="bg-white w-full max-w-md rounded-xl shadow-xl p-6 space-y-4">
 
+                <h2 class="text-xl font-bold text-slate-800 text-center">
+                    Choose Application Type
+                </h2>
+
+                <div class="space-y-3">
+                    <button onclick="selectApplicationType('single')"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
+                        Single Application
+                    </button>
+
+                    <button onclick="selectApplicationType('group')"
+                        class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold">
+                        Group Application
+                    </button>
+                </div>
+
+                <button onclick="closeApplyModal()"
+                    class="w-full mt-4 text-slate-600 hover:text-slate-800 font-medium underline">
+                    Cancel
+                </button>
+
+            </div>
+        </div>
+        <script>
+            function openApplyModal() {
+                document.getElementById('applyModal').classList.remove('hidden');
+                document.getElementById('applyModal').classList.add('flex');
+            }
+
+            function closeApplyModal() {
+                document.getElementById('applyModal').classList.add('hidden');
+                document.getElementById('applyModal').classList.remove('flex');
+            }
+
+            function selectApplicationType(type) {
+                // Redirect to a dedicated route
+                window.location.href = "/applications/start/{{ $rental->id }}/" + type;
+            }
+        </script>
 </x-app-layout>
