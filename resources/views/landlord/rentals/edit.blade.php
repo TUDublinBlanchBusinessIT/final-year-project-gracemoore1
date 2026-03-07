@@ -24,9 +24,11 @@
                     @csrf
                     @method('PUT')
 
+                    {{-- DETAILS --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                         <div>
-                            <label class="text-sm font-semibold text-gray-700">House Number</label>
+                            <label class="text-sm font-semibold text-gray-700">House Number (optional)</label>
                             <input name="housenumber" value="{{ old('housenumber', $rental->housenumber) }}"
                                    class="mt-2 w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                    placeholder="e.g. 14">
@@ -47,17 +49,85 @@
                         </div>
 
                         <div>
-                            <label class="text-sm font-semibold text-gray-700">Postcode *</label>
-                            <input name="postcode" value="{{ old('postcode', $rental->postcode) }}" required
+                            <label class="text-sm font-semibold text-gray-700">Postcode (optional)</label>
+                            <input name="postcode" value="{{ old('postcode', $rental->postcode) }}"
                                    class="mt-2 w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                    placeholder="e.g. D12XY89">
                         </div>
 
                         <div>
-                            <label class="text-sm font-semibold text-gray-700">Size (optional)</label>
+                            <label class="text-sm font-semibold text-gray-700">Measurement (optional)</label>
                             <input name="measurement" value="{{ old('measurement', $rental->measurement) }}"
                                    class="mt-2 w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                    placeholder="e.g. 15sqm">
+                        </div>
+
+                        {{-- House Type --}}
+                        <div>
+                            <label class="text-sm font-semibold text-slate-700">House Type</label>
+                            <select name="housetype" class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500" required>
+                                <option value="any" @selected(old('housetype', $rental->housetype) === 'any')>Any</option>
+                                <option value="single_private" @selected(old('housetype', $rental->housetype) === 'single_private')>
+                                    Single room in private home (e.g. in a family home)
+                                </option>
+                                <option value="private_shared" @selected(old('housetype', $rental->housetype) === 'private_shared')>
+                                    Private room in shared house (e.g. shared with other tenants)
+                                </option>
+                                <option value="whole_property_group" @selected(old('housetype', $rental->housetype) === 'whole_property_group')>
+                                    Whole property (group application only)
+                                </option>
+                            </select>
+                            @error('housetype')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Accommodation Type --}}
+                        <div>
+                            <label class="text-sm font-semibold text-slate-700">Accommodation Type</label>
+                            <select name="accommodation_type"
+                                    class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500" required>
+                                <option value="" @selected(old('accommodation_type', $rental->accommodation_type) === null)>Select</option>
+                                <option value="house" @selected(old('accommodation_type', $rental->accommodation_type) === 'house')>House</option>
+                                <option value="apartment" @selected(old('accommodation_type', $rental->accommodation_type) === 'apartment')>Apartment</option>
+                            </select>
+                            @error('accommodation_type')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Application Type --}}
+                        <div>
+                            <label for="application_type" class="text-sm font-semibold text-slate-700">Application Type</label>
+                            <select
+                                id="application_type"
+                                name="application_type"
+                                class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                required
+                            >
+                                <option value="" @selected(old('application_type', $rental->application_type) === null)>Select</option>
+                                <option value="single" @selected(old('application_type', $rental->application_type) === 'single')>Single Applications</option>
+                                <option value="group"  @selected(old('application_type', $rental->application_type) === 'group')>Group Applications</option>
+                            </select>
+                            @error('application_type')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Nights per week --}}
+                        <div>
+                            <label class="text-sm font-semibold text-slate-700">Nights per Week</label>
+                            <input
+                                type="number"
+                                name="nightsperweek"
+                                value="{{ old('nightsperweek', $rental->nightsperweek) }}"
+                                min="0"
+                                max="7"
+                                step="1"
+                                class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="e.g. 5"
+                            />
+                            <p class="mt-1 text-xs text-slate-500">Enter a number from 0 to 7</p>
                         </div>
 
                         <div>
@@ -73,50 +143,36 @@
                             <select name="status" required
                                     class="mt-2 w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                                 <option value="available" {{ old('status', $rental->status) === 'available' ? 'selected' : '' }}>Available</option>
-                                <option value="occupied" {{ old('status', $rental->status) === 'occupied' ? 'selected' : '' }}>Occupied</option>
+                                <option value="occupied"  {{ old('status', $rental->status) === 'occupied'  ? 'selected' : '' }}>Occupied</option>
                             </select>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4 md:col-span-2">
                             <div>
                                 <label class="text-sm font-semibold text-gray-700">Available from *</label>
                                 <input name="availablefrom" type="date" required
-                                       value="{{ old('availablefrom', $rental->availablefrom) }}"
+                                       value="{{ old('availablefrom', optional($rental->availablefrom)->format('Y-m-d')) }}"
                                        class="mt-2 w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                             </div>
 
                             <div>
                                 <label class="text-sm font-semibold text-gray-700">Available until *</label>
                                 <input name="availableuntil" type="date" required
-                                       value="{{ old('availableuntil', $rental->availableuntil) }}"
+                                       value="{{ old('availableuntil', optional($rental->availableuntil)->format('Y-m-d')) }}"
                                        class="mt-2 w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Nights per Week</label>
-                        <input
-                            type="number"
-                            name="nightsperweek"
-                            value="{{ old('nightsperweek') }}"
-                            min="0"
-                            max="7"
-                            step="1"
-                            class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                            placeholder="e.g. 5"
-                        />
-                        <p class="mt-1 text-xs text-slate-500">Enter a number from 0 to 7</p>
-                    </div>
-
-                    <div>
+                    {{-- Description --}}
+                    <div class="mt-6">
                         <label class="text-sm font-semibold text-gray-700">Description *</label>
                         <textarea name="description" rows="5" required
                                   class="mt-2 w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                   placeholder="Describe the listing...">{{ old('description', $rental->description) }}</textarea>
                     </div>
 
-                    <div class="flex items-center justify-between pt-2">
+                    <div class="flex items-center justify-between pt-4">
                         <a href="{{ route('dashboard') }}"
                            class="text-sm font-semibold text-gray-600 hover:text-gray-900">
                             ← Back to dashboard
