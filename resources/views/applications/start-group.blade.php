@@ -45,7 +45,7 @@
                            class="w-full border rounded-lg px-3 py-2">
 
                     {{-- Gender --}}
-                    font-medium">Gender</label>
+                    <font-medium">Gender</label>
                     <select name="tenants[0][gender]" required
                             class="w-full border rounded-lg px-3 py-2">
                         <option value="">Select…</option>

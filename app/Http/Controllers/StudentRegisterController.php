@@ -414,22 +414,38 @@ class StudentRegisterController extends Controller
     {
         if (!session()->has('student_id')) return redirect('/student/login');
 
-        $studentId = session('student_id');
+        // Current student
+        $student   = \App\Models\Student::find(session('student_id'));
+        $myId      = $student->id;
+        $myEmail   = $student->email;
+
+        // We search for the exact JSON pattern "email":"<their email>"
+        // so we don't accidentally match a substring of another address.
+        $needle = '"email":"' . addslashes($myEmail) . '"';
 
         $pending = \App\Models\Application::with('rental')
-            ->where('studentid', $studentId)
+            ->where(function ($q) use ($myId, $needle) {
+                $q->where('studentid', $myId)
+                ->orWhere('group_members', 'like', '%' . $needle . '%');
+            })
             ->where('status', 'pending')
             ->orderByDesc('dateapplied')
             ->get();
 
         $accepted = \App\Models\Application::with('rental')
-            ->where('studentid', $studentId)
+            ->where(function ($q) use ($myId, $needle) {
+                $q->where('studentid', $myId)
+                ->orWhere('group_members', 'like', '%' . $needle . '%');
+            })
             ->where('status', 'accepted')
             ->orderByDesc('dateapplied')
             ->get();
 
         $rejected = \App\Models\Application::with('rental')
-            ->where('studentid', $studentId)
+            ->where(function ($q) use ($myId, $needle) {
+                $q->where('studentid', $myId)
+                ->orWhere('group_members', 'like', '%' . $needle . '%');
+            })
             ->where('status', 'rejected')
             ->orderByDesc('dateapplied')
             ->get();
