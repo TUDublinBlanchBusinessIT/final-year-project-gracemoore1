@@ -64,6 +64,11 @@
                             ->first();
                     ?>
 
+                    <?php
+                        $endDate = $rental->availableuntil ? \Carbon\Carbon::parse($rental->availableuntil) : null;
+                        $daysUntilEnd = $endDate ? now()->diffInDays($endDate, false) : null;
+                    ?>                    
+
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition">
 
                         
@@ -116,6 +121,18 @@
 
                                 </div>
                             <?php endif; ?>
+
+                            <?php if($rental->status === 'let_agreed' && $endDate): ?>
+                                <?php if($daysUntilEnd < 0): ?>
+                                    <div class="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                        This agreement has ended. Please update the dates or make the listing available for new tenants.
+                                    </div>
+                                <?php elseif($daysUntilEnd <= 14): ?>
+                                    <div class="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                                        This listing is ending soon. Please update the current agreement or add new dates for new tenants.
+                                    </div>
+                                <?php endif; ?>
+                            <?php endif; ?>                            
 
                             <p class="mt-3 text-sm text-slate-600 line-clamp-2">
                                 <?php echo e(\Illuminate\Support\Str::limit($rental->description, 120)); ?>
