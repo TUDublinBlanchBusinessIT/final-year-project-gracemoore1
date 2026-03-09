@@ -1,0 +1,58 @@
+<?php if (isset($component)) { $__componentOriginalc98b3e35bd8155af0bdb37c6a10156df = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc98b3e35bd8155af0bdb37c6a10156df = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.admin.accounts','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('admin.accounts'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+    <div class="p-6 bg-white shadow rounded-lg">
+
+        <h2 class="text-lg font-semibold text-gray-900">Landlord Accounts</h2>
+
+        <table class="mt-4 w-full text-left text-sm">
+            <thead class="border-b font-semibold text-slate-700">
+                <tr>
+                    <th class="py-2">ID</th>
+                    <th class="py-2">Full Name</th>
+                    <th class="py-2">Email</th>
+                    <th class="py-2">Listings</th>
+                    <th class="py-2">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody class="text-gray-800">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $landlords; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <tr class="border-b">
+                        <td class="py-2"><?php echo e($l->id); ?></td>
+                        <td class="py-2"><?php echo e($l->firstname); ?> <?php echo e($l->surname); ?></td>
+                        <td class="py-2"><?php echo e($l->email); ?></td>
+                        <td class="py-2">
+                            <?php echo e(\App\Models\LandlordRental::where('landlordid', $l->id)->count()); ?>
+
+                        </td>
+
+                        <td class="py-2">
+                            <a href="<?php echo e(route('admin.accounts.landlord.view', $l->id)); ?>"
+                               class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            </tbody>
+        </table>
+
+    </div>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc98b3e35bd8155af0bdb37c6a10156df)): ?>
+<?php $attributes = $__attributesOriginalc98b3e35bd8155af0bdb37c6a10156df; ?>
+<?php unset($__attributesOriginalc98b3e35bd8155af0bdb37c6a10156df); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc98b3e35bd8155af0bdb37c6a10156df)): ?>
+<?php $component = $__componentOriginalc98b3e35bd8155af0bdb37c6a10156df; ?>
+<?php unset($__componentOriginalc98b3e35bd8155af0bdb37c6a10156df); ?>
+<?php endif; ?><?php /**PATH C:\Users\gmoor\final-year-project-gracemoore1\resources\views/admin/landlord-accounts.blade.php ENDPATH**/ ?>

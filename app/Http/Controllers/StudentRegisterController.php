@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentCodeMail;
 use App\Models\LandlordRental;
-
 use App\Models\Application;
 use Illuminate\Support\Facades\Log;
 
@@ -22,70 +21,38 @@ class StudentRegisterController extends Controller
     public function register(Request $request) {
         //  Allowlist of Irish HEI domains (annotated with institution names)
         $allowedEduDomainsIE = [
-            'ucd.ie',               // University College Dublin (UCD)
-            'ucdconnect.ie',        // University College Dublin — Student Email
-
-            'mu.ie',                // Maynooth University (MU)
-
-            'dcu.ie',
-            'mail.dcu.ie',               // Dublin City University (DCU)
-
-            'ul.ie',                // University of Limerick (UL)
-
-            'nuigalway.ie',         // National University of Ireland, Galway (legacy)
-            'universityofgalway.ie',// University of Galway (current)
-
-            'ucc.ie',               // University College Cork (UCC)
-
-            'tcd.ie',               // Trinity College Dublin (TCD)
-
-            'rcsi.ie',              // Royal College of Surgeons in Ireland (RCSI)
-
-            'setu.ie',              // South East Technological University (SETU)
-            'itcarlow.ie',          // IT Carlow (legacy, now part of SETU)
-
-            'mtu.ie',               // Munster Technological University (MTU)
-            'ittralee.ie',          // IT Tralee (legacy, now part of MTU)
-
-            'dkit.ie',              // Dundalk Institute of Technology (DKIT)
-
-            'itsligo.ie',           // IT Sligo (legacy, now ATU)
-            'gmit.ie',              // Galway-Mayo Institute of Technology (legacy, now ATU)
-            'lyit.ie',              // Letterkenny Institute of Technology (legacy, now ATU)
-            'atu.ie',               // Atlantic Technological University (ATU)
-
-            'ait.ie',               // Athlone Institute of Technology (legacy, now TUS)
-            'lit.ie',               // Limerick Institute of Technology (legacy, now TUS)
-            'tus.ie',               // Technological University of the Shannon (TUS)
-
-            'ncirl.ie',             // National College of Ireland (NCI)
-
-            'ncad.ie',              // National College of Art and Design (NCAD)
-
-            'iadt.ie',              // IADT Dún Laoghaire (Institute of Art, Design and Technology)
-
-            'mie.ie',               // Marino Institute of Education (MIE)
-
-            'riam.ie',              // Royal Irish Academy of Music (RIAM)
-
-            'carlowcollege.ie',     // Carlow College (St. Patrick’s)
-
-            'ipa.ie',               // Institute of Public Administration (IPA)
-
-            'mytudublin.ie',        // Technological University Dublin (TUD) — Student Email
-            'tudublin.ie',          // Technological University Dublin (TUD)
+            'ucd.ie', 'ucdconnect.ie',
+            'mu.ie',
+            'dcu.ie', 'mail.dcu.ie',
+            'ul.ie',
+            'nuigalway.ie', 'universityofgalway.ie',
+            'ucc.ie',
+            'tcd.ie',
+            'rcsi.ie',
+            'setu.ie', 'itcarlow.ie',
+            'mtu.ie', 'ittralee.ie',
+            'dkit.ie',
+            'itsligo.ie', 'gmit.ie', 'lyit.ie', 'atu.ie',
+            'ait.ie', 'lit.ie', 'tus.ie',
+            'ncirl.ie',
+            'ncad.ie',
+            'iadt.ie',
+            'mie.ie',
+            'riam.ie',
+            'carlowcollege.ie',
+            'ipa.ie',
+            'mytudublin.ie', 'tudublin.ie',
         ];
 
         $data = $request->validate([
-            'firstname' => 'required',
-            'surname' => 'required',
+            'firstname'   => 'required',
+            'surname'     => 'required',
             'dateofbirth' => 'required|date',
-            //  College email check — ONLY affects validation; no other behavior changes
+            // College email validation only
             'email' => ['required','email', function($attribute, $value, $fail) use ($allowedEduDomainsIE) {
                 $domain = strtolower(substr(strrchr($value, "@"), 1) ?: '');
-                // Reduce to base (eTLD+1) simply: e.g. "mail.tcd.ie" -> "tcd.ie"
-                $parts = explode('.', $domain);
-                $base = implode('.', array_slice($parts, -2));
+                $parts  = explode('.', $domain);
+                $base   = implode('.', array_slice($parts, -2)); // "mail.tcd.ie" -> "tcd.ie"
                 if (!in_array($base, $allowedEduDomainsIE)) {
                     $fail('Please use your university email address.');
                 }
@@ -94,35 +61,34 @@ class StudentRegisterController extends Controller
         ]);
 
         $code = rand(1000, 9999);
-        
-        // Log the code for debugging
+
         Log::info('Student email verification code generated', [
             'email' => $data['email'],
-            'code' => $code,
+            'code'  => $code,
         ]);
 
         session([
             'registration_data' => [
-                'firstname' => $data['firstname'],
-                'surname' => $data['surname'],
-                'dateofbirth' => $data['dateofbirth'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
+                'firstname'               => $data['firstname'],
+                'surname'                 => $data['surname'],
+                'dateofbirth'             => $data['dateofbirth'],
+                'email'                   => $data['email'],
+                'password'                => Hash::make($data['password']),
                 'email_verification_code' => $code
             ]
         ]);
 
         Mail::to($data['email'])->send(new StudentCodeMail($code));
-        //  END DEBUG BLOCK
 
         return redirect('/student/verify-email');
     }
 
-
+    /*** SHOW EMAIL VERIFICATION PAGE (GET) ***/
     public function showVerify() {
         return view('student.verify-email');
     }
 
+    /*** HANDLE EMAIL VERIFICATION CODE (POST) ***/
     public function verifyEmail(Request $request) {
         $request->validate(['code' => 'required|digits:4']);
         $registration = session('registration_data');
@@ -135,17 +101,22 @@ class StudentRegisterController extends Controller
             return back()->withErrors(['code' => 'Invalid verification code']);
         }
 
-        // Mark email as verified in session (unchanged)
         $registration['email_verified'] = true;
         session(['registration_data' => $registration]);
 
         return redirect('/student/verify-id');
     }
 
+    /*** SHOW ID VERIFICATION PAGE (GET) ***/
     public function showVerifyId() {
         return view('student.verify-id');
     }
 
+    /**
+     * HANDLE ID OCR VERIFICATION (POST)
+     * Names-only verification (DOB removed).
+     * - Accent-insensitive, fuzzy, and MRZ support
+     */
     public function verifyId(Request $request)
     {
         $request->validate([
@@ -154,43 +125,94 @@ class StudentRegisterController extends Controller
 
         $registration = session('registration_data');
         if (!$registration || empty($registration['email_verified'])) {
-            return redirect('/student/register')->withErrors(['ocr_text' => 'Please complete registration and email verification first.']);
+            return redirect('/student/register')->withErrors([
+                'ocr_text' => 'Please complete registration and email verification first.',
+            ]);
         }
 
-        $text = strtolower($request->input('ocr_text'));
-        $text_clean = str_replace(['<', ' '], '', $text);
+        // ---- OCR text in multiple forms ----
+        $rawOcr     = (string)$request->input('ocr_text', '');
+        $text       = mb_strtolower($rawOcr, 'UTF-8');       // raw lowercase
+        $text_clean = str_replace(['<', ' '], '', $text);    // historical clean
 
-        // Prepare names for matching (existing logic)
-        $firstname = strtolower($registration['firstname']);
-        $surname = strtolower($registration['surname']);
+        // Irish transliteration BEFORE iconv; keep letters+digits only to handle fadas robustly
+        $norm_ie = function ($s) {
+            $s = strtr($s, [
+                'Á'=>'A','É'=>'E','Í'=>'I','Ó'=>'O','Ú'=>'U',
+                'á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u',
+            ]);
+            $s = mb_strtolower((string)$s, 'UTF-8');
+            $x = @iconv('UTF-8', 'ASCII//TRANSLIT', $s);
+            if ($x === false || $x === null) $x = $s;
+            return preg_replace('/[^a-z0-9]/', '', $x); // keep a-z0-9 only
+        };
+
+        $text_norm = $norm_ie($rawOcr);
+
+        // ---- Name matching only (DOB removed) ----
+        $firstname = mb_strtolower($registration['firstname'], 'UTF-8');
+        $surname   = mb_strtolower($registration['surname'], 'UTF-8');
+
         $firstname_nospace = str_replace(' ', '', $firstname);
-        $surname_nospace = str_replace(' ', '', $surname);
+        $surname_nospace   = str_replace(' ', '', $surname);
 
-        // Exact/substring checks (existing logic)
+        // Accentless variants for names too (so Ó/á/etc. match even if OCR is inconsistent)
+        $firstname_norm = $norm_ie($firstname);
+        $surname_norm   = $norm_ie($surname);
+
+        // Exact/substring checks across multiple text forms
         $firstnameMatch =
             str_contains($text, $firstname) ||
-            str_contains($text_clean, $firstname) ||
-            str_contains($text, $firstname_nospace) ||
-            str_contains($text_clean, $firstname_nospace);
+            str_contains($text_clean, $firstname_nospace) ||
+            ($firstname_norm !== '' && strpos($text_norm, $firstname_norm) !== false);
 
         $surnameMatch =
             str_contains($text, $surname) ||
-            str_contains($text_clean, $surname) ||
-            str_contains($text, $surname_nospace) ||
-            str_contains($text_clean, $surname_nospace);
+            str_contains($text_clean, $surname_nospace) ||
+            ($surname_norm !== '' && strpos($text_norm, $surname_norm) !== false);
 
-        // Minimal MRZ-based matching (first given-name token only; middle name optional)
-        // This augments your existing checks; it doesn't replace them.
+        // Fuzzy backups if still not matched
+        if (!$firstnameMatch) {
+            $firstPercent = $firstPercentClean = $firstPercentNoSpace = $firstPercentCleanNoSpace = $firstPercentNorm = 0.0;
+            similar_text($firstname, $text, $firstPercent);
+            similar_text($firstname, $text_clean, $firstPercentClean);
+            similar_text($firstname_nospace, $text, $firstPercentNoSpace);
+            similar_text($firstname_nospace, $text_clean, $firstPercentCleanNoSpace);
+            similar_text($firstname_norm, $text_norm, $firstPercentNorm);
+            $firstnameMatch = max(
+                (float)$firstPercent,
+                (float)$firstPercentClean,
+                (float)$firstPercentNoSpace,
+                (float)$firstPercentCleanNoSpace,
+                (float)$firstPercentNorm
+            ) >= 80.0;
+        }
+
+        if (!$surnameMatch) {
+            $surPercent = $surPercentClean = $surPercentNoSpace = $surPercentCleanNoSpace = $surPercentNorm = 0.0;
+            similar_text($surname, $text, $surPercent);
+            similar_text($surname, $text_clean, $surPercentClean);
+            similar_text($surname_nospace, $text, $surPercentNoSpace);
+            similar_text($surname_nospace, $text_clean, $surPercentCleanNoSpace);
+            similar_text($surname_norm, $text_norm, $surPercentNorm);
+            $surnameMatch = max(
+                (float)$surPercent,
+                (float)$surPercentClean,
+                (float)$surPercentNoSpace,
+                (float)$surPercentCleanNoSpace,
+                (float)$surPercentNorm
+            ) >= 80.0;
+        }
+
+        // ---- Optional MRZ augment (kept): helps when the readable zone is poor but MRZ is good ----
         $mrzFirstMatches = false;
         $mrzSurnameMatches = false;
         (function() use ($request, $registration, &$mrzFirstMatches, &$mrzSurnameMatches) {
-            $raw = strtoupper($request->input('ocr_text'));
-            // Keep only characters typical in MRZ
+            $raw  = strtoupper($request->input('ocr_text'));
             $norm = preg_replace('/[^A-Z0-9<\n]/', '', $raw);
             $lines = array_values(array_filter(array_map('trim', explode("\n", $norm))));
             if (count($lines) === 0) return;
 
-            // Look for SURNAME<<GIVEN<NAMES>
             $line1 = null;
             foreach ($lines as $ln) {
                 if (strpos($ln, '<<') !== false) { $line1 = $ln; break; }
@@ -205,121 +227,55 @@ class StudentRegisterController extends Controller
             $givenTokens = array_values(array_filter(explode('<', $givenRaw)));
             if (!$givenTokens) return;
 
-            $firstFromMrz = $givenTokens[0]; // ONLY the first given name
+            $firstFromMrz = $givenTokens[0];
             $surFromMrz   = str_replace('<','', $surnameRaw);
 
             $userFirst = strtoupper($registration['firstname']);
             $userSur   = strtoupper($registration['surname']);
 
-            // exact or prefix/substring tolerance (OCR may merge tokens)
             $mrzFirstMatches   = ($firstFromMrz === $userFirst) || (strpos($firstFromMrz, $userFirst) === 0);
             $mrzSurnameMatches = ($surFromMrz === $userSur) || (strpos($surFromMrz, $userSur) !== false);
         })();
 
-        // Fuzzy match if not exact (existing logic)
-        if (!$firstnameMatch) {
-            similar_text($firstname, $text, $firstPercent);
-            similar_text($firstname, $text_clean, $firstPercentClean);
-            similar_text($firstname_nospace, $text, $firstPercentNoSpace);
-            similar_text($firstname_nospace, $text_clean, $firstPercentCleanNoSpace);
-            $firstnameMatch = max($firstPercent, $firstPercentClean, $firstPercentNoSpace, $firstPercentCleanNoSpace) >= 80;
-        }
-        if (!$surnameMatch) {
-            similar_text($surname, $text, $surPercent);
-            similar_text($surname, $text_clean, $surPercentClean);
-            similar_text($surname_nospace, $text, $surPercentNoSpace);
-            similar_text($surname_nospace, $text_clean, $surPercentCleanNoSpace);
-            $surnameMatch = max($surPercent, $surPercentClean, $surPercentNoSpace, $surPercentCleanNoSpace) >= 80;
-        }
-
-        // ✅ Incorporate MRZ-derived matches so first name alone is enough
+        // Final decision: names only
         $firstnameMatch = $firstnameMatch || $mrzFirstMatches;
         $surnameMatch   = $surnameMatch   || $mrzSurnameMatches;
 
-        // Robust date-of-birth matching (existing logic)
-        $dob = strtotime($registration['dateofbirth']);
-        $day = date('d', $dob);
-        $year = date('Y', $dob);
-        $month = date('M', $dob); // e.g. JAN
-
-        // Normalize helper (remove accents + punctuation)
-        function norm($s) {
-            $s = strtolower($s);
-            $s = iconv('UTF-8','ASCII//TRANSLIT',$s); // lún → lun
-            return preg_replace('/[^a-z]/','', $s);
-        }
-
-        // Dictionary of month variations (English + Irish + OCR variants)
-        $monthDictionary = [
-            'january'   => ['jan','ja','janu','janua','ian','ean','january'],
-            'february'  => ['feb','fe','febr','feabh','feabhra','february'],
-            'march'     => ['mar','ma','már','marc','march'],
-            'april'     => ['apr','ap','aib','aibrean','aibreán','april'],
-            'may'       => ['may','ma','beal','bealtaine'],
-            'june'      => ['jun','ju','meith','meitheamh','june'],
-            'july'      => ['jul','ju','iuil','iúil','july'],
-            'august'    => ['aug','au','lun','lún','lunas','lunasa','lúnasa','august'],
-            'september' => ['sep','se','sept','mean','meán','meánfomhair','september'],
-            'october'   => ['oct','oc','deir','deireadhfomhair','october'],
-            'november'  => ['nov','no','samh','samhain','november'],
-            'december'  => ['dec','de','noll','nollaig','december'],
-        ];
-
-        // Find real month being checked
-        $englishMonth = strtolower(date('F', $dob)); // "august"
-
-        // Start your original structure
-        $possibleMonths = [
-            strtolower($month),                    // "aug"
-            strtolower($englishMonth),             // "august"
-            strtolower(substr($month, 0, 2)),      // "au"
-        ];
-
-        // Add all normalized dictionary variants for that month
-        foreach ($monthDictionary[$englishMonth] as $variant) {
-            $possibleMonths[] = norm($variant);
-        }
-        $dayFound = stripos($text, ltrim($day, '0')) !== false || stripos($text, $day) !== false;
-        $yearFound = stripos($text, $year) !== false;
-
-        $monthFound = false;
-        foreach ($possibleMonths as $m) {
-            if (stripos($text, $m) !== false) {
-                $monthFound = true;
-                break;
-            }
-        }
-
-        $dobFound = $dayFound && $monthFound && $yearFound;
-
-        if ($firstnameMatch && $surnameMatch && $dobFound) {
-            // Only create the student now, if not already created
+        if ($firstnameMatch && $surnameMatch) {
+            // Create/update student & mark ID verified
             $student = Student::where('email', $registration['email'])->first();
             if (!$student) {
                 $student = Student::create([
-                    'firstname' => $registration['firstname'],
-                    'surname' => $registration['surname'],
-                    'dateofbirth' => $registration['dateofbirth'],
-                    'email' => $registration['email'],
-                    'password' => $registration['password'],
+                    'firstname'               => $registration['firstname'],
+                    'surname'                 => $registration['surname'],
+                    'dateofbirth'             => $registration['dateofbirth'], // kept in profile
+                    'email'                   => $registration['email'],
+                    'password'                => $registration['password'],     // already hashed
                     'email_verification_code' => null,
-                    // Your existing behavior: email was verified earlier in session
-                    'email_verified' => true,
-                    // ✅ Set ID verified only after OCR success
-                    'id_verified' => true,
+                    'email_verified'          => true,
+                    'id_verified'             => true,
                 ]);
             } else {
-                // ✅ If a record exists, mark ID as verified now (no other logic changes)
-                $student->update([
-                    'id_verified' => true,
-                ]);
+                $student->update(['id_verified' => true]);
             }
+
             session()->forget('registration_data');
             session(['student_id' => $student->id]);
+
             return redirect('/home')->with('success', 'ID verified!');
         }
 
-        return back()->withErrors(['ocr_text' => 'ID verification failed. Make sure your details are clearly visible.']);
+        // Helpful debug (no raw OCR stored). Confirms DOB is disabled now.
+        Log::debug('Student ID verification failed (names only, DOB check disabled)', [
+            'email'           => $registration['email'] ?? null,
+            'ocr_sha256'      => hash('sha256', $rawOcr),
+            'firstnameMatch'  => $firstnameMatch,
+            'surnameMatch'    => $surnameMatch,
+        ]);
+
+        return back()->withErrors([
+            'ocr_text' => 'ID verification failed. Make sure your name is clearly visible.',
+        ]);
     }
 
     public function dashboard(Request $request) {
@@ -327,28 +283,25 @@ class StudentRegisterController extends Controller
             return redirect('/login');
         }
 
-        // Load the logged-in student
         $student = \App\Models\Student::find(session('student_id'));
 
-        // ——— FILTER INPUTS (GET) ———
-        $q                  = trim((string) $request->query('q', ''));
-        $county             = trim((string) $request->query('county', ''));
-        $housetype          = $request->query('housetype');                 // any | single_private | private_shared | whole_property_group
-        $accommodationType  = $request->query('accommodation_type');        // house | apartment
-        $applicationType    = $request->query('application_type');          // single | group
-        $fromDate           = $request->query('from');                      // YYYY-MM-DD
-        $untilDate          = $request->query('until');                     // YYYY-MM-DD
-        $minRent            = $request->query('min_rent');                  // numeric
-        $maxRent            = $request->query('max_rent');                  // numeric
-        $nightsBucket       = $request->query('nights_bucket');             // any | 1-3 | 4-5 | 6-7
+        $q                 = trim((string) $request->query('q', ''));
+        $county            = trim((string) $request->query('county', ''));
+        $housetype         = $request->query('housetype');
+        $accommodationType = $request->query('accommodation_type');
+        $applicationType   = $request->query('application_type');
+        $fromDate          = $request->query('from');
+        $untilDate         = $request->query('until');
+        $minRent           = $request->query('min_rent');
+        $maxRent           = $request->query('max_rent');
+        $nightsBucket      = $request->query('nights_bucket');
 
         $query = \App\Models\LandlordRental::query()
             ->join('landlord', 'landlord.id', '=', 'rental.landlordid')
-            ->where('landlord.status', 'active')   // only active landlords
-            ->where('rental.status', 'available')  // only available listings
+            ->where('landlord.status', 'active')
+            ->where('rental.status', 'available')
             ->select('rental.*');
 
-        // TEXT SEARCH (street, county, postcode, description)
         if ($q !== '') {
             $like = '%' . str_replace('%', '\%', $q) . '%';
             $query->where(function ($sub) use ($like) {
@@ -359,12 +312,10 @@ class StudentRegisterController extends Controller
             });
         }
 
-        // COUNTY
         if ($county !== '') {
             $query->where('rental.county', $county);
         }
 
-        // HOUSETYPE
         if ($housetype !== null && $housetype !== '' && $housetype !== 'any') {
             $allowed = ['any','single_private','private_shared','whole_property_group'];
             if (in_array($housetype, $allowed, true)) {
@@ -372,7 +323,6 @@ class StudentRegisterController extends Controller
             }
         }
 
-        // ACCOMMODATION TYPE
         if ($accommodationType !== null && $accommodationType !== '') {
             $allowed = ['house','apartment'];
             if (in_array($accommodationType, $allowed, true)) {
@@ -380,7 +330,6 @@ class StudentRegisterController extends Controller
             }
         }
 
-        // APPLICATION TYPE
         if ($applicationType !== null && $applicationType !== '') {
             $allowed = ['single','group'];
             if (in_array($applicationType, $allowed, true)) {
@@ -388,8 +337,7 @@ class StudentRegisterController extends Controller
             }
         }
 
-        // DATE OVERLAP:
-        // Overlap condition: listing_from <= filter_until AND listing_until >= filter_from
+        // DATE OVERLAP
         if ($fromDate && $untilDate) {
             $query->whereDate('rental.availablefrom', '<=', $untilDate)
                 ->whereDate('rental.availableuntil', '>=', $fromDate);
@@ -399,7 +347,6 @@ class StudentRegisterController extends Controller
             $query->whereDate('rental.availablefrom', '<=', $untilDate);
         }
 
-        // RENT RANGE
         if ($minRent !== null && $minRent !== '') {
             $query->where('rental.rentpermonth', '>=', (float)$minRent);
         }
@@ -407,7 +354,6 @@ class StudentRegisterController extends Controller
             $query->where('rental.rentpermonth', '<=', (float)$maxRent);
         }
 
-        // NIGHTS PER WEEK (buckets)
         if ($nightsBucket && $nightsBucket !== 'any') {
             switch ($nightsBucket) {
                 case '1-3':
@@ -422,7 +368,6 @@ class StudentRegisterController extends Controller
             }
         }
 
-        // ORDER newest first
         $listings = $query->orderByDesc('rental.id')->get();
 
         return view('student.dashboard', compact('listings', 'student'));
@@ -439,55 +384,53 @@ class StudentRegisterController extends Controller
         return view('student.listing-show', compact('rental'));
     }
 
-
     public function studentProfile()
     {
         if (!session()->has('student_id')) return redirect('/student/login');
         return view('student.profile-new');
     }
 
-        public function studentProfileApplications()
-        {
-            if (!session()->has('student_id')) {
-                return redirect('/student/login');
-            }
-
-            $student = Student::find(session('student_id'));
-            $myId    = $student->id;
-            $myEmail = strtolower(trim($student->email));
-
-            // JSON pattern for matching email (case + whitespace tolerant)
-            $pattern = '"email"[[:space:]]*:[[:space:]]*"'.$myEmail.'"';
-
-            $pending = Application::with('rental')
-                ->where(function ($q) use ($myId, $pattern) {
-                    $q->where('studentid', $myId)
-                    ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
-                })
-                ->where('status','pending')
-                ->orderByDesc('dateapplied')
-                ->get();
-
-            $accepted = Application::with('rental')
-                ->where(function ($q) use ($myId, $pattern) {
-                    $q->where('studentid', $myId)
-                    ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
-                })
-                ->where('status','accepted')
-                ->orderByDesc('dateapplied')
-                ->get();
-
-            $rejected = Application::with('rental')
-                ->where(function ($q) use ($myId, $pattern) {
-                    $q->where('studentid', $myId)
-                    ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
-                })
-                ->where('status','rejected')
-                ->orderByDesc('dateapplied')
-                ->get();
-
-            return view('student.profile-applications', compact('pending','accepted','rejected'));
+    public function studentProfileApplications()
+    {
+        if (!session()->has('student_id')) {
+            return redirect('/student/login');
         }
+
+        $student = Student::find(session('student_id'));
+        $myId    = $student->id;
+        $myEmail = strtolower(trim($student->email));
+
+        $pattern = '"email"[[:space:]]*:[[:space:]]*"'.$myEmail.'"';
+
+        $pending = Application::with('rental')
+            ->where(function ($q) use ($myId, $pattern) {
+                $q->where('studentid', $myId)
+                  ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
+            })
+            ->where('status','pending')
+            ->orderByDesc('dateapplied')
+            ->get();
+
+        $accepted = Application::with('rental')
+            ->where(function ($q) use ($myId, $pattern) {
+                $q->where('studentid', $myId)
+                  ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
+            })
+            ->where('status','accepted')
+            ->orderByDesc('dateapplied')
+            ->get();
+
+        $rejected = Application::with('rental')
+            ->where(function ($q) use ($myId, $pattern) {
+                $q->where('studentid', $myId)
+                  ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
+            })
+            ->where('status','rejected')
+            ->orderByDesc('dateapplied')
+            ->get();
+
+        return view('student.profile-applications', compact('pending','accepted','rejected'));
+    }
 
     public function studentProfileAccount()
     {
@@ -496,8 +439,6 @@ class StudentRegisterController extends Controller
         $student = Student::find(session('student_id'));
         return view('student.profile-account', compact('student'));
     }
-
-
     
     public function studentResetPassword(Request $request)
     {
@@ -515,37 +456,17 @@ class StudentRegisterController extends Controller
             return back()->withErrors(['current_password' => 'Student not found.']);
         }
 
-        
         if (!Hash::check($request->input('current_password'), $student->password)) {
             return back()->withErrors(['current_password' => 'The current password is incorrect.']);
         }
 
-        // Update immediately
         $student->password = Hash::make($request->input('password'));
         $student->save();
 
-        // Optional safety: rotate session ID after credential change
         $request->session()->regenerate();
 
-        // This matches your Blade check: session('status') === 'password-updated'
         return back()->with('status', 'password-updated');
     }
-
-
-    //public function studentResetPassword(Request $request)
-    //{
-      //  if (!session()->has('student_id')) return redirect('/student/login');
-
-        //$request->validate([
-          //  'password' => 'required|confirmed|min:6'
-        //]);
-
-        //$student = Student::find(session('student_id'));
-        //$student->password = Hash::make($request->password);
-        //$student->save();
-
-        //return back()->with('success', 'Password updated.');
-    //}
 
     public function studentDeleteAccount()
     {
