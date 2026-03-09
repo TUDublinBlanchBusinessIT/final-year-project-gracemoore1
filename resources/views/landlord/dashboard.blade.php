@@ -48,6 +48,13 @@
                         $firstImage = $imageList[0] ?? null;
                     @endphp
 
+                    @php
+                        $acceptedApplication = \App\Models\Application::with('student')
+                            ->where('rentalid', $rental->id)
+                            ->where('status', 'accepted')
+                            ->first();
+                    @endphp
+
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition">
 
                         {{-- Image preview --}}
@@ -88,6 +95,13 @@
                                     {{ $rental->status === 'let_agreed' ? 'Let Agreed' : ucfirst($rental->status ?? 'unknown') }}
                                 </span>
                             </div>
+
+                            @if($rental->status === 'let_agreed' && $acceptedApplication && $acceptedApplication->student)
+                                <div class="mt-2 text-sm text-slate-700">
+                                    <span class="font-medium">Accepted Student:</span>
+                                    {{ $acceptedApplication->student->firstname }} {{ $acceptedApplication->student->surname }}
+                                </div>
+                            @endif
 
                             <p class="mt-3 text-sm text-slate-600 line-clamp-2">
                                 {{ \Illuminate\Support\Str::limit($rental->description, 120) }}

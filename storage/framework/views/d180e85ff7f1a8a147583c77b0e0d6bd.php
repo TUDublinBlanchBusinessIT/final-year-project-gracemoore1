@@ -57,6 +57,13 @@
                         $firstImage = $imageList[0] ?? null;
                     ?>
 
+                    <?php
+                        $acceptedApplication = \App\Models\Application::with('student')
+                            ->where('rentalid', $rental->id)
+                            ->where('status', 'accepted')
+                            ->first();
+                    ?>
+
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition">
 
                         
@@ -101,6 +108,14 @@
 
                                 </span>
                             </div>
+
+                            <?php if($rental->status === 'let_agreed' && $acceptedApplication && $acceptedApplication->student): ?>
+                                <div class="mt-2 text-sm text-slate-700">
+                                    <span class="font-medium">Accepted Student:</span>
+                                    <?php echo e($acceptedApplication->student->firstname); ?> <?php echo e($acceptedApplication->student->surname); ?>
+
+                                </div>
+                            <?php endif; ?>
 
                             <p class="mt-3 text-sm text-slate-600 line-clamp-2">
                                 <?php echo e(\Illuminate\Support\Str::limit($rental->description, 120)); ?>
