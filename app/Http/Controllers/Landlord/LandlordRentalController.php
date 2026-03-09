@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Landlord;
+use Illuminate\Support\Facades\DB;
 
 class LandlordRentalController extends Controller
 {
@@ -179,18 +180,35 @@ class LandlordRentalController extends Controller
      *  ---------------------------------------------------- */
     public function acceptApplication($applicationId)
     {
-        $landlordId = $this->getCurrentLandlordId();
-
-        $app = Application::with('rental')->findOrFail($applicationId);
+        $app = Application::findOrFail($applicationId);
+        $rental = LandlordRental::findOrFail($app->rentalid);
 
         // Only the owner of the listing can accept
-        if (!$app->rental || (int)$app->rental->landlordid !== (int)$landlordId) {
+        if ($rental->landlordid != session('landlord_id')) {
             abort(403);
         }
 
-        $app->update(['status' => 'accepted']);
+        DB::transaction(function () use ($app, $rental) {
+            $alreadyAccepted = Application::where('rentalid', $app->rentalid)
+                ->where('status', 'accepted')
+                ->where('id', '!=', $app->id)
+                ->exists();
 
-        return back()->with('success', 'Application accepted.');
+            if ($alreadyAccepted) {
+                abort(400, 'A student has already been accepted for this property.');
+            }
+
+            $app->update(['status' => 'accepted']);
+
+            Application::where('rentalid', $app->rentalid)
+                ->where('id', '!=', $app->id)
+                ->where('status', 'pending')
+                ->update(['status' => 'rejected']);
+
+            $rental->update(['status' => 'let_agreed']);
+        });
+
+        return back()->with('success', 'Application accepted. All other applications were rejected and the property is now let agreed.');
     }
 
     /** ----------------------------------------------------

@@ -8,6 +8,13 @@
         </h2>
     </x-slot>
 
+    <div class="mb-4">
+        <a href="{{ url()->previous() }}" 
+        class="inline-block px-4 py-2 bg-gray-200 text-gray-800 text-sm rounded hover:bg-gray-300">
+            ← Back
+        </a>
+    </div>
+
     <div class="max-w-5xl mx-auto mt-6 px-4 sm:px-6 lg:px-8">
 
         @php

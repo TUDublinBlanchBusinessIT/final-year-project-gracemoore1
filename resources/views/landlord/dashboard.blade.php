@@ -48,6 +48,18 @@
                         $firstImage = $imageList[0] ?? null;
                     @endphp
 
+                    @php
+                        $acceptedApplication = \App\Models\Application::with('student')
+                            ->where('rentalid', $rental->id)
+                            ->where('status', 'accepted')
+                            ->first();
+                    @endphp
+
+                    @php
+                        $endDate = $rental->availableuntil ? \Carbon\Carbon::parse($rental->availableuntil) : null;
+                        $daysUntilEnd = $endDate ? now()->diffInDays($endDate, false) : null;
+                    @endphp                    
+
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition">
 
                         {{-- Image preview --}}
@@ -82,10 +94,31 @@
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs border
                                     {{ $rental->status === 'available'
                                         ? 'bg-green-50 text-green-700 border-green-200'
-                                        : 'bg-slate-100 text-slate-700 border-slate-200' }}">
-                                    {{ ucfirst($rental->status ?? 'unknown') }}
+                                        : ($rental->status === 'let_agreed'
+                                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                            : 'bg-slate-100 text-slate-700 border-slate-200') }}">
+                                    {{ $rental->status === 'let_agreed' ? 'Let Agreed' : ucfirst($rental->status ?? 'unknown') }}
                                 </span>
                             </div>
+
+                            @if($rental->status === 'let_agreed' && $acceptedApplication && $acceptedApplication->student)
+                                <div class="mt-2 text-sm text-slate-700">
+                                    <span class="font-medium">Accepted Student:</span>
+                                    {{ $acceptedApplication->student->firstname }} {{ $acceptedApplication->student->surname }}
+                                </div>
+                            @endif
+
+                            @if($rental->status === 'let_agreed' && $endDate)
+                                @if($daysUntilEnd < 0)
+                                    <div class="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                        This agreement has ended. Please update the dates or make the listing available for new tenants.
+                                    </div>
+                                @elseif($daysUntilEnd <= 14)
+                                    <div class="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                                        This listing is ending soon. Please update the current agreement or add new dates for new tenants.
+                                    </div>
+                                @endif
+                            @endif                            
 
                             <p class="mt-3 text-sm text-slate-600 line-clamp-2">
                                 {{ \Illuminate\Support\Str::limit($rental->description, 120) }}
