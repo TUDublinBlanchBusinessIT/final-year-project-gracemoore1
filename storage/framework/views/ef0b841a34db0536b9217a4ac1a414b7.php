@@ -1,16 +1,25 @@
-<x-app-layout>
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
 
-    {{-- Header --}}
-    <x-slot name="header">
+    
+     <?php $__env->slot('header', null, []); ?> 
         <div class="flex items-start justify-start">
             <div class="text-left">
                 <div class="text-2xl font-extrabold text-blue-600 leading-none">RentConnect</div>
                 <div class="mt-1 font-semibold text-gray-800">Dashboard</div>
             </div>
         </div>
-    </x-slot>
+     <?php $__env->endSlot(); ?>
 
-    @php
+    <?php
         $student = \App\Models\Student::find(session('student_id'));
 
         $collegeToCounty = [
@@ -24,16 +33,16 @@
             'CIT' => 'Cork',
             'RCSI' => 'Dublin',
         ];
-    @endphp
+    ?>
 
     <div>
 
-                {{-- Welcome --}}
+                
         <h1 class="text-2xl font-bold text-slate-900 mb-8">
-            Welcome back, {{ $student->firstname ?? $student->name ?? 'Student' }}!
+            Welcome back, <?php echo e($student->firstname ?? $student->name ?? 'Student'); ?>!
         </h1>
 
-        {{-- SEARCH BAR --}}
+        
         <div class="flex items-center bg-white border border-slate-300 rounded-xl px-4 py-3 shadow-sm">
             <svg class="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2"
                 viewBox="0 0 24 24">
@@ -52,23 +61,24 @@
             </button>
         </div>
 
-        {{-- COLLEGE CHIPS --}}
+        
         <div class="mt-4 flex gap-2 overflow-x-auto pb-2">
-            @foreach ($collegeToCounty as $college => $county)
+            <?php $__currentLoopData = $collegeToCounty; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college => $county): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <button
-                    onclick="filterCounty('{{ $county }}')"
+                    onclick="filterCounty('<?php echo e($county); ?>')"
                     class="shrink-0 px-3 py-2 rounded-full border border-blue-500 text-blue-600 bg-white text-sm font-semibold hover:bg-blue-50">
-                    {{ $college }}
+                    <?php echo e($college); ?>
+
                 </button>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
-        {{-- FILTER DRAWER --}}
+        
         <div id="filterDrawer"
              class="hidden bg-white border border-slate-300 rounded-xl shadow-sm px-6 py-6 mt-4">
             <form class="space-y-4">
 
-                {{-- Location --}}
+                
                 <div>
                     <label class="font-semibold text-slate-700">Location</label>
                     <input id="countyInput" type="text"
@@ -76,14 +86,15 @@
                            placeholder="Dublin" />
                 </div>
 
-                {{-- House Type --}}
+                
                 <!--<p class="text-sm text-slate-600">
-                    {{ [
+                    <?php echo e([
                         'any' => 'Any',
                         'single_private' => 'Single room in private home',
                         'private_shared' => 'Private room in shared house',
                         'whole_property_group' => 'Whole property (group application only)',
-                    ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
+                    ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '')); ?>
+
                 </p> -->
 
                 <div>
@@ -95,7 +106,7 @@
                     </select>
                 </div>
 
-                {{-- Dates --}}
+                
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="font-semibold text-slate-700">Available From</label>
@@ -107,7 +118,7 @@
                     </div>
                 </div>
 
-                {{-- Rent --}}
+                
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="font-semibold text-slate-700">Min Rent (€)</label>
@@ -119,7 +130,7 @@
                     </div>
                 </div>
 
-                {{-- Nights --}}
+                
                 <div>
                     <label class="font-semibold text-slate-700">Nights per Week</label>
                     <select class="w-full mt-1 rounded-lg border-slate-300">
@@ -136,207 +147,217 @@
             </form>
         </div>
 
-        {{-- ========================= --}}
-        {{-- COUNTY SECTIONS --}}
-        {{-- ========================= --}}
-        @php
+        
+        
+        
+        <?php
             $counties = ['Dublin', 'Galway', 'Limerick', 'Cork', 'Kildare'];
-        @endphp
+        ?>
 
-        @foreach ($counties as $county)
-            @php
+        <?php $__currentLoopData = $counties; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $county): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
                 $countyListings = collect($listings)->where('county', $county);
-            @endphp
+            ?>
 
-            <div class="mt-10 county-section" data-county="{{ $county }}">
-                <h2 class="text-xl font-bold text-slate-900 mb-3">{{ $county }}</h2>
+            <div class="mt-10 county-section" data-county="<?php echo e($county); ?>">
+                <h2 class="text-xl font-bold text-slate-900 mb-3"><?php echo e($county); ?></h2>
 
-                @if ($countyListings->count() > 0)
+                <?php if($countyListings->count() > 0): ?>
 
-                    {{-- ============= --}}
-                    {{-- MOBILE CARDS --}}
-                    {{-- ============= --}}
-                    <div class="flex gap-4 overflow-x-auto pb-2 lg:hidden">
-                        @foreach ($countyListings as $rental)
                     
-                            <!--@php
+                    
+                    
+                    <div class="flex gap-4 overflow-x-auto pb-2 lg:hidden">
+                        <?php $__currentLoopData = $countyListings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rental): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    
+                            <!--<?php
                                 $images = json_decode($rental->images ?? '[]', true) ?? [];
                                 $imgCount = count($images);
-                            @endphp -->
+                            ?> -->
 
-                            {{-- 50% WIDER: min-w-[390px] --}}
+                            
                             <div class="min-w-[390px] bg-white rounded-xl border border-slate-200 shadow-sm p-4 hover:shadow-md transition">
 
-                                {{-- Carousel --}}
-                                <div class="relative" data-carousel data-key="mobile-{{ $rental->id }}" data-count="{{ $imgCount }}">
+                                
+                                <div class="relative" data-carousel data-key="mobile-<?php echo e($rental->id); ?>" data-count="<?php echo e($imgCount); ?>">
                                     <div class="overflow-hidden rounded-lg">
-                                        <div id="track-mobile-{{ $rental->id }}" class="flex transition-transform duration-300 ease-out">
-                                            @forelse ($images as $img)
+                                        <div id="track-mobile-<?php echo e($rental->id); ?>" class="flex transition-transform duration-300 ease-out">
+                                            <?php $__empty_1 = true; $__currentLoopData = $images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $img): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
 
                                                 <div class="w-full shrink-0">
-                                                    <img src="{{ asset('storage/' . $img) }}" class="w-full h-40 object-cover rounded-lg" />
+                                                    <img src="<?php echo e(asset('storage/' . $img)); ?>" class="w-full h-40 object-cover rounded-lg" />
                                                 </div>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <div class="w-full h-40 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
                                                     No image
                                                 </div>
-                                            @endforelse
+                                            <?php endif; ?>
                                         </div>
                                     </div>
 
-                                    @if ($imgCount > 1)
-                                        <button onclick="prevImage('mobile', {{ $rental->id }})"
+                                    <?php if($imgCount > 1): ?>
+                                        <button onclick="prevImage('mobile', <?php echo e($rental->id); ?>)"
                                             class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">‹</button>
 
-                                        <button onclick="nextImage('mobile', {{ $rental->id }})"
+                                        <button onclick="nextImage('mobile', <?php echo e($rental->id); ?>)"
                                             class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">›</button>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
 
-                                {{-- CLICKABLE DETAILS --}}
-                                <a href="{{ route('listing.show', $rental->id) }}" class="block mt-3">
+                                
+                                <a href="<?php echo e(route('listing.show', $rental->id)); ?>" class="block mt-3">
 
-                                    {{-- Address --}}
+                                    
                                     <div class="font-semibold text-slate-900">
-                                        {{ $rental->housenumber ? $rental->housenumber . ' ' : '' }}
-                                        {{ $rental->street }}, {{ $rental->county }}
+                                        <?php echo e($rental->housenumber ? $rental->housenumber . ' ' : ''); ?>
+
+                                        <?php echo e($rental->street); ?>, <?php echo e($rental->county); ?>
+
                                     </div>
 
-                                    {{-- House Type --}}
+                                    
                                      <p class="text-sm text-slate-600">
-                                        {{ [
+                                        <?php echo e([
                                             'any' => 'Any',
                                             'single_private' => 'Single room in private home',
                                             'private_shared' => 'Private room in shared house',
                                             'whole_property_group' => 'Whole property (group application only)',
-                                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
+                                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '')); ?>
+
                                     </p>   
 
                                     
-                                    <!-- @if ($rental->housetype)
+                                    <!-- <?php if($rental->housetype): ?>
                                         <div class="text-sm text-slate-700 mt-1">
-                                            {{ $rental->housetype }}
-                                        </div>
-                                    @endif -->
+                                            <?php echo e($rental->housetype); ?>
 
-                                    {{-- Nights per Week --}}
-                                    @if ($rental->nightsperweek)
+                                        </div>
+                                    <?php endif; ?> -->
+
+                                    
+                                    <?php if($rental->nightsperweek): ?>
                                         <div class="text-sm text-slate-700">
-                                            {{ $rental->nightsperweek }} nights / week
+                                            <?php echo e($rental->nightsperweek); ?> nights / week
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
 
-                                    {{-- Availability --}}
+                                    
                                     <div class="text-sm text-slate-600 mt-1">
-                                        Available: {{ $rental->availablefrom }} → {{ $rental->availableuntil }}
+                                        Available: <?php echo e($rental->availablefrom); ?> → <?php echo e($rental->availableuntil); ?>
+
                                     </div>
 
-                                    {{-- Price --}}
+                                    
                                     <div class="text-base text-slate-800 font-bold mt-2">
-                                        €{{ number_format($rental->rentpermonth, 2) }} / month
+                                        €<?php echo e(number_format($rental->rentpermonth, 2)); ?> / month
                                     </div>
 
                                 </a>
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
 
 
-                    {{-- ============== --}}
-                    {{-- DESKTOP CARDS --}}
-                    {{-- ============== --}}
-                    {{-- 50% WIDER: 2 columns --}}
+                    
+                    
+                    
+                    
                     <div class="hidden lg:grid lg:grid-cols-2 lg:gap-6">
-                        @foreach ($countyListings as $rental)
+                        <?php $__currentLoopData = $countyListings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rental): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
-                            @php
+                            <?php
                                 $images = json_decode($rental->images ?? '[]', true) ?? [];
                                 $imgCount = count($images);
-                            @endphp
+                            ?>
 
                             <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 hover:shadow-md transition">
 
-                                {{-- Carousel --}}
-                                <div class="relative" data-carousel data-key="desktop-{{ $rental->id }}" data-count="{{ $imgCount }}">
+                                
+                                <div class="relative" data-carousel data-key="desktop-<?php echo e($rental->id); ?>" data-count="<?php echo e($imgCount); ?>">
                                     <div class="overflow-hidden rounded-lg">
-                                        <div id="track-desktop-{{ $rental->id }}" class="flex transition-transform duration-300 ease-out">
-                                            @forelse ($images as $img)
+                                        <div id="track-desktop-<?php echo e($rental->id); ?>" class="flex transition-transform duration-300 ease-out">
+                                            <?php $__empty_1 = true; $__currentLoopData = $images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $img): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
 
                                                 <div class="w-full shrink-0">
-                                                    <img src="{{ asset('storage/' . $img) }}" class="w-full h-48 object-cover rounded-lg" />
+                                                    <img src="<?php echo e(asset('storage/' . $img)); ?>" class="w-full h-48 object-cover rounded-lg" />
                                                 </div>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <div class="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
                                                     No image
                                                 </div>
-                                            @endforelse
+                                            <?php endif; ?>
                                         </div>
                                     </div>
 
-                                    @if ($imgCount > 1)
-                                        <button onclick="prevImage('desktop', {{ $rental->id }})"
+                                    <?php if($imgCount > 1): ?>
+                                        <button onclick="prevImage('desktop', <?php echo e($rental->id); ?>)"
                                             class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">‹</button>
 
-                                        <button onclick="nextImage('desktop', {{ $rental->id }})"
+                                        <button onclick="nextImage('desktop', <?php echo e($rental->id); ?>)"
                                             class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">›</button>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
 
-                                {{-- CLICKABLE DETAILS --}}
-                                <a href="{{ route('listing.show', $rental->id) }}" class="block mt-3">
+                                
+                                <a href="<?php echo e(route('listing.show', $rental->id)); ?>" class="block mt-3">
 
-                                    {{-- Address --}}
+                                    
                                     <div class="font-semibold text-slate-900">
-                                        {{ $rental->housenumber ? $rental->housenumber . ' ' : '' }}
-                                        {{ $rental->street }}, {{ $rental->county }}
+                                        <?php echo e($rental->housenumber ? $rental->housenumber . ' ' : ''); ?>
+
+                                        <?php echo e($rental->street); ?>, <?php echo e($rental->county); ?>
+
                                     </div>
 
-                                    {{-- House Type --}}
-                                    <!--@if ($rental->housetype)
+                                    
+                                    <!--<?php if($rental->housetype): ?>
                                         <div class="text-sm text-slate-700 mt-1">
-                                            {{ $rental->housetype }}
+                                            <?php echo e($rental->housetype); ?>
+
                                         </div>
-                                    @endif -->
+                                    <?php endif; ?> -->
                                      <p class="text-sm text-slate-600">
-                                        {{ [
+                                        <?php echo e([
                                             'any' => 'Any',
                                             'single_private' => 'Single room in private home',
                                             'private_shared' => 'Private room in shared house',
                                             'whole_property_group' => 'Whole property (group application only)',
-                                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
+                                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '')); ?>
+
                                     </p>                                       
 
-                                    {{-- Nights per Week --}}
-                                    @if ($rental->nightsperweek)
+                                    
+                                    <?php if($rental->nightsperweek): ?>
                                         <div class="text-sm text-slate-700">
-                                            {{ $rental->nightsperweek }} nights / week
+                                            <?php echo e($rental->nightsperweek); ?> nights / week
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
 
-                                    {{-- Availability --}}
+                                    
                                     <div class="text-sm text-slate-600 mt-1">
-                                        Available: {{ $rental->availablefrom }} → {{ $rental->availableuntil }}
+                                        Available: <?php echo e($rental->availablefrom); ?> → <?php echo e($rental->availableuntil); ?>
+
                                     </div>
 
-                                    {{-- Price --}}
+                                    
                                     <div class="text-base text-slate-800 font-bold mt-2">
-                                        €{{ number_format($rental->rentpermonth, 2) }} / month
+                                        €<?php echo e(number_format($rental->rentpermonth, 2)); ?> / month
                                     </div>
 
                                 </a>
 
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
 
 
-                @else
-                    {{-- NO LISTINGS UI --}}
+                <?php else: ?>
+                    
                     <div class="flex gap-4 overflow-x-auto pb-2 lg:hidden">
                         <div class="min-w-[390px] bg-white rounded-xl border border-slate-200 shadow-sm p-4">
                             <div class="font-semibold text-slate-700">No listings available yet</div>
                             <div class="text-slate-500 text-sm mt-1">
-                                Listings in {{ $county }} will appear here.
+                                Listings in <?php echo e($county); ?> will appear here.
                             </div>
                         </div>
                     </div>
@@ -345,17 +366,17 @@
                         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
                             <div class="font-semibold text-slate-700">No listings available yet</div>
                             <div class="text-slate-500 text-sm mt-1">
-                                Listings in {{ $county }} will appear here.
+                                Listings in <?php echo e($county); ?> will appear here.
                             </div>
                         </div>
                     </div>
 
-                @endif
+                <?php endif; ?>
             </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
-    {{-- CAROUSEL SCRIPT --}}
+    
     <script>
         const filterBtn = document.getElementById('filterToggle');
         const drawer = document.getElementById('filterDrawer');
@@ -429,4 +450,14 @@
         });
     </script>
 
-</x-app-layout>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php /**PATH C:\Users\moyak\final-year-project-gracemoore1\resources\views/student/dashboard.blade.php ENDPATH**/ ?>
