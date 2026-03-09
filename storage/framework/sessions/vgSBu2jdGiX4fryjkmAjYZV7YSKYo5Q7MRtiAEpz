@@ -1,1 +1,1 @@
-a:4:{s:6:"_token";s:40:"oAoeTBjb7lDfyM9vSIGiXwW7QQBrk8QERW4qlKmO";s:9:"_previous";a:2:{s:3:"url";s:26:"http://localhost:8000/home";s:5:"route";s:17:"student.dashboard";}s:6:"_flash";a:2:{s:3:"old";a:0:{}s:3:"new";a:0:{}}s:10:"student_id";i:6;}
+a:3:{s:6:"_flash";a:2:{s:3:"old";a:0:{}s:3:"new";a:0:{}}s:6:"_token";s:40:"PDJZEpT4dihRE24HNm2qIKh8B2ZCBILfsgeMfZZb";s:9:"_previous";a:2:{s:3:"url";s:27:"http://localhost:8000/login";s:5:"route";s:5:"login";}}

@@ -24,6 +24,7 @@ class StudentRegisterController extends Controller
             'ucd.ie', 'ucdconnect.ie',
             'mu.ie',
             'dcu.ie', 'mail.dcu.ie',
+            'mumail.ie',
             'ul.ie',
             'nuigalway.ie', 'universityofgalway.ie',
             'ucc.ie',
