@@ -403,7 +403,7 @@
             form.submit();
         }
 
-        // --- Carousel as you had it originally ---
+        // --- Carousel as we had it originally ---
         const carouselState = {};
 
         function stateKey(view, id) {

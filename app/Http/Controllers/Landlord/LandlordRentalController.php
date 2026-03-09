@@ -188,7 +188,7 @@ class LandlordRentalController extends Controller
             abort(403);
         }
 
-        DB::transaction(function () use ($app) {
+        DB::transaction(function () use ($app, $rental) {
             $alreadyAccepted = Application::where('rentalid', $app->rentalid)
                 ->where('status', 'accepted')
                 ->where('id', '!=', $app->id)
@@ -204,9 +204,11 @@ class LandlordRentalController extends Controller
                 ->where('id', '!=', $app->id)
                 ->where('status', 'pending')
                 ->update(['status' => 'rejected']);
+
+            $rental->update(['status' => 'let_agreed']);
         });
 
-        return back()->with('success', 'Application accepted. All other applications were rejected.');
+        return back()->with('success', 'Application accepted. All other applications were rejected and the property is now let agreed.');
     }
 
     /** ----------------------------------------------------

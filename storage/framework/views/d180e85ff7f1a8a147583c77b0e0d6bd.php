@@ -94,8 +94,10 @@
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs border
                                     <?php echo e($rental->status === 'available'
                                         ? 'bg-green-50 text-green-700 border-green-200'
-                                        : 'bg-slate-100 text-slate-700 border-slate-200'); ?>">
-                                    <?php echo e(ucfirst($rental->status ?? 'unknown')); ?>
+                                        : ($rental->status === 'let_agreed'
+                                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                            : 'bg-slate-100 text-slate-700 border-slate-200')); ?>">
+                                    <?php echo e($rental->status === 'let_agreed' ? 'Let Agreed' : ucfirst($rental->status ?? 'unknown')); ?>
 
                                 </span>
                             </div>
