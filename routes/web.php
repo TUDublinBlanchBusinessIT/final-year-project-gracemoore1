@@ -193,7 +193,7 @@ Route::prefix('admin/accounts')->group(function () {
     Route::get('/group-applications', function (\Illuminate\Http\Request $req) {
     $term = trim($req->query('q', ''));
 
-    $results = \App\Models\Application::with(['group.members', 'rental', 'rental.landlord'])
+    $results = \App\Models\Application::with(['group.members', 'rental'])
         ->where('applicationtype', 'group')
         ->when($term !== '', function ($q) use ($term) {
 
@@ -224,7 +224,7 @@ Route::prefix('admin/accounts')->group(function () {
     
    // VIEW PAGE (single group application)
     Route::get('/group-applications/{id}', function ($id) {
-        $app = \App\Models\Application::with(['group.members', 'rental.landlord'])
+        $app = \App\Models\Application::with(['group.members', 'rental'])
             ->findOrFail($id);
 
         return view('admin.view-group-application', compact('app'));
