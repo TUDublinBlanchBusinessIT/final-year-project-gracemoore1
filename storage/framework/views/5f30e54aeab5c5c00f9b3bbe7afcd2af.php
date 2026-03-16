@@ -3,6 +3,17 @@
     $student = \App\Models\Student::find(session('student_id'));
 ?>
 
+<?php
+    $studentUnreadCount = 0;
+
+    if ($student) {
+        $studentUnreadCount = \App\Models\Message::where('studentid', $student->id)
+            ->where('sender_type', 'landlord')
+            ->where('is_read_by_student', false)
+            ->count();
+    }
+?>
+
 <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-60 bg-white border-r border-slate-200 px-4 py-6 z-50">
     <div class="w-full flex flex-col gap-2">
 
@@ -89,6 +100,13 @@
            class="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition
            <?php echo e(request()->routeIs('student.messages') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'); ?>">
             💬 <span class="font-semibold">Messages</span>
+                <?php if($studentUnreadCount > 0): ?>
+                    <span class="inline-flex items-center justify-center min-w-[20px] h-[20px] rounded-full bg-red-500 px-1.5 text-[11px] font-semibold text-white">
+                        <?php echo e($studentUnreadCount); ?>
+
+                    </span>
+                <?php endif; ?>
+
         </a>
 
         <a href="<?php echo e(route('student.support')); ?>"

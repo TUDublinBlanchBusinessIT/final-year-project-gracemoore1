@@ -29,4 +29,9 @@ class LandlordRental extends Model
         // 'propertyid',
 
     ];
+
+    public function landlord()
+    {
+        return $this->belongsTo(Landlord::class, 'landlordid');
+    }
 }

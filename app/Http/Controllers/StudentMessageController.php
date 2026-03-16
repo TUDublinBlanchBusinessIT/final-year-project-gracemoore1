@@ -3,20 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
-use App\Models\Landlord;
 use App\Models\Message;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
-class LandlordMessageController extends Controller
+class StudentMessageController extends Controller
 {
     public function index()
     {
-        $landlordId = Landlord::where('email', auth()->user()->email)->value('id');
+        $studentId = session('student_id');
 
-        $applications = Application::with(['student', 'rental'])
-            ->whereHas('rental', function ($query) use ($landlordId) {
-                $query->where('landlordid', $landlordId);
-            })
+        $applications = Application::with(['rental.landlord', 'student'])
+            ->where('studentid', $studentId)
             ->get()
             ->filter(function ($application) {
                 return Message::where('studentid', $application->studentid)
@@ -24,19 +22,24 @@ class LandlordMessageController extends Controller
                     ->exists();
             });
 
-        return view('landlord.messages.index', compact('applications'));
+        return view('student.messages.index', compact('applications'));
     }
 
     public function show($applicationId)
     {
-        $application = Application::with(['student', 'rental'])->findOrFail($applicationId);
+        $studentId = session('student_id');
+
+        $application = Application::with(['rental.landlord', 'student'])
+            ->where('id', $applicationId)
+            ->where('studentid', $studentId)
+            ->firstOrFail();
 
         Message::where('studentid', $application->studentid)
             ->where('rentalid', $application->rentalid)
-            ->where('sender_type', 'student')
-            ->where('is_read_by_landlord', false)
+            ->where('sender_type', 'landlord')
+            ->where('is_read_by_student', false)
             ->update([
-                'is_read_by_landlord' => true,
+                'is_read_by_student' => true,
             ]);
 
         $messages = Message::where('studentid', $application->studentid)
@@ -44,7 +47,7 @@ class LandlordMessageController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return view('landlord.rentals.message-student', compact('application', 'messages'));
+        return view('student.messages.chat', compact('application', 'messages'));
     }
 
     public function store(Request $request, $applicationId)
@@ -53,21 +56,25 @@ class LandlordMessageController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
-        $application = Application::with(['rental'])->findOrFail($applicationId);
+        $studentId = session('student_id');
+
+        $application = Application::with(['rental.landlord', 'student'])
+            ->where('id', $applicationId)
+            ->where('studentid', $studentId)
+            ->firstOrFail();
 
         Message::create([
             'content' => $request->message,
-            'sender_type' => 'landlord',
+            'sender_type' => 'student',
             'timestamp' => now(),
             'studentid' => $application->studentid,
             'landlordid' => $application->rental->landlordid,
             'rentalid' => $application->rentalid,
             'serviceproviderpartnershipid' => null,
-            'is_read_by_student' => false,
-            'is_read_by_landlord' => true,
+            'is_read_by_student' => true,
+            'is_read_by_landlord' => false,
         ]);
 
-        return redirect()->route('landlord.messages.show', $application->id)
-            ->with('success', 'Message sent successfully.');
+        return redirect()->route('student.messages.show', $application->id);
     }
 }

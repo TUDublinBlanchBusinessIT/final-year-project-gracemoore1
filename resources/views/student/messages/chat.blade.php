@@ -9,20 +9,20 @@
         <div class="max-w-4xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
-                {{-- Top chat header --}}
                 <div class="border-b border-slate-200 px-6 py-4 bg-white">
                     <div class="flex items-center gap-4">
-                        <a href="{{ route('landlord.messages') }}" class="text-slate-500 hover:text-slate-700 text-xl">
+                        <a href="{{ route('student.messages') }}" class="text-slate-500 hover:text-slate-700 text-xl">
                             ←
                         </a>
 
                         <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-lg font-semibold">
-                            {{ strtoupper(substr($application->student->firstname ?? 'S', 0, 1)) }}
+                            {{ strtoupper(substr($application->rental->landlord->firstname ?? 'L', 0, 1)) }}
                         </div>
 
                         <div>
                             <h3 class="text-lg font-semibold text-slate-900">
-                                {{ $application->student->firstname ?? 'Student' }} {{ $application->student->surname ?? '' }}
+                                {{ $application->rental->landlord->firstname ?? 'Landlord' }}
+                                {{ $application->rental->landlord->surname ?? '' }}
                             </h3>
                             <p class="text-sm text-slate-500">
                                 {{ $application->rental->housenumber ?? '' }}
@@ -33,15 +33,7 @@
                     </div>
                 </div>
 
-                {{-- Success message --}}
-                @if(session('success'))
-                    <div class="mx-6 mt-4 rounded-lg border border-green-300 bg-green-100 px-4 py-3 text-sm text-green-800">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                {{-- Chat messages area --}}
-                <div class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
+                <div class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4" id="chatBox">
 
                     @php
                         $lastDate = null;
@@ -50,7 +42,7 @@
                     @forelse($messages as $message)
                         @php
                             $messageDate = \Carbon\Carbon::parse($message->created_at)->format('d M Y');
-                            $isLandlordMessage = $message->sender_type === 'landlord';
+                            $isStudentMessage = $message->sender_type === 'student';
                         @endphp
 
                         @if($lastDate !== $messageDate)
@@ -64,29 +56,28 @@
                             @endphp
                         @endif
 
-                        <div class="flex {{ $isLandlordMessage ? 'justify-end' : 'justify-start' }}">
+                        <div class="flex {{ $isStudentMessage ? 'justify-end' : 'justify-start' }}">
                             <div class="max-w-[75%]">
                                 <div class="px-4 py-3 rounded-2xl text-sm shadow-sm
-                                    {{ $isLandlordMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md' }}">
+                                    {{ $isStudentMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md' }}">
                                     {{ $message->content }}
                                 </div>
 
-                                <div class="mt-1 text-[11px] text-slate-400 {{ $isLandlordMessage ? 'text-right' : 'text-left' }}">
+                                <div class="mt-1 text-[11px] text-slate-400 {{ $isStudentMessage ? 'text-right' : 'text-left' }}">
                                     {{ \Carbon\Carbon::parse($message->created_at)->format('H:i') }}
                                 </div>
                             </div>
                         </div>
                     @empty
                         <div class="flex justify-center items-center h-full">
-                            <p class="text-sm text-slate-500">No messages yet. Start the conversation below.</p>
+                            <p class="text-sm text-slate-500">No messages yet.</p>
                         </div>
                     @endforelse
 
                 </div>
 
-                {{-- Message input area --}}
                 <div class="border-t border-slate-200 bg-white px-6 py-4">
-                    <form action="{{ route('landlord.messages.store', $application->id) }}" method="POST" class="flex items-end gap-3">
+                    <form action="{{ route('student.messages.store', $application->id) }}" method="POST" class="flex items-end gap-3">
                         @csrf
 
                         <div class="flex-1">
@@ -109,4 +100,13 @@
             </div>
         </div>
     </div>
+
+    <script>
+        window.addEventListener('load', function () {
+            const chatBox = document.getElementById('chatBox');
+            if (chatBox) {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        });
+    </script>
 </x-app-layout>

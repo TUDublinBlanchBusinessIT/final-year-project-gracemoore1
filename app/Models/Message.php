@@ -10,11 +10,14 @@ class Message extends Model
 
     protected $fillable = [
         'content',
+        'sender_type',
         'timestamp',
         'studentid',
         'landlordid',
         'rentalid',
         'serviceproviderpartnershipid',
+        'is_read_by_student',
+        'is_read_by_landlord',    
     ];
 
     public function student()

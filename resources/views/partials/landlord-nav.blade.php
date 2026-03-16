@@ -7,6 +7,19 @@
         RentConnect
     </div> -->
 
+    @php
+        $landlord = \App\Models\Landlord::find(session('landlord_id'));
+
+        $landlordUnreadCount = 0;
+
+        if ($landlord) {
+            $landlordUnreadCount = \App\Models\Message::where('landlordid', $landlord->id)
+                ->where('sender_type', 'student')
+                ->where('is_read_by_landlord', false)
+                ->count();
+        }
+    @endphp
+
     {{-- User dropdown --}}
     <div class="mt-2">
         <x-dropdown align="left" width="48">
@@ -61,6 +74,13 @@
                 <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
             </svg>
             <span class="font-semibold">Messages</span>
+        
+            @if($landlordUnreadCount > 0)
+                <span class="inline-flex items-center justify-center min-w-[20px] h-[20px] rounded-full bg-red-500 px-1.5 text-[11px] font-semibold text-white">
+                    {{ $landlordUnreadCount }}
+                </span>
+            @endif
+    
         </a>
 
         <a href="{{ route('landlord.support') }}"

@@ -19,6 +19,8 @@ use App\Http\Controllers\LandlordMessageController;
 // Student controllers
 use App\Http\Controllers\StudentRegisterController;
 use App\Http\Controllers\StudentPasswordResetController;
+//student messaging
+use App\Http\Controllers\StudentMessageController;
 
 // Breeze / Laravel User Controllers
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -164,6 +166,12 @@ Route::middleware('auth')->group(function () {
         ->name('profile.destroy');
 
 });
+
+
+//student messaging
+Route::get('/student/messages', [StudentMessageController::class, 'index'])->name('student.messages');
+Route::get('/student/messages/{application}', [StudentMessageController::class, 'show'])->name('student.messages.show');
+Route::post('/student/messages/{application}', [StudentMessageController::class, 'store'])->name('student.messages.store');
 
 //admin
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
@@ -317,10 +325,10 @@ Route::post('/admin/partnerships', [App\Http\Controllers\PartnershipController::
 
 
 
-Route::get('/student/messages', function () {
-    if (!session('student_id')) return redirect('/student/login');
-    return view('student.messages');
-})->name('student.messages');
+//Route::get('/student/messages', function () {
+    //if (!session('student_id')) return redirect('/student/login');
+    //return view('student.messages');
+//})->name('student.messages');
 
 Route::get('/student/support', function () {
     if (!session('student_id')) return redirect('/student/login');
