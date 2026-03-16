@@ -208,14 +208,29 @@ Route::prefix('admin/accounts')->group(function () {
             } else {
                 // Search by listing address
                 
-            $like = '%' . $term . '%';
+            
+                $like = '%' . $term . '%';
 
-            $q->whereHas('rental', function ($r) use ($like) {
-                $r->where('street', 'like', $like)
-                ->orWhere('county', 'like', $like)
-                ->orWhere('postcode', 'like', $like)
-                ->orWhere('housenumber', 'like', $like)
-                ->orWhereRaw("CONCAT(COALESCE(housenumber,''), ' ', COALESCE(street,'')) LIKE ?", [$like]);
+                $q->whereHas('rental', function ($r) use ($like) {
+                    $r->where('street', 'like', $like)
+                    ->orWhere('county', 'like', $like)
+                    ->orWhere('postcode', 'like', $like)
+                    ->orWhere('housenumber', 'like', $like)
+
+                    // match "5 Western Road"
+                    ->orWhereRaw("CONCAT(housenumber, ' ', street) LIKE ?", [$like])
+
+                    // match "Western Road 5"
+                    ->orWhereRaw("CONCAT(street, ' ', housenumber) LIKE ?", [$like])
+
+                    // ⭐ match "5 Western Road, Cork"
+                    ->orWhereRaw("CONCAT(
+                                        COALESCE(housenumber,''), ' ',
+                                        COALESCE(street,''), ', ',
+                                        COALESCE(county,'')
+                                    ) LIKE ?", [$like]);
+
+
             });
 
             }
