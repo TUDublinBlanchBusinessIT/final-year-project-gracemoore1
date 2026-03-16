@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Message;
 
 class Application extends Model
 {
@@ -29,6 +30,12 @@ class Application extends Model
     public function rental()
     {
         return $this->belongsTo(\App\Models\LandlordRental::class, 'rentalid');
+    }
+
+    public function relatedMessages()
+    {
+        return $this->hasMany(Message::class, 'rentalid', 'rentalid')
+            ->where('studentid', $this->studentid);
     }
 
 }

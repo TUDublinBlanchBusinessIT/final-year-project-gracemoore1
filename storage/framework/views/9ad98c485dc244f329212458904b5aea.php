@@ -119,6 +119,11 @@
                                             </button>
                                         </form>
 
+                                        <a href="<?php echo e(route('landlord.messages.show', $app->id)); ?>"
+                                            class="px-3 py-1 rounded bg-blue-600 text-white text-xs hover:bg-blue-700">
+                                            Message Student
+                                        </a>
+
                                     </div>
 
                                 </div>

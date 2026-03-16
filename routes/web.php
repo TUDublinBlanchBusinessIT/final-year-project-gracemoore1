@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\LandlordRegisterController;
 use App\Http\Controllers\Auth\LandlordCodeVerificationController; 
 use App\Http\Controllers\Auth\LandlordOCRController;
 use App\Http\Controllers\LandlordController;
+use App\Http\Controllers\LandlordMessageController;
 
 
 // Student controllers
@@ -99,6 +100,10 @@ Route::post('/student/verify-id', [StudentRegisterController::class, 'verifyId']
 Route::get('/home', [StudentRegisterController::class, 'dashboard'])
     ->name('student.dashboard');
 
+// MESSAGES LANDLORD
+
+Route::get('/landlord/messages/{application}', [LandlordMessageController::class, 'show'])->name('landlord.messages.show');
+Route::post('/landlord/messages/{application}', [LandlordMessageController::class, 'store'])->name('landlord.messages.store');
 
 // STUDENT LOGIN
 Route::get('/student/login', function() {
