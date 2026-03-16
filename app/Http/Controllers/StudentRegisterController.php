@@ -399,40 +399,48 @@ class StudentRegisterController extends Controller
 
         $student = Student::find(session('student_id'));
         $myId    = $student->id;
-        $myEmail = strtolower(trim($student->email));
 
-        $pattern = '"email"[[:space:]]*:[[:space:]]*"'.$myEmail.'"';
+        // SINGLE applications (legacy)
+        $singleBase = \App\Models\Application::with('rental')
+            ->where('applicationtype', 'single')
+            ->where('studentid', $myId);
 
-        $pending = Application::with('rental')
-            ->where(function ($q) use ($myId, $pattern) {
-                $q->where('studentid', $myId)
-                  ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
-            })
-            ->where('status','pending')
-            ->orderByDesc('dateapplied')
-            ->get();
+        // GROUP applications: either the user is the creator OR is in the group's members
+        $groupBase = \App\Models\Application::with(['rental', 'group'])
+            ->where('applicationtype', 'group')
+            ->where(function ($q) use ($myId) {
+                $q->where('studentid', $myId) // creator
+                ->orWhereIn('group_id', function ($sq) use ($myId) {
+                    $sq->select('group_id')
+                        ->from('student_groups')
+                        ->where('student_id', $myId);
+                });
+            });
 
-        $accepted = Application::with('rental')
-            ->where(function ($q) use ($myId, $pattern) {
-                $q->where('studentid', $myId)
-                  ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
-            })
-            ->where('status','accepted')
-            ->orderByDesc('dateapplied')
-            ->get();
+        $pending  = $singleBase->clone()->where('status', 'pending')->orderByDesc('dateapplied')->get()
+                ->merge($groupBase->clone()->where('status','pending')->orderByDesc('dateapplied')->get());
 
-        $rejected = Application::with('rental')
-            ->where(function ($q) use ($myId, $pattern) {
-                $q->where('studentid', $myId)
-                  ->orWhereRaw('LOWER(group_members) REGEXP ?', [$pattern]);
-            })
-            ->where('status','rejected')
-            ->orderByDesc('dateapplied')
-            ->get();
+        $accepted = $singleBase->clone()->where('status', 'accepted')->orderByDesc('dateapplied')->get()
+                ->merge($groupBase->clone()->where('status','accepted')->orderByDesc('dateapplied')->get());
 
-        return view('student.profile-applications', compact('pending','accepted','rejected'));
+        $rejected = $singleBase->clone()->where('status', 'rejected')->orderByDesc('dateapplied')->get()
+                ->merge($groupBase->clone()->where('status','rejected')->orderByDesc('dateapplied')->get());
+
+        // Tag the type for your blade and standardize rental relation presence
+        $tag = function ($c) {
+            return $c->map(function ($a) {
+                $a->applicationtype = $a->applicationtype ?? ($a->group_id ? 'group' : 'single');
+                // Ensure ->rental relation exists for both
+                return $a;
+            });
+        };
+
+        return view('student.profile-applications', [
+            'pending'  => $tag($pending),
+            'accepted' => $tag($accepted),
+            'rejected' => $tag($rejected),
+        ]);
     }
-
     public function studentProfileAccount()
     {
         if (!session()->has('student_id')) return redirect('/student/login');

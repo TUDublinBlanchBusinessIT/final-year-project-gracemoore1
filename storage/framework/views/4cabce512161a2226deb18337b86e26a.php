@@ -1,18 +1,28 @@
-<x-app-layout>
-    <x-slot name="header">
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+     <?php $__env->slot('header', null, []); ?> 
         <h2 class="font-bold text-xl text-gray-800">
-            Group Application – {{ $rental->street }}, {{ $rental->county }}
+            Group Application – <?php echo e($rental->street); ?>, <?php echo e($rental->county); ?>
+
         </h2>
-    </x-slot>
+     <?php $__env->endSlot(); ?>
 
     <div class="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-xl shadow">
         <h3 class="text-lg font-semibold mb-4">Group Application</h3>
 
-        {{-- ✅ REAL FORM TAG HERE --}}
-        <form method="POST" action="{{ route('applications.submit.group', $rental->id) }}">
-            @csrf
+        
+        <form method="POST" action="<?php echo e(route('applications.submit.group', $rental->id)); ?>">
+            <?php echo csrf_field(); ?>
 
-            {{-- Mode --}}
+            
             <div class="mb-4">
                 <label class="font-semibold">Choose a group</label>
                 <select id="mode-select" name="mode" class="w-full border rounded-lg px-3 py-2" onchange="toggleMode()">
@@ -21,24 +31,24 @@
                 </select>
             </div>
 
-            {{-- Existing groups --}}
+            
             <div id="existing-group-section">
                 <label class="block mb-1 font-medium">Existing groups</label>
                 <select name="existing_group_id" class="w-full border rounded-lg px-3 py-2">
-                    @forelse($existingGroups as $g)
-                        @php
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $existingGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $g): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <?php
                             $label = $g->members->map(fn($m) => trim($m->firstname.' '.$m->surname))->implode(', ');
-                        @endphp
-                        <option value="{{ $g->id }}">{{ $label }}</option>
-                    @empty
+                        ?>
+                        <option value="<?php echo e($g->id); ?>"><?php echo e($label); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <option value="">No saved groups yet</option>
-                    @endforelse
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </select>
             </div>
 
-            {{-- New group --}}
+            
             <div id="new-group-section" class="hidden">
-                {{-- Tenant 1 (You) --}}
+                
                 <div class="tenant-card p-4 border rounded-lg bg-slate-50">
                     <h4 class="font-semibold mb-2">Tenant 1 (You)</h4>
 
@@ -46,12 +56,12 @@
                         <div>
                             <label class="block mb-1 font-medium">Full Name</label>
                             <input type="text" class="w-full bg-slate-100 rounded-lg px-3 py-2"
-                                   value="{{ $student->firstname }} {{ $student->surname }}" disabled>
+                                   value="<?php echo e($student->firstname); ?> <?php echo e($student->surname); ?>" disabled>
                         </div>
                         <div>
                             <label class="block mb-1 font-medium">Email</label>
                             <input type="email" class="w-full bg-slate-100 rounded-lg px-3 py-2"
-                                   value="{{ $student->email }}" disabled>
+                                   value="<?php echo e($student->email); ?>" disabled>
                         </div>
                     </div>
 
@@ -68,7 +78,7 @@
                 </button>
             </div>
 
-            {{-- Additional details --}}
+            
             <div class="mt-6">
                 <label class="block font-medium mb-1">Additional Details (optional)</label>
                 <textarea name="additional_details" rows="4" class="w-full border rounded-lg px-3 py-2"></textarea>
@@ -131,4 +141,13 @@
 
         document.addEventListener('DOMContentLoaded', toggleMode);
     </script>
-</x-app-layout>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?><?php /**PATH C:\Users\gmoor\final-year-project-gracemoore1\resources\views/applications/start-group.blade.php ENDPATH**/ ?>

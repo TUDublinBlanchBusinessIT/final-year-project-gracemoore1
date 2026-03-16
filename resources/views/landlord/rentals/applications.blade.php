@@ -59,14 +59,14 @@
                                         <p><span class="font-medium">Additional Info:</span> {{ $app->additional_details }}</p>
                                     @endif
 
-                                    @if($app->applicationtype === 'group')
+                                    @if($app->applicationtype === 'group' && $app->group)
                                         <div class="mt-1">
                                             <p class="font-medium">Group Members:</p>
                                             <ul class="ml-5 list-disc text-sm">
-                                                @foreach(json_decode($app->group_members, true) as $member)
+                                                @foreach($app->group->members as $m)
                                                     <li>
-                                                        {{ $member['full_name'] }}
-                                                        ({{ $member['age'] }} yrs, {{ ucfirst($member['gender']) }})
+                                                        {{ $m->firstname }} {{ $m->surname }}
+                                                        (ID: {{ $m->id }})
                                                     </li>
                                                 @endforeach
                                             </ul>

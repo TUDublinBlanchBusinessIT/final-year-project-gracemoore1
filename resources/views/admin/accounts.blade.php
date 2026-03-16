@@ -43,6 +43,18 @@
                     </a>
                 </li>
 
+                
+        {{-- ⭐ NEW TAB HERE ⭐ --}}
+                <li>
+                    <a href="{{ route('admin.accounts.groupapplications') }}"
+                    class="{{ request()->routeIs('admin.accounts.groupapplications')
+                                ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
+                                : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
+                        Group Applications
+                    </a>
+                </li>
+
+
                 <li>
                     <a href="{{ route('admin.accounts.suspended') }}"
                     class="{{ request()->routeIs('admin.accounts.suspended')

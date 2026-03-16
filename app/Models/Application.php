@@ -17,7 +17,7 @@ class Application extends Model
         'age',
         'gender',
         'additional_details',
-        'group_members',
+        'group_id',
     ];
 
     // Helpful relationships using your custom FK names
@@ -30,5 +30,11 @@ class Application extends Model
     {
         return $this->belongsTo(\App\Models\LandlordRental::class, 'rentalid');
     }
+
+    public function group()
+    {
+        return $this->belongsTo(\App\Models\Group::class, 'group_id');
+    }
+
 
 }

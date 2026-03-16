@@ -190,6 +190,47 @@ Route::prefix('admin/accounts')->group(function () {
         return view('admin.serviceprovider-accounts', compact('providers'));
     })->name('admin.accounts.serviceproviders');
 
+    Route::get('/group-applications', function (\Illuminate\Http\Request $req) {
+    $term = trim($req->query('q', ''));
+
+    $results = \App\Models\Application::with(['group.members', 'rental', 'rental.landlord'])
+        ->where('applicationtype', 'group')
+        ->when($term !== '', function ($q) use ($term) {
+
+            // Search by student ID → return all group apps they belong to
+            if (ctype_digit($term)) {
+                $q->whereIn('group_id', function ($sq) use ($term) {
+                    $sq->select('group_id')
+                       ->from('student_groups')
+                       ->where('student_id', intval($term));
+                });
+
+            } else {
+                // Search by listing address
+                $like = '%' . str_replace('%', '\%', $term) . '%';
+                $q->whereHas('rental', function ($r) use ($like) {
+                    $r->where('street', 'like', $like)
+                      ->orWhere('county', 'like', $like)
+                      ->orWhere('postcode', 'like', $like);
+                });
+            }
+        })
+        ->orderByDesc('dateapplied')
+        ->paginate(20);
+
+    return view('admin.group-applications', compact('results', 'term'));
+    })->name('admin.accounts.groupapplications');
+
+    
+   // VIEW PAGE (single group application)
+    Route::get('/group-applications/{id}', function ($id) {
+        $app = \App\Models\Application::with(['group.members', 'rental.landlord'])
+            ->findOrFail($id);
+
+        return view('admin.view-group-application', compact('app'));
+    })->name('admin.accounts.groupapplications.view');
+
+
     // Suspended Accounts (ALL types shown here)
     Route::get('/suspended', function () {
         $students  = \App\Models\Student::where('status', 'suspended')->get();
@@ -383,6 +424,8 @@ Route::prefix('student/profile-new')->group(function () {
     Route::post('/delete-account', [StudentRegisterController::class, 'studentDeleteAccount'])
         ->name('student.profile.new.delete');
 });
+    /* 
+
 
 
 /* ===========================
