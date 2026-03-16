@@ -10,72 +10,118 @@
 <?php $component->withAttributes([]); ?>
      <?php $__env->slot('header', null, []); ?> 
         <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Message Student
+            Messages
         </h2>
      <?php $__env->endSlot(); ?>
 
     <div class="pb-28 lg:pl-70">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-8 text-gray-900">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
+                
+                <div class="border-b border-slate-200 px-6 py-4 bg-white">
+                    <div class="flex items-center gap-4">
+                        <a href="<?php echo e(route('landlord.messages')); ?>" class="text-slate-500 hover:text-slate-700 text-xl">
+                            ←
+                        </a>
+
+                        <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-lg font-semibold">
+                            <?php echo e(strtoupper(substr($application->student->firstname ?? 'S', 0, 1))); ?>
+
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900">
+                                <?php echo e($application->student->firstname ?? 'Student'); ?> <?php echo e($application->student->surname ?? ''); ?>
+
+                            </h3>
+                            <p class="text-sm text-slate-500">
+                                <?php echo e($application->rental->housenumber ?? ''); ?>
+
+                                <?php echo e($application->rental->street ?? ''); ?>,
+                                <?php echo e($application->rental->county ?? ''); ?>
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                
                 <?php if(session('success')): ?>
-                    <div class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300 text-sm">
+                    <div class="mx-6 mt-4 rounded-lg border border-green-300 bg-green-100 px-4 py-3 text-sm text-green-800">
                         <?php echo e(session('success')); ?>
 
                     </div>
                 <?php endif; ?>
 
-                <h1 class="text-base font-semibold text-slate-700 mb-6">
-                    Conversation with
-                    <span class="font-bold text-slate-900">
-                        <?php echo e($application->student->firstname ?? 'Student'); ?> <?php echo e($application->student->surname ?? ''); ?>
+                
+                <div class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
 
-                    </span>
-                    about
-                    <span class="font-bold text-slate-900">
-                        <?php echo e($application->rental->housenumber ?? ''); ?>
+                    <?php
+                        $lastDate = null;
+                    ?>
 
-                        <?php echo e($application->rental->street ?? ''); ?>,
-                        <?php echo e($application->rental->county ?? ''); ?>
-
-                    </span>
-                </h1>
-
-                <div class="border rounded-xl p-4 bg-slate-50 space-y-3 mb-6 max-h-[400px] overflow-y-auto">
                     <?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                        <div class="<?php echo e($message->landlordid ? 'text-right' : 'text-left'); ?>">
-                            <div class="inline-block px-4 py-2 rounded-xl text-sm <?php echo e($message->landlordid ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'); ?>">
-                                <?php echo e($message->content); ?>
+                        <?php
+                            $messageDate = \Carbon\Carbon::parse($message->created_at)->format('d M Y');
+                            $isLandlordMessage = !empty($message->landlordid);
+                        ?>
 
+                        <?php if($lastDate !== $messageDate): ?>
+                            <div class="flex justify-center my-4">
+                                <span class="px-4 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">
+                                    <?php echo e($messageDate); ?>
+
+                                </span>
                             </div>
-                            <div class="text-xs text-gray-500 mt-1">
-                                <?php echo e(\Carbon\Carbon::parse($message->created_at)->format('d M Y H:i')); ?>
+                            <?php
+                                $lastDate = $messageDate;
+                            ?>
+                        <?php endif; ?>
 
+                        <div class="flex <?php echo e($isLandlordMessage ? 'justify-end' : 'justify-start'); ?>">
+                            <div class="max-w-[75%]">
+                                <div class="px-4 py-3 rounded-2xl text-sm shadow-sm
+                                    <?php echo e($isLandlordMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md'); ?>">
+                                    <?php echo e($message->content); ?>
+
+                                </div>
+
+                                <div class="mt-1 text-[11px] text-slate-400 <?php echo e($isLandlordMessage ? 'text-right' : 'text-left'); ?>">
+                                    <?php echo e(\Carbon\Carbon::parse($message->created_at)->format('H:i')); ?>
+
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                        <p class="text-sm text-gray-500">No messages yet. Start the conversation below.</p>
+                        <div class="flex justify-center items-center h-full">
+                            <p class="text-sm text-slate-500">No messages yet. Start the conversation below.</p>
+                        </div>
                     <?php endif; ?>
+
                 </div>
 
-                <form action="<?php echo e(route('landlord.messages.store', $application->id)); ?>" method="POST">
-                    <?php echo csrf_field(); ?>
+                
+                <div class="border-t border-slate-200 bg-white px-6 py-4">
+                    <form action="<?php echo e(route('landlord.messages.store', $application->id)); ?>" method="POST" class="flex items-end gap-3">
+                        <?php echo csrf_field(); ?>
 
-                    <div class="mb-3">
-                        <textarea
-                            name="message"
-                            rows="4"
-                            class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring focus:ring-blue-200"
-                            placeholder="Type your message to the student here..."
-                            required></textarea>
-                    </div>
+                        <div class="flex-1">
+                            <textarea
+                                name="message"
+                                rows="2"
+                                class="w-full resize-none rounded-2xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-400 focus:ring focus:ring-blue-100"
+                                placeholder="Type your message here..."
+                                required></textarea>
+                        </div>
 
-                    <button
-                        type="submit"
-                        class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">
-                        Send Message
-                    </button>
-                </form>
+                        <button
+                            type="submit"
+                            class="rounded-2xl bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700">
+                            Send
+                        </button>
+                    </form>
+                </div>
 
             </div>
         </div>

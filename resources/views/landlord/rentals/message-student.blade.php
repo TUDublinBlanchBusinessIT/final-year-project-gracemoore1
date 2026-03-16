@@ -1,66 +1,110 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Message Student
+            Messages
         </h2>
     </x-slot>
 
     <div class="pb-28 lg:pl-70">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-8 text-gray-900">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
+                {{-- Top chat header --}}
+                <div class="border-b border-slate-200 px-6 py-4 bg-white">
+                    <div class="flex items-center gap-4">
+                        <a href="{{ route('landlord.messages') }}" class="text-slate-500 hover:text-slate-700 text-xl">
+                            ←
+                        </a>
+
+                        <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-lg font-semibold">
+                            {{ strtoupper(substr($application->student->firstname ?? 'S', 0, 1)) }}
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900">
+                                {{ $application->student->firstname ?? 'Student' }} {{ $application->student->surname ?? '' }}
+                            </h3>
+                            <p class="text-sm text-slate-500">
+                                {{ $application->rental->housenumber ?? '' }}
+                                {{ $application->rental->street ?? '' }},
+                                {{ $application->rental->county ?? '' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Success message --}}
                 @if(session('success'))
-                    <div class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300 text-sm">
+                    <div class="mx-6 mt-4 rounded-lg border border-green-300 bg-green-100 px-4 py-3 text-sm text-green-800">
                         {{ session('success') }}
                     </div>
                 @endif
 
-                <h1 class="text-base font-semibold text-slate-700 mb-6">
-                    Conversation with
-                    <span class="font-bold text-slate-900">
-                        {{ $application->student->firstname ?? 'Student' }} {{ $application->student->surname ?? '' }}
-                    </span>
-                    about
-                    <span class="font-bold text-slate-900">
-                        {{ $application->rental->housenumber ?? '' }}
-                        {{ $application->rental->street ?? '' }},
-                        {{ $application->rental->county ?? '' }}
-                    </span>
-                </h1>
+                {{-- Chat messages area --}}
+                <div class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
 
-                <div class="border rounded-xl p-4 bg-slate-50 space-y-3 mb-6 max-h-[400px] overflow-y-auto">
+                    @php
+                        $lastDate = null;
+                    @endphp
+
                     @forelse($messages as $message)
-                        <div class="{{ $message->landlordid ? 'text-right' : 'text-left' }}">
-                            <div class="inline-block px-4 py-2 rounded-xl text-sm {{ $message->landlordid ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800' }}">
-                                {{ $message->content }}
+                        @php
+                            $messageDate = \Carbon\Carbon::parse($message->created_at)->format('d M Y');
+                            $isLandlordMessage = !empty($message->landlordid);
+                        @endphp
+
+                        @if($lastDate !== $messageDate)
+                            <div class="flex justify-center my-4">
+                                <span class="px-4 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">
+                                    {{ $messageDate }}
+                                </span>
                             </div>
-                            <div class="text-xs text-gray-500 mt-1">
-                                {{ \Carbon\Carbon::parse($message->created_at)->format('d M Y H:i') }}
+                            @php
+                                $lastDate = $messageDate;
+                            @endphp
+                        @endif
+
+                        <div class="flex {{ $isLandlordMessage ? 'justify-end' : 'justify-start' }}">
+                            <div class="max-w-[75%]">
+                                <div class="px-4 py-3 rounded-2xl text-sm shadow-sm
+                                    {{ $isLandlordMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md' }}">
+                                    {{ $message->content }}
+                                </div>
+
+                                <div class="mt-1 text-[11px] text-slate-400 {{ $isLandlordMessage ? 'text-right' : 'text-left' }}">
+                                    {{ \Carbon\Carbon::parse($message->created_at)->format('H:i') }}
+                                </div>
                             </div>
                         </div>
                     @empty
-                        <p class="text-sm text-gray-500">No messages yet. Start the conversation below.</p>
+                        <div class="flex justify-center items-center h-full">
+                            <p class="text-sm text-slate-500">No messages yet. Start the conversation below.</p>
+                        </div>
                     @endforelse
+
                 </div>
 
-                <form action="{{ route('landlord.messages.store', $application->id) }}" method="POST">
-                    @csrf
+                {{-- Message input area --}}
+                <div class="border-t border-slate-200 bg-white px-6 py-4">
+                    <form action="{{ route('landlord.messages.store', $application->id) }}" method="POST" class="flex items-end gap-3">
+                        @csrf
 
-                    <div class="mb-3">
-                        <textarea
-                            name="message"
-                            rows="4"
-                            class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring focus:ring-blue-200"
-                            placeholder="Type your message to the student here..."
-                            required></textarea>
-                    </div>
+                        <div class="flex-1">
+                            <textarea
+                                name="message"
+                                rows="2"
+                                class="w-full resize-none rounded-2xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-400 focus:ring focus:ring-blue-100"
+                                placeholder="Type your message here..."
+                                required></textarea>
+                        </div>
 
-                    <button
-                        type="submit"
-                        class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">
-                        Send Message
-                    </button>
-                </form>
+                        <button
+                            type="submit"
+                            class="rounded-2xl bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700">
+                            Send
+                        </button>
+                    </form>
+                </div>
 
             </div>
         </div>
