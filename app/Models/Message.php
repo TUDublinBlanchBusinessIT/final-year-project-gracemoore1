@@ -31,4 +31,6 @@ class Message extends Model
     {
         return $this->belongsTo(LandlordRental::class, 'rentalid');
     }
+
+
 }

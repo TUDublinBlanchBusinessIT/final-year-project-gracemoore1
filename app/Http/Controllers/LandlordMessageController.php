@@ -8,6 +8,25 @@ use Illuminate\Http\Request;
 
 class LandlordMessageController extends Controller
 {
+
+    public function index()
+    {
+        $landlordId = \App\Models\Landlord::where('email', auth()->user()->email)->value('id');
+
+        $applications = \App\Models\Application::with(['student', 'rental'])
+            ->whereHas('rental', function ($query) use ($landlordId) {
+                $query->where('landlordid', $landlordId);
+            })
+            ->get()
+            ->filter(function ($application) {
+                return \App\Models\Message::where('studentid', $application->studentid)
+                    ->where('rentalid', $application->rentalid)
+                    ->exists();
+            });
+
+        return view('landlord.messages.index', compact('applications'));
+    }
+
     public function show($applicationId)
     {
         $application = Application::with(['student', 'rental'])->findOrFail($applicationId);

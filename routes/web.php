@@ -15,6 +15,7 @@ use App\Http\Controllers\LandlordController;
 use App\Http\Controllers\LandlordMessageController;
 
 
+
 // Student controllers
 use App\Http\Controllers\StudentRegisterController;
 use App\Http\Controllers\StudentPasswordResetController;
@@ -104,6 +105,7 @@ Route::get('/home', [StudentRegisterController::class, 'dashboard'])
 
 Route::get('/landlord/messages/{application}', [LandlordMessageController::class, 'show'])->name('landlord.messages.show');
 Route::post('/landlord/messages/{application}', [LandlordMessageController::class, 'store'])->name('landlord.messages.store');
+Route::get('/landlord/messages', [LandlordMessageController::class, 'index'])->name('landlord.messages');
 
 // STUDENT LOGIN
 Route::get('/student/login', function() {

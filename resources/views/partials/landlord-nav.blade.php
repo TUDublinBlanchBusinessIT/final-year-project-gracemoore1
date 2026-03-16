@@ -54,9 +54,9 @@
             <span class="font-semibold">Home</span>
         </a>
 
-        <a href="{{ route('messages') }}"
+        <a href="{{ route('landlord.messages') }}"
            class="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition
-           {{ request()->routeIs('messages') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+           {{ request()->routeIs('landlord.messages') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
             </svg>
@@ -97,9 +97,9 @@
             <span class="text-[11px] font-semibold">Home</span>
         </a>
 
-        <a href="{{ route('messages') }}"
+        <a href="{{ route('landlord.messages') }}"
            class="flex flex-col items-center justify-center gap-1 w-20 py-2 rounded-xl transition
-           {{ request()->routeIs('messages') ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:text-slate-900' }}">
+           {{ request()->routeIs('landlord.messages') ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:text-slate-900' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
             </svg>
