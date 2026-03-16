@@ -13,8 +13,15 @@
             {{ $app->rental->street }}, {{ $app->rental->county }}
         </p>
         <p><strong>Landlord:</strong>
-            {{ $app->rental->landlord->firstname }} {{ $app->rental->landlord->surname }}
-            ({{ $app->rental->landlord->email }})
+           @php
+            $landlord = \App\Models\Landlord::find($app->rental->landlordid);
+        @endphp
+
+        @if($landlord)
+            {{ $landlord->firstname }} {{ $landlord->surname }} ({{ $landlord->email }})
+        @else
+            Unknown
+        @endif
         </p>
     </div>
 
@@ -41,5 +48,8 @@
     </div>
 
 </div>
+<a href="{{ route('admin.accounts.groupapplications') }}" class="text-blue-600 hover:underline">
+    ← Back to Group Applications
+</a>
 
 </x-admin.accounts>

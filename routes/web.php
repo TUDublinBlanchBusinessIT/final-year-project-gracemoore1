@@ -207,12 +207,17 @@ Route::prefix('admin/accounts')->group(function () {
 
             } else {
                 // Search by listing address
-                $like = '%' . str_replace('%', '\%', $term) . '%';
-                $q->whereHas('rental', function ($r) use ($like) {
-                    $r->where('street', 'like', $like)
-                      ->orWhere('county', 'like', $like)
-                      ->orWhere('postcode', 'like', $like);
-                });
+                
+            $like = '%' . $term . '%';
+
+            $q->whereHas('rental', function ($r) use ($like) {
+                $r->where('street', 'like', $like)
+                ->orWhere('county', 'like', $like)
+                ->orWhere('postcode', 'like', $like)
+                ->orWhere('housenumber', 'like', $like)
+                ->orWhereRaw("CONCAT(COALESCE(housenumber,''), ' ', COALESCE(street,'')) LIKE ?", [$like]);
+            });
+
             }
         })
         ->orderByDesc('dateapplied')
@@ -227,7 +232,7 @@ Route::prefix('admin/accounts')->group(function () {
         $app = \App\Models\Application::with(['group.members', 'rental'])
             ->findOrFail($id);
 
-        return view('admin.view-group-application', compact('app'));
+        return view('admin.view-group-applicationS', compact('app'));
     })->name('admin.accounts.groupapplications.view');
 
 
