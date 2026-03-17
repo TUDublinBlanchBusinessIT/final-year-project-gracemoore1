@@ -9,9 +9,14 @@
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
      <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Messages
-        </h2>
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900 leading-tight">
+                Messages
+            </h2>
+            <p class="mt-1 text-sm text-blue-600">
+                Manage conversations with students
+            </p>
+        </div>
      <?php $__env->endSlot(); ?>
 
     <div class="pb-28 lg:pl-70">

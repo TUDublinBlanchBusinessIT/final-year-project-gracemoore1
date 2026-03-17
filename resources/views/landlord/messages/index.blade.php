@@ -1,8 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Messages
-        </h2>
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900 leading-tight">
+                Messages
+            </h2>
+            <p class="mt-1 text-sm text-blue-600">
+                Manage conversations with students
+            </p>
+        </div>
     </x-slot>
 
     <div class="pb-28 lg:pl-70">

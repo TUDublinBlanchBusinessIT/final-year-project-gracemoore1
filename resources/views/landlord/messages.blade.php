@@ -3,7 +3,12 @@
         <h2 class="font-semibold text-base text-gray-800 leading-tight">
             Messages
         </h2>
+        <p class="mt-1 text-sm text-blue-600">
+            Manage conversations with students
+        </p>
+        </div>
     </x-slot>
+
 
     <div class="pb-28 lg:pl-70">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
