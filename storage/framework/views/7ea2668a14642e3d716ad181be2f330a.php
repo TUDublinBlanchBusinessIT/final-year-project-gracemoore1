@@ -14,92 +14,74 @@
         </h2>
      <?php $__env->endSlot(); ?>
 
+    <div class="mb-4">
+        <a href="<?php echo e(route('landlord.messages')); ?>" 
+        class="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1">
+            ← Back to Messages
+        </a>
+    </div>
+
+<div class="pb-28 lg:pl-70">
+    <div class="max-w-4xl mx-auto">
+
+    
+
     <div class="pb-28 lg:pl-70">
         <div class="max-w-4xl mx-auto">
-            <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
 
-                
-                <div class="border-b border-slate-200 px-6 py-4 bg-white">
-                    <div class="flex items-center gap-4">
-                        <a href="<?php echo e(route('landlord.messages')); ?>" class="text-slate-500 hover:text-slate-700 text-xl">
-                            ←
-                        </a>
+                <?php
+                    $lastDate = null;
+                ?>
 
-                        <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-lg font-semibold">
-                            <?php echo e(strtoupper(substr($application->student->firstname ?? 'S', 0, 1))); ?>
+                <?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <?php
+                        $messageDate = \Carbon\Carbon::parse($message->created_at)->format('d M Y');
+                        $isLandlordMessage = $message->sender_type === 'landlord';
+                    ?>
 
+                    <?php if($lastDate !== $messageDate): ?>
+                        <div class="flex justify-center my-4">
+                            <span class="px-4 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">
+                                <?php echo e($messageDate); ?>
+
+                            </span>
                         </div>
+                        <?php
+                            $lastDate = $messageDate;
+                        ?>
+                    <?php endif; ?>
 
-                        <div>
-                            <h3 class="text-lg font-semibold text-slate-900">
-                                <?php echo e($application->student->firstname ?? 'Student'); ?> <?php echo e($application->student->surname ?? ''); ?>
+                    <div class="flex <?php echo e($isLandlordMessage ? 'justify-end' : 'justify-start'); ?>">
+                        <div class="max-w-[75%]">
 
-                            </h3>
-                            <p class="text-sm text-slate-500">
-                                <?php echo e($application->rental->housenumber ?? ''); ?>
+                            <div class="px-4 py-3 rounded-2xl text-sm shadow-sm
+                                <?php echo e($isLandlordMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md'); ?>">
+                                <?php echo e($message->content); ?>
 
-                                <?php echo e($application->rental->street ?? ''); ?>,
-                                <?php echo e($application->rental->county ?? ''); ?>
+                            </div>
 
-                            </p>
+                            <div class="mt-1 text-[11px] text-slate-400 <?php echo e($isLandlordMessage ? 'text-right' : 'text-left'); ?>">
+                                <?php echo e(\Carbon\Carbon::parse($message->created_at)->format('H:i')); ?>
+
+
+                                <?php if($isLandlordMessage): ?>
+                                    <span class="ml-1">
+                                        <?php echo e($message->is_read_by_student ? 'Seen' : 'Sent'); ?>
+
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+
                         </div>
                     </div>
-                </div>
-
-                
-                <?php if(session('success')): ?>
-                    <div class="mx-6 mt-4 rounded-lg border border-green-300 bg-green-100 px-4 py-3 text-sm text-green-800">
-                        <?php echo e(session('success')); ?>
-
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <div class="flex justify-center items-center h-full">
+                        <p class="text-sm text-slate-500">No messages yet. Start the conversation below.</p>
                     </div>
                 <?php endif; ?>
 
-                
-                <div class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
-
-                    <?php
-                        $lastDate = null;
-                    ?>
-
-                    <?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                        <?php
-                            $messageDate = \Carbon\Carbon::parse($message->created_at)->format('d M Y');
-                            $isLandlordMessage = $message->sender_type === 'landlord';
-                        ?>
-
-                        <?php if($lastDate !== $messageDate): ?>
-                            <div class="flex justify-center my-4">
-                                <span class="px-4 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">
-                                    <?php echo e($messageDate); ?>
-
-                                </span>
-                            </div>
-                            <?php
-                                $lastDate = $messageDate;
-                            ?>
-                        <?php endif; ?>
-
-                        <div class="flex <?php echo e($isLandlordMessage ? 'justify-end' : 'justify-start'); ?>">
-                            <div class="max-w-[75%]">
-                                <div class="px-4 py-3 rounded-2xl text-sm shadow-sm
-                                    <?php echo e($isLandlordMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md'); ?>">
-                                    <?php echo e($message->content); ?>
-
-                                </div>
-
-                                <div class="mt-1 text-[11px] text-slate-400 <?php echo e($isLandlordMessage ? 'text-right' : 'text-left'); ?>">
-                                    <?php echo e(\Carbon\Carbon::parse($message->created_at)->format('H:i')); ?>
-
-                                </div>
-                            </div>
-                        </div>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                        <div class="flex justify-center items-center h-full">
-                            <p class="text-sm text-slate-500">No messages yet. Start the conversation below.</p>
-                        </div>
-                    <?php endif; ?>
-
-                </div>
+            </div>
 
                 
                 <div class="border-t border-slate-200 bg-white px-6 py-4">

@@ -82,6 +82,13 @@
                                 <div class="mt-1 text-[11px] text-slate-400 <?php echo e($isStudentMessage ? 'text-right' : 'text-left'); ?>">
                                     <?php echo e(\Carbon\Carbon::parse($message->created_at)->format('H:i')); ?>
 
+
+                                    <?php if($isStudentMessage): ?>
+                                        <span class="ml-1">
+                                            <?php echo e($message->is_read_by_landlord ? 'Seen' : 'Sent'); ?>
+
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>

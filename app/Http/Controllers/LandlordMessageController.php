@@ -11,7 +11,7 @@ class LandlordMessageController extends Controller
 {
     public function index()
     {
-        $landlordId = Landlord::where('email', auth()->user()->email)->value('id');
+        $landlordId = session('landlord_id');
 
         $applications = Application::with(['student', 'rental'])
             ->whereHas('rental', function ($query) use ($landlordId) {

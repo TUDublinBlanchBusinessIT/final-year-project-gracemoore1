@@ -65,6 +65,12 @@
 
                                 <div class="mt-1 text-[11px] text-slate-400 {{ $isStudentMessage ? 'text-right' : 'text-left' }}">
                                     {{ \Carbon\Carbon::parse($message->created_at)->format('H:i') }}
+
+                                    @if($isStudentMessage)
+                                        <span class="ml-1">
+                                            {{ $message->is_read_by_landlord ? 'Seen' : 'Sent' }}
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
