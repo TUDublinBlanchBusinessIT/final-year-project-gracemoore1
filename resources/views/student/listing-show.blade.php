@@ -160,6 +160,65 @@
 
 
 
+            {{-- ============================
+                MAPS: PREVIEW + DIRECTIONS
+            ============================ --}}
+            @php
+                $destinationAddress = trim(
+                    ($rental->housenumber ? $rental->housenumber.' ' : '') .
+                    $rental->street . ', ' .
+                    $rental->county .
+                    (!empty($rental->postcode) ? ', '.$rental->postcode : '') .
+                    ', Ireland'
+                );
+            @endphp
+
+            <div class="mt-8 bg-white border border-slate-200 rounded-xl p-4 shadow space-y-4">
+
+                <h2 class="text-lg font-semibold text-slate-900">Location</h2>
+
+                {{-- Map canvas --}}
+                <div id="rc-map" class="w-full h-72 rounded-xl overflow-hidden border"></div>
+
+                {{-- Directions controls --}}
+                <div class="grid gap-3 md:grid-cols-2">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Starting point (e.g. your college)</label>
+                        <input
+                            id="rc-origin"
+                            type="text"
+                            placeholder="University College Cork"
+                            class="mt-1 w-full border rounded-lg px-3 py-2"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Travel mode</label>
+                        <select id="rc-mode" class="mt-1 w-full border rounded-lg px-3 py-2">
+                            <option value="DRIVING">Driving</option>
+                            <option value="WALKING">Walking</option>
+                            <option value="TRANSIT">Public transport</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <button type="button"
+                            onclick="rcShowRoute()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        Show route
+                    </button>
+
+                    <button type="button"
+                            onclick="rcClearRoute()"
+                            class="bg-slate-100 hover:bg-slate-200 text-slate-800 px-4 py-2 rounded-lg">
+                        Clear
+                    </button>
+                </div>
+
+                {{-- Distance / duration output --}}
+                <div id="rc-summary" class="text-sm text-slate-700"></div>
+            </div>
             {{-- Apply button (no action yet) --}}
                 <button type="button"
                         onclick="openApplyModal()"
@@ -221,6 +280,102 @@
             }
         });
     </script>
+
+    {{-- ============================
+                MAPS SCRIPTS
+            ============================ --}}
+            <script>
+            let rcMap, rcMarker, rcDirectionsService, rcDirectionsRenderer, rcAutocomplete;
+
+            const RC_DESTINATION_ADDR = @json($destinationAddress);
+
+            async function rcInitMap() {
+                // Base map
+                rcMap = new google.maps.Map(document.getElementById('rc-map'), {
+                    center: { lat: 53.3498, lng: -6.2603 }, // Dublin fallback
+                    zoom: 12,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: false,
+                });
+
+                // Services
+                rcDirectionsService  = new google.maps.DirectionsService();
+                rcDirectionsRenderer = new google.maps.DirectionsRenderer({ map: rcMap, suppressMarkers: false });
+
+                // Autocomplete on origin (Places API)
+                const originInput = document.getElementById('rc-origin');
+                rcAutocomplete = new google.maps.places.Autocomplete(originInput, {
+                    fields: ['place_id', 'geometry', 'name'],
+                });
+
+                // Geocode destination to drop a preview marker & center map (Geocoding API)
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ address: RC_DESTINATION_ADDR }, (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                        const loc = results[0].geometry.location;
+                        rcMap.setCenter(loc);
+                        rcMap.setZoom(14);
+                        rcMarker = new google.maps.Marker({
+                            map: rcMap,
+                            position: loc,
+                            title: RC_DESTINATION_ADDR
+                        });
+                    } else {
+                        console.warn('Destination geocode failed:', status);
+                    }
+                });
+            }
+
+            function rcShowRoute() {
+                const origin = document.getElementById('rc-origin').value.trim();
+                const mode   = document.getElementById('rc-mode').value;
+
+                if (!origin) {
+                    alert('Please enter a starting point.');
+                    return;
+                }
+
+                // Clear any previous summary
+                document.getElementById('rc-summary').innerHTML = '';
+
+                rcDirectionsService.route({
+                    origin,
+                    destination: RC_DESTINATION_ADDR,
+                    travelMode: google.maps.TravelMode[mode], // DRIVING | WALKING | TRANSIT
+                    provideRouteAlternatives: false,
+                }, (res, status) => {
+                    if (status === 'OK' && res.routes && res.routes.length) {
+                        rcDirectionsRenderer.setDirections(res);
+
+                        const leg = res.routes[0].legs[0];
+                        const distance = leg.distance?.text ?? '';
+                        const duration = leg.duration?.text ?? '';
+
+                        document.getElementById('rc-summary').innerHTML =
+                            `<div class="mt-2">
+                                <span class="font-semibold">Distance:</span> ${distance}
+                                <span class="ml-3 font-semibold">Time:</span> ${duration}
+                            </div>`;
+                    } else {
+                        alert('Could not find a route for that origin/mode. Try a different starting point or mode.');
+                        console.warn('Directions error:', status, res);
+                    }
+                });
+            }
+
+            function rcClearRoute() {
+                rcDirectionsRenderer.set('directions', null);
+                document.getElementById('rc-summary').innerHTML = '';
+            }
+
+            // Expose to window (buttons call these)
+            window.rcShowRoute  = rcShowRoute;
+            window.rcClearRoute = rcClearRoute;
+            </script>
+
+            {{-- Load Maps JS (with Places) using YOUR KEY directly for now --}}
+            https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVClXnFjWcvq4mHnJFKw1pGVn8abqd5E&libraries=places&callback=rcInitMapscript>
         <!-- Application Modal -->
         <div id="applyModal"
             class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden justify-center items-center p-4">
@@ -265,4 +420,5 @@
                 window.location.href = "/applications/start/{{ $rental->id }}/" + type;
             }
         </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_key') }}&libraries=places&callback=rcInitMap" async defer></script>
 </x-app-layout>
