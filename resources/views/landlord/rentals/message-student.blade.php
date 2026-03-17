@@ -5,21 +5,35 @@
         </h2>
     </x-slot>
 
-    <div class="mb-4">
-        <a href="{{ route('landlord.messages') }}" 
-        class="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1">
-            ← Back to Messages
-        </a>
-    </div>
-
-<div class="pb-28 lg:pl-70">
-    <div class="max-w-4xl mx-auto">
-
-    
-
     <div class="pb-28 lg:pl-70">
         <div class="max-w-4xl mx-auto">
-            <div class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
+            <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
+
+                <div class="border-b border-slate-200 px-6 py-4 bg-white">
+                    <div class="flex items-center gap-4">
+                        <a href="{{ route('landlord.messages') }}" class="text-slate-500 hover:text-slate-700 text-xl">
+                            ←
+                        </a>
+
+                        <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-lg font-semibold">
+                            {{ strtoupper(substr($application->student->firstname ?? 'S', 0, 1)) }}
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900">
+                                {{ $application->student->firstname ?? 'Student' }} {{ $application->student->surname ?? '' }}
+                            </h3>
+                            <p class="text-sm text-slate-500">
+                                {{ $application->rental->housenumber ?? '' }}
+                                {{ $application->rental->street ?? '' }},
+                                {{ $application->rental->county ?? '' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                
+            <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
 
                 @php
                     $lastDate = null;
@@ -95,4 +109,13 @@
             </div>
         </div>
     </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chat = document.getElementById("chatContainer");
+        if (chat) {
+            chat.scrollTop = chat.scrollHeight;
+        }
+    });
+    </script>
 </x-app-layout>

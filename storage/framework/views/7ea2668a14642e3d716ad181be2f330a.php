@@ -14,21 +14,39 @@
         </h2>
      <?php $__env->endSlot(); ?>
 
-    <div class="mb-4">
-        <a href="<?php echo e(route('landlord.messages')); ?>" 
-        class="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1">
-            ← Back to Messages
-        </a>
-    </div>
-
-<div class="pb-28 lg:pl-70">
-    <div class="max-w-4xl mx-auto">
-
-    
-
     <div class="pb-28 lg:pl-70">
         <div class="max-w-4xl mx-auto">
-            <div class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
+            <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
+
+                <div class="border-b border-slate-200 px-6 py-4 bg-white">
+                    <div class="flex items-center gap-4">
+                        <a href="<?php echo e(route('landlord.messages')); ?>" class="text-slate-500 hover:text-slate-700 text-xl">
+                            ←
+                        </a>
+
+                        <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-lg font-semibold">
+                            <?php echo e(strtoupper(substr($application->student->firstname ?? 'S', 0, 1))); ?>
+
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900">
+                                <?php echo e($application->student->firstname ?? 'Student'); ?> <?php echo e($application->student->surname ?? ''); ?>
+
+                            </h3>
+                            <p class="text-sm text-slate-500">
+                                <?php echo e($application->rental->housenumber ?? ''); ?>
+
+                                <?php echo e($application->rental->street ?? ''); ?>,
+                                <?php echo e($application->rental->county ?? ''); ?>
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                
+            <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
 
                 <?php
                     $lastDate = null;
@@ -108,6 +126,15 @@
             </div>
         </div>
     </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chat = document.getElementById("chatContainer");
+        if (chat) {
+            chat.scrollTop = chat.scrollHeight;
+        }
+    });
+    </script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>

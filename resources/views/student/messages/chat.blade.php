@@ -5,6 +5,7 @@
         </h2>
     </x-slot>
 
+
     <div class="pb-28 lg:pl-70">
         <div class="max-w-4xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
@@ -33,7 +34,7 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4" id="chatBox">
+                <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
 
                     @php
                         $lastDate = null;
@@ -114,5 +115,14 @@
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
         });
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chat = document.getElementById("chatContainer");
+        if (chat) {
+            chat.scrollTop = chat.scrollHeight;
+        }
+    });
     </script>
 </x-app-layout>

@@ -22,7 +22,13 @@ class LandlordMessageController extends Controller
                 return Message::where('studentid', $application->studentid)
                     ->where('rentalid', $application->rentalid)
                     ->exists();
-            });
+            })
+                ->sortByDesc(function ($application) {
+                    return Message::where('studentid', $application->studentid)
+                        ->where('rentalid', $application->rentalid)
+                        ->max('created_at');
+                })
+                ->values();
 
         return view('landlord.messages.index', compact('applications'));
     }
