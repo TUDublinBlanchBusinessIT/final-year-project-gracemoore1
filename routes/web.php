@@ -12,11 +12,15 @@ use App\Http\Controllers\Auth\LandlordRegisterController;
 use App\Http\Controllers\Auth\LandlordCodeVerificationController; 
 use App\Http\Controllers\Auth\LandlordOCRController;
 use App\Http\Controllers\LandlordController;
+use App\Http\Controllers\LandlordMessageController;
+
 
 
 // Student controllers
 use App\Http\Controllers\StudentRegisterController;
 use App\Http\Controllers\StudentPasswordResetController;
+//student messaging
+use App\Http\Controllers\StudentMessageController;
 
 // Breeze / Laravel User Controllers
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -99,6 +103,11 @@ Route::post('/student/verify-id', [StudentRegisterController::class, 'verifyId']
 Route::get('/home', [StudentRegisterController::class, 'dashboard'])
     ->name('student.dashboard');
 
+// MESSAGES LANDLORD
+
+Route::get('/landlord/messages/{application}', [LandlordMessageController::class, 'show'])->name('landlord.messages.show');
+Route::post('/landlord/messages/{application}', [LandlordMessageController::class, 'store'])->name('landlord.messages.store');
+Route::get('/landlord/messages', [LandlordMessageController::class, 'index'])->name('landlord.messages');
 
 // STUDENT LOGIN
 Route::get('/student/login', function() {
@@ -157,6 +166,12 @@ Route::middleware('auth')->group(function () {
         ->name('profile.destroy');
 
 });
+
+
+//student messaging
+Route::get('/student/messages', [StudentMessageController::class, 'index'])->name('student.messages');
+Route::get('/student/messages/{application}', [StudentMessageController::class, 'show'])->name('student.messages.show');
+Route::post('/student/messages/{application}', [StudentMessageController::class, 'store'])->name('student.messages.store');
 
 //admin
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
@@ -371,10 +386,10 @@ Route::post('/admin/partnerships', [App\Http\Controllers\PartnershipController::
 
 
 
-Route::get('/student/messages', function () {
-    if (!session('student_id')) return redirect('/student/login');
-    return view('student.messages');
-})->name('student.messages');
+//Route::get('/student/messages', function () {
+    //if (!session('student_id')) return redirect('/student/login');
+    //return view('student.messages');
+//})->name('student.messages');
 
 Route::get('/student/support', function () {
     if (!session('student_id')) return redirect('/student/login');
