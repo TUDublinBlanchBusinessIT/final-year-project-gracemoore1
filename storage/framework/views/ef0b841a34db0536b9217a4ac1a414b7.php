@@ -393,6 +393,7 @@
             if (input) input.value = county;
         }
 
+        // --- Carousel as we had it originally ---
         const carouselState = {};
 
         function stateKey(view, id) {
