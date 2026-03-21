@@ -1,4 +1,3 @@
-
 <x-app-layout>
 
     {{-- Header --}}
@@ -158,6 +157,61 @@
                 </div>
             @endif
 
+            {{-- ============================
+            {{-- ============================
+                MAP LOCATION + DIRECTIONS
+            ============================ --}}
+            @php
+                $destinationAddress = trim(
+                    ($rental->housenumber ? $rental->housenumber.' ' : '') .
+                    $rental->street . ', ' .
+                    $rental->county .
+                    (!empty($rental->postcode) ? ', '.$rental->postcode : '') .
+                    ', Ireland'
+                );
+            @endphp
+
+            <div class="mt-8 bg-white border border-slate-200 rounded-xl p-4 shadow space-y-4">
+
+                <h2 class="text-lg font-semibold text-slate-900">Location</h2>
+
+                <!-- Map -->
+                <div id="rc-map" class="w-full h-72 rounded-xl overflow-hidden border"></div>
+
+                <!-- Directions controls -->
+                <div class="grid gap-3 md:grid-cols-2">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Starting point</label>
+                        <input id="rc-origin" type="text"
+                            placeholder="University College Cork"
+                            class="mt-1 w-full border rounded-lg px-3 py-2">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Travel mode</label>
+                        <select id="rc-mode" class="mt-1 w-full border rounded-lg px-3 py-2">
+                            <option value="DRIVING">Driving</option>
+                            <option value="WALKING">Walking</option>
+                            <option value="TRANSIT">Public transport</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="rcShowRoute()" type="button"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        Show route
+                    </button>
+
+                    <button onclick="rcClearRoute()" type="button"
+                        class="bg-slate-100 hover:bg-slate-200 text-slate-800 px-4 py-2 rounded-lg">
+                        Clear
+                    </button>
+                </div>
+
+                <div id="rc-summary" class="text-sm text-slate-700"></div>
+            </div>
+
 
 
             {{-- Apply button (no action yet) --}}
@@ -265,4 +319,85 @@
                 window.location.href = "/applications/start/{{ $rental->id }}/" + type;
             }
         </script>
+
+        {{-- ============================
+                    MAPS SCRIPTS
+            ============================ --}}
+            <script>
+            let rcMap, rcMarker, rcDirectionsService, rcDirectionsRenderer, rcAutocomplete;
+
+            const RC_DESTINATION_ADDR = @json($destinationAddress);
+
+            function rcInitMap() {
+                rcMap = new google.maps.Map(document.getElementById('rc-map'), {
+                    center: { lat: 53.3498, lng: -6.2603 },
+                    zoom: 12,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: false,
+                });
+
+                rcDirectionsService  = new google.maps.DirectionsService();
+                rcDirectionsRenderer = new google.maps.DirectionsRenderer({ map: rcMap });
+
+                const originInput = document.getElementById('rc-origin');
+                rcAutocomplete = new google.maps.places.Autocomplete(originInput, {
+                    fields: ['place_id', 'geometry', 'name'],
+                });
+
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ address: RC_DESTINATION_ADDR }, (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                        const loc = results[0].geometry.location;
+                        rcMap.setCenter(loc);
+                        rcMap.setZoom(14);
+
+                        rcMarker = new google.maps.Marker({
+                            map: rcMap,
+                            position: loc,
+                            title: RC_DESTINATION_ADDR
+                        });
+                    }
+                });
+            }
+
+            function rcShowRoute() {
+                const origin = document.getElementById('rc-origin').value.trim();
+                const mode   = document.getElementById('rc-mode').value;
+
+                if (!origin) {
+                    alert('Please enter a starting point.');
+                    return;
+                }
+
+                document.getElementById('rc-summary').innerHTML = '';
+
+                rcDirectionsService.route({
+                    origin,
+                    destination: RC_DESTINATION_ADDR,
+                    travelMode: google.maps.TravelMode[mode],
+                }, (res, status) => {
+                    if (status === 'OK') {
+                        rcDirectionsRenderer.setDirections(res);
+                        const leg = res.routes[0].legs[0];
+
+                        document.getElementById('rc-summary').innerHTML =
+                            `<div class="mt-2">
+                                <span class="font-semibold">Distance:</span> ${leg.distance.text}
+                                <span class="ml-3 font-semibold">Time:</span> ${leg.duration.text}
+                            </div>`;
+                    }
+                });
+            }
+
+            function rcClearRoute() {
+                rcDirectionsRenderer.set('directions', null);
+                document.getElementById('rc-summary').innerHTML = '';
+            }
+
+            window.rcShowRoute  = rcShowRoute;
+            window.rcClearRoute = rcClearRoute;
+            </script>
+
+            <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_key') }}&libraries=places&callback=rcInitMap" async defer></script>
 </x-app-layout>
