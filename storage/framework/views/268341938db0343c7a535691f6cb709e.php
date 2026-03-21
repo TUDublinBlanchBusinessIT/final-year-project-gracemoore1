@@ -1,25 +1,34 @@
-<x-app-layout>
-    <x-slot name="header">
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+     <?php $__env->slot('header', null, []); ?> 
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Post Your Listing
         </h2>
-    </x-slot>
+     <?php $__env->endSlot(); ?>
 
-    {{-- Push content away from landlord sidebar + leave room for mobile bottom nav --}}
+    
     <div class="pb-28 lg:pl-70">
         <div class="py-10">
             <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             
-                @if ($errors->any())
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->any()): ?>
                     <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
                         <div class="font-semibold">Please fix the following:</div>
                         <ul class="list-disc pl-5 mt-2 text-sm">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li><?php echo e($error); ?></li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </ul>
                     </div>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="p-6 sm:p-8">
@@ -32,7 +41,7 @@
                                 </p>
                             </div>
 
-                            <a href="{{ route('dashboard') }}"
+                            <a href="<?php echo e(route('dashboard')); ?>"
                                class="text-sm font-semibold text-slate-600 hover:text-slate-900">
                                 ← Back
                             </a>
@@ -40,12 +49,12 @@
 
                         <form class="mt-8 space-y-8"
                               method="POST"
-                              action="{{ route('landlord.rentals.store') }}"
+                              action="<?php echo e(route('landlord.rentals.store')); ?>"
                               enctype="multipart/form-data">
-                            @csrf
+                            <?php echo csrf_field(); ?>
 
-                            {{-- Images --}}
-                            {{-- Images (CHANGED: supports adding in multiple selections) --}}
+                            
+                            
                             <section class="space-y-3">
                                 <div class="flex items-center justify-between">
                                     <h2 class="text-lg font-bold text-slate-900">Images</h2>
@@ -55,7 +64,7 @@
                                     </span>
                                 </div>
 
-    {{-- Upload area acts as an "Add more" trigger --}}
+    
                                 <label class="block cursor-pointer" id="addMoreImagesBtn">
                                     <div class="rounded-2xl border border-dashed border-slate-300 p-6 hover:border-blue-400 transition">
                                         <div class="flex items-center gap-4">
@@ -80,10 +89,10 @@
                                     </div>
                                 </label>
 
-    {{-- Where we keep all file inputs (one per pick) --}}
-                                {{---<div id="imagesInputs" class="hidden"></div>---}}
+    
+                                
                                 <div id="imagesInputs"></div>
-    {{-- Previews --}}
+    
                                 <div id="previewGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3"></div>
                             </section>
 
@@ -92,35 +101,35 @@
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">House Number (optional)</label>
-                                    <input name="housenumber" value="{{ old('housenumber') }}"
+                                    <input name="housenumber" value="<?php echo e(old('housenumber')); ?>"
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g. 14" />
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Street</label>
-                                    <input name="street" value="{{ old('street') }}" required
+                                    <input name="street" value="<?php echo e(old('street')); ?>" required
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g. The Green" />
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">County</label>
-                                    <input name="county" value="{{ old('county') }}" required
+                                    <input name="county" value="<?php echo e(old('county')); ?>" required
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g. Dublin" />
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Postcode</label>
-                                    <input name="postcode" value="{{ old('postcode') }}"
+                                    <input name="postcode" value="<?php echo e(old('postcode')); ?>"
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g. D14" />
                                 </div>
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Measurement</label>
-                                    <input name="measurement" value="{{ old('measurement') }}"
+                                    <input name="measurement" value="<?php echo e(old('measurement')); ?>"
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g. 15sqm" />
                                 </div>
@@ -140,10 +149,10 @@
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">House Type</label>
                                     <select name="housetype" class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                                        <option value="any" @selected(old('housetype') === 'any')>Any</option>
-                                        <option value="single_private" @selected(old('housetype') === 'single_private')>Single room in private home (e.g. in a family home)</option>
-                                        <option value="private_shared" @selected(old('housetype') === 'private_shared')>Private room in shared house (e.g. shared with other tenants)</option>
-                                        <option value="whole_property_group" @selected(old('housetype') === 'whole_property_group')>
+                                        <option value="any" <?php if(old('housetype') === 'any'): echo 'selected'; endif; ?>>Any</option>
+                                        <option value="single_private" <?php if(old('housetype') === 'single_private'): echo 'selected'; endif; ?>>Single room in private home (e.g. in a family home)</option>
+                                        <option value="private_shared" <?php if(old('housetype') === 'private_shared'): echo 'selected'; endif; ?>>Private room in shared house (e.g. shared with other tenants)</option>
+                                        <option value="whole_property_group" <?php if(old('housetype') === 'whole_property_group'): echo 'selected'; endif; ?>>
                                             Whole property (group application only)
                                         </option>
                                     </select>
@@ -154,9 +163,9 @@
                                     <label class="text-sm font-semibold text-slate-700">Accommodation Type</label>
                                     <select name="accommodation_type"
                                             class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                                        <option value="" @selected(old('accommodation_type') === null)>Select</option>
-                                        <option value="house" @selected(old('accommodation_type') === 'house')>House</option>
-                                        <option value="apartment" @selected(old('accommodation_type') === 'apartment')>Apartment</option>
+                                        <option value="" <?php if(old('accommodation_type') === null): echo 'selected'; endif; ?>>Select</option>
+                                        <option value="house" <?php if(old('accommodation_type') === 'house'): echo 'selected'; endif; ?>>House</option>
+                                        <option value="apartment" <?php if(old('accommodation_type') === 'apartment'): echo 'selected'; endif; ?>>Apartment</option>
                                     </select>
                                 </div>
 
@@ -169,14 +178,21 @@
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         required
                                     >
-                                        <option value="" @selected(old('application_type') === null)>Select</option>
-                                        <option value="single" @selected(old('application_type') === 'single')>Single Applications</option>
-                                        <option value="group" @selected(old('application_type') === 'group')>Group Applications</option>
+                                        <option value="" <?php if(old('application_type') === null): echo 'selected'; endif; ?>>Select</option>
+                                        <option value="single" <?php if(old('application_type') === 'single'): echo 'selected'; endif; ?>>Single Applications</option>
+                                        <option value="group" <?php if(old('application_type') === 'group'): echo 'selected'; endif; ?>>Group Applications</option>
                                     </select>
 
-                                    @error('application_type')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['application_type'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                        <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </div>
 
                                 <!-- UPDATED: Nights Per Week -->
@@ -185,7 +201,7 @@
                                     <input
                                         type="number"
                                         name="nightsperweek"
-                                        value="{{ old('nightsperweek') }}"
+                                        value="<?php echo e(old('nightsperweek')); ?>"
                                         min="0"
                                         max="7"
                                         step="1"
@@ -197,7 +213,7 @@
 
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Rent per month (€)</label>
-                                    <input name="rentpermonth" value="{{ old('rentpermonth') }}" required type="number" step="0.01" min="0"
+                                    <input name="rentpermonth" value="<?php echo e(old('rentpermonth')); ?>" required type="number" step="0.01" min="0"
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="e.g. 850" />
                                 </div>
@@ -205,20 +221,20 @@
                                 <div>
                                     <label class="text-sm font-semibold text-slate-700">Status</label>
                                     <select name="status" class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                                        <option value="available" @selected(old('status')==='available')>Available</option>
-                                        <option value="occupied" @selected(old('status')==='occupied')>Occupied</option>
+                                        <option value="available" <?php if(old('status')==='available'): echo 'selected'; endif; ?>>Available</option>
+                                        <option value="occupied" <?php if(old('status')==='occupied'): echo 'selected'; endif; ?>>Occupied</option>
                                     </select>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="text-sm font-semibold text-slate-700">Available from</label>
-                                        <input name="availablefrom" value="{{ old('availablefrom') }}" type="date" required
+                                        <input name="availablefrom" value="<?php echo e(old('availablefrom')); ?>" type="date" required
                                             class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500" />
                                     </div>
                                     <div>
                                         <label class="text-sm font-semibold text-slate-700">Available until</label>
-                                        <input name="availableuntil" value="{{ old('availableuntil') }}" type="date" required
+                                        <input name="availableuntil" value="<?php echo e(old('availableuntil')); ?>" type="date" required
                                             class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500" />
                                     </div>
                                 </div>
@@ -230,11 +246,11 @@
                                 <label class="text-sm font-semibold text-slate-700">Description</label>
                                 <textarea name="description" rows="5" required
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                                        placeholder="Brief description about the accommodation...">{{ old('description') }}</textarea>
+                                        placeholder="Brief description about the accommodation..."><?php echo e(old('description')); ?></textarea>
                             </section>
-                            {{-- Actions --}}
+                            
                             <div class="flex items-center justify-end gap-3 pt-2">
-                                <a href="{{ route('dashboard') }}"
+                                <a href="<?php echo e(route('dashboard')); ?>"
                                    class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50">
                                     Cancel
                                 </a>
@@ -253,8 +269,8 @@
         </div>
     </div>
 
-    {{-- Image preview script --}}
-{{-- Image picker script (NEW: supports multiple selections, max 5) --}}
+    
+
 <script>
     const inputsContainer = document.getElementById('imagesInputs');
     const previewGrid     = document.getElementById('previewGrid');
@@ -339,4 +355,14 @@
         }
     });
 </script>
-</x-app-layout>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php /**PATH C:\Users\gmoor\final-year-project-gracemoore1\resources\views/landlord/rentals/create.blade.php ENDPATH**/ ?>
