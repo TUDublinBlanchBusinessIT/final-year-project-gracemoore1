@@ -20,19 +20,32 @@
                     </div>
                 @else
                     <div class="space-y-4">
+
                         @foreach($applications as $application)
-
                             @php
-                                $lastMessage = \App\Models\Message::where('studentid', $application->studentid)
-                                    ->where('rentalid', $application->rentalid)
-                                    ->latest('created_at')
-                                    ->first();
+                                if ($application->applicationtype === 'group' && $application->group_id) {
+                                    $lastMessage = \App\Models\Message::where('group_id', $application->group_id)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->latest('created_at')
+                                        ->first();
 
-                                $unreadCount = \App\Models\Message::where('studentid', $application->studentid)
-                                    ->where('rentalid', $application->rentalid)
-                                    ->where('sender_type', 'landlord')
-                                    ->where('is_read_by_student', false)
-                                    ->count();
+                                    $unreadCount = \App\Models\Message::where('group_id', $application->group_id)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->where('sender_type', 'landlord')
+                                        ->where('is_read_by_student', false)
+                                        ->count();
+                                } else {
+                                    $lastMessage = \App\Models\Message::where('studentid', $application->studentid)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->latest('created_at')
+                                        ->first();
+
+                                    $unreadCount = \App\Models\Message::where('studentid', $application->studentid)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->where('sender_type', 'landlord')
+                                        ->where('is_read_by_student', false)
+                                        ->count();
+                                }
                             @endphp
 
                             <a href="{{ route('student.messages.show', $application->id) }}"
@@ -68,8 +81,8 @@
                                     </div>
                                 </div>
                             </a>
-
                         @endforeach
+
                     </div>
                 @endif
 

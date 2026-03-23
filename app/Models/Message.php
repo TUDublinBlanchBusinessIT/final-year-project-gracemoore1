@@ -13,6 +13,7 @@ class Message extends Model
         'sender_type',
         'timestamp',
         'studentid',
+        'group_id',
         'landlordid',
         'rentalid',
         'serviceproviderpartnershipid',

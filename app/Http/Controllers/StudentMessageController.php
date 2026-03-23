@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Models\Message;
-use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StudentMessageController extends Controller
 {
@@ -13,21 +13,39 @@ class StudentMessageController extends Controller
     {
         $studentId = session('student_id');
 
-        $applications = Application::with(['rental.landlord', 'student'])
-            ->where('studentid', $studentId)
+        $applications = Application::with(['rental.landlord', 'student', 'group'])
+            ->where(function ($query) use ($studentId) {
+                $query->where('studentid', $studentId)
+                    ->orWhereIn('group_id', function ($subQuery) use ($studentId) {
+                        $subQuery->select('group_id')
+                            ->from('student_groups')
+                            ->where('student_id', $studentId);
+                    });
+            })
             ->get()
             ->filter(function ($application) {
+                if ($application->applicationtype === 'group' && $application->group_id) {
+                    return Message::where('group_id', $application->group_id)
+                        ->where('rentalid', $application->rentalid)
+                        ->exists();
+                }
+
                 return Message::where('studentid', $application->studentid)
                     ->where('rentalid', $application->rentalid)
                     ->exists();
             })
+            ->sortByDesc(function ($application) {
+                if ($application->applicationtype === 'group' && $application->group_id) {
+                    return Message::where('group_id', $application->group_id)
+                        ->where('rentalid', $application->rentalid)
+                        ->max('created_at');
+                }
 
-        ->sortByDesc(function ($application) {
-            return Message::where('studentid', $application->studentid)
-                ->where('rentalid', $application->rentalid)
-                ->max('created_at');
-        })
-        ->values();
+                return Message::where('studentid', $application->studentid)
+                    ->where('rentalid', $application->rentalid)
+                    ->max('created_at');
+            })
+            ->values();
 
         return view('student.messages.index', compact('applications'));
     }
@@ -36,25 +54,55 @@ class StudentMessageController extends Controller
     {
         $studentId = session('student_id');
 
-        $application = Application::with(['rental.landlord', 'student'])
+        $application = Application::with(['rental.landlord', 'student', 'group'])
             ->where('id', $applicationId)
-            ->where('studentid', $studentId)
+            ->where(function ($query) use ($studentId) {
+                $query->where('studentid', $studentId)
+                    ->orWhereIn('group_id', function ($subQuery) use ($studentId) {
+                        $subQuery->select('group_id')
+                            ->from('student_groups')
+                            ->where('student_id', $studentId);
+                    });
+            })
             ->firstOrFail();
 
-        Message::where('studentid', $application->studentid)
-            ->where('rentalid', $application->rentalid)
-            ->where('sender_type', 'landlord')
-            ->where('is_read_by_student', false)
-            ->update([
-                'is_read_by_student' => true,
-            ]);
+        if ($application->applicationtype === 'group' && $application->group_id) {
+            Message::where('group_id', $application->group_id)
+                ->where('rentalid', $application->rentalid)
+                ->where('sender_type', 'landlord')
+                ->where('is_read_by_student', false)
+                ->update([
+                    'is_read_by_student' => true,
+                ]);
 
-        $messages = Message::where('studentid', $application->studentid)
-            ->where('rentalid', $application->rentalid)
-            ->orderBy('created_at', 'asc')
-            ->get();
+            $messages = Message::where('group_id', $application->group_id)
+                ->where('rentalid', $application->rentalid)
+                ->orderBy('created_at', 'asc')
+                ->get();
 
-        return view('student.messages.chat', compact('application', 'messages'));
+            $groupMembers = DB::table('student_groups')
+                ->join('student', 'student.id', '=', 'student_groups.student_id')
+                ->where('student_groups.group_id', $application->group_id)
+                ->select('student.id', 'student.firstname', 'student.surname')
+                ->get();
+        } else {
+            Message::where('studentid', $application->studentid)
+                ->where('rentalid', $application->rentalid)
+                ->where('sender_type', 'landlord')
+                ->where('is_read_by_student', false)
+                ->update([
+                    'is_read_by_student' => true,
+                ]);
+
+            $messages = Message::where('studentid', $application->studentid)
+                ->where('rentalid', $application->rentalid)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            $groupMembers = collect();
+        }
+
+        return view('student.messages.chat', compact('application', 'messages', 'groupMembers'));
     }
 
     public function store(Request $request, $applicationId)
@@ -65,16 +113,24 @@ class StudentMessageController extends Controller
 
         $studentId = session('student_id');
 
-        $application = Application::with(['rental.landlord', 'student'])
+        $application = Application::with(['rental.landlord', 'student', 'group'])
             ->where('id', $applicationId)
-            ->where('studentid', $studentId)
+            ->where(function ($query) use ($studentId) {
+                $query->where('studentid', $studentId)
+                    ->orWhereIn('group_id', function ($subQuery) use ($studentId) {
+                        $subQuery->select('group_id')
+                            ->from('student_groups')
+                            ->where('student_id', $studentId);
+                    });
+            })
             ->firstOrFail();
 
         Message::create([
             'content' => $request->message,
             'sender_type' => 'student',
             'timestamp' => now(),
-            'studentid' => $application->studentid,
+            'studentid' => $studentId,
+            'group_id' => $application->group_id,
             'landlordid' => $application->rental->landlordid,
             'rentalid' => $application->rentalid,
             'serviceproviderpartnershipid' => null,

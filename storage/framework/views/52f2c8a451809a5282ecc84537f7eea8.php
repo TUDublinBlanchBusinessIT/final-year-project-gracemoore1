@@ -29,19 +29,32 @@
                     </div>
                 <?php else: ?>
                     <div class="space-y-4">
+
                         <?php $__currentLoopData = $applications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $application): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-
                             <?php
-                                $lastMessage = \App\Models\Message::where('studentid', $application->studentid)
-                                    ->where('rentalid', $application->rentalid)
-                                    ->latest('created_at')
-                                    ->first();
+                                if ($application->applicationtype === 'group' && $application->group_id) {
+                                    $lastMessage = \App\Models\Message::where('group_id', $application->group_id)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->latest('created_at')
+                                        ->first();
 
-                                $unreadCount = \App\Models\Message::where('studentid', $application->studentid)
-                                    ->where('rentalid', $application->rentalid)
-                                    ->where('sender_type', 'landlord')
-                                    ->where('is_read_by_student', false)
-                                    ->count();
+                                    $unreadCount = \App\Models\Message::where('group_id', $application->group_id)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->where('sender_type', 'landlord')
+                                        ->where('is_read_by_student', false)
+                                        ->count();
+                                } else {
+                                    $lastMessage = \App\Models\Message::where('studentid', $application->studentid)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->latest('created_at')
+                                        ->first();
+
+                                    $unreadCount = \App\Models\Message::where('studentid', $application->studentid)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->where('sender_type', 'landlord')
+                                        ->where('is_read_by_student', false)
+                                        ->count();
+                                }
                             ?>
 
                             <a href="<?php echo e(route('student.messages.show', $application->id)); ?>"
@@ -84,8 +97,8 @@
                                     </div>
                                 </div>
                             </a>
-
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
                     </div>
                 <?php endif; ?>
 

@@ -37,18 +37,38 @@ class LandlordMessageController extends Controller
     {
         $application = Application::with(['student', 'rental'])->findOrFail($applicationId);
 
-        Message::where('studentid', $application->studentid)
-            ->where('rentalid', $application->rentalid)
-            ->where('sender_type', 'student')
-            ->where('is_read_by_landlord', false)
-            ->update([
-                'is_read_by_landlord' => true,
-            ]);
+        
+        if ($application->applicationtype === 'group' && $application->group_id) {
 
-        $messages = Message::where('studentid', $application->studentid)
-            ->where('rentalid', $application->rentalid)
-            ->orderBy('created_at', 'asc')
-            ->get();
+            Message::where('group_id', $application->group_id)
+                ->where('rentalid', $application->rentalid)
+                ->where('sender_type', 'student')
+                ->where('is_read_by_landlord', false)
+                ->update([
+                    'is_read_by_landlord' => true,
+                ]);
+
+            $messages = Message::where('group_id', $application->group_id)
+                ->where('rentalid', $application->rentalid)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+        } else {
+
+            Message::where('studentid', $application->studentid)
+                ->where('rentalid', $application->rentalid)
+                ->where('sender_type', 'student')
+                ->where('is_read_by_landlord', false)
+                ->update([
+                    'is_read_by_landlord' => true,
+                ]);
+
+            $messages = Message::where('studentid', $application->studentid)
+                ->where('rentalid', $application->rentalid)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+        }
 
         return view('landlord.rentals.message-student', compact('application', 'messages'));
     }
@@ -66,6 +86,7 @@ class LandlordMessageController extends Controller
             'sender_type' => 'landlord',
             'timestamp' => now(),
             'studentid' => $application->studentid,
+            'group_id' => $application->group_id,
             'landlordid' => $application->rental->landlordid,
             'rentalid' => $application->rentalid,
             'serviceproviderpartnershipid' => null,

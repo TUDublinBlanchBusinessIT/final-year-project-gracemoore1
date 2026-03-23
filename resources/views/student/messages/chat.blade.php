@@ -30,6 +30,13 @@
                                 {{ $application->rental->street ?? '' }},
                                 {{ $application->rental->county ?? '' }}
                             </p>
+
+                            @if($application->applicationtype === 'group' && $groupMembers->count())
+                                <p class="text-xs text-slate-400 mt-1">
+                                    Group members:
+                                    {{ $groupMembers->pluck('firstname')->implode(', ') }}
+                                </p>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -59,6 +66,20 @@
 
                         <div class="flex {{ $isStudentMessage ? 'justify-end' : 'justify-start' }}">
                             <div class="max-w-[75%]">
+                                @if($application->applicationtype === 'group')
+
+                                    @if($message->sender_type === 'student')
+                                        <p class="text-xs text-gray-400 mb-1 {{ $isStudentMessage ? 'text-right' : 'text-left' }}">
+                                            {{ \App\Models\Student::find($message->studentid)->firstname ?? 'Student' }}
+                                        </p>
+                                    @else
+                                        <p class="text-xs text-gray-400 mb-1 text-left">
+                                            {{ $application->rental->landlord->firstname ?? 'Landlord' }}
+                                        </p>
+                                    @endif
+
+                                @endif
+                            
                                 <div class="px-4 py-3 rounded-2xl text-sm shadow-sm
                                     {{ $isStudentMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md' }}">
                                     {{ $message->content }}
