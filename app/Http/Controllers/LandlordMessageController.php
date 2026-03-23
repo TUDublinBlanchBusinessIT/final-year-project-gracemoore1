@@ -15,22 +15,34 @@ class LandlordMessageController extends Controller
     {
         $landlordId = session('landlord_id');
 
-        $applications = Application::with(['student', 'rental'])
+        $applications = Application::with(['student', 'rental', 'group'])
             ->whereHas('rental', function ($query) use ($landlordId) {
                 $query->where('landlordid', $landlordId);
             })
             ->get()
             ->filter(function ($application) {
+                if ($application->applicationtype === 'group' && $application->group_id) {
+                    return Message::where('group_id', $application->group_id)
+                        ->where('rentalid', $application->rentalid)
+                        ->exists();
+                }
+
                 return Message::where('studentid', $application->studentid)
                     ->where('rentalid', $application->rentalid)
                     ->exists();
             })
-                ->sortByDesc(function ($application) {
-                    return Message::where('studentid', $application->studentid)
+            ->sortByDesc(function ($application) {
+                if ($application->applicationtype === 'group' && $application->group_id) {
+                    return Message::where('group_id', $application->group_id)
                         ->where('rentalid', $application->rentalid)
                         ->max('created_at');
-                })
-                ->values();
+                }
+
+                return Message::where('studentid', $application->studentid)
+                    ->where('rentalid', $application->rentalid)
+                    ->max('created_at');
+            })
+            ->values();
 
         return view('landlord.messages.index', compact('applications'));
     }

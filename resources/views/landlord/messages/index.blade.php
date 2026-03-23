@@ -22,9 +22,7 @@
                     <div class="space-y-4">
                         @foreach($applications as $application)
 
-                            //
                             @php
-
                                 if ($application->applicationtype === 'group' && $application->group_id) {
 
                                     $lastMessage = \App\Models\Message::where('group_id', $application->group_id)
@@ -32,11 +30,21 @@
                                         ->latest('created_at')
                                         ->first();
 
-                                    $unreadCount = \App\Models\Message::where('group_id', $application->group_id)
-                                        ->where('rentalid', $application->rentalid)
-                                        ->where('sender_type', 'landlord')
-                                        ->where('is_read_by_student', false)
-                                        ->count();
+                                    $groupMembers = \Illuminate\Support\Facades\DB::table('student_groups')
+                                        ->join('student', 'student.id', '=', 'student_groups.student_id')
+                                        ->where('student_groups.group_id', $application->group_id)
+                                        ->select('student.firstname', 'student.surname')
+                                        ->get();
+
+                                    $memberCount = $groupMembers->count();
+
+                                    $chatName = ($application->student->firstname ?? 'Student') . ' ' . ($application->student->surname ?? '');
+
+                                    if ($memberCount > 1) {
+                                        $chatName .= ' +' . ($memberCount - 1) . ' other' . ($memberCount - 1 > 1 ? 's' : '');
+                                    }
+
+                                    $chatType = 'Group application';
 
                                 } else {
 
@@ -45,24 +53,32 @@
                                         ->latest('created_at')
                                         ->first();
 
-                                    $unreadCount = \App\Models\Message::where('studentid', $application->studentid)
-                                        ->where('rentalid', $application->rentalid)
-                                        ->where('sender_type', 'landlord')
-                                        ->where('is_read_by_student', false)
-                                        ->count();
+                                    $chatName = ($application->student->firstname ?? 'Student') . ' ' . ($application->student->surname ?? '');
+
+                                    $chatType = 'Individual application';
 
                                 }
-
                             @endphp
 
                             <a href="{{ route('landlord.messages.show', $application->id) }}"
-                               class="block rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h3 class="text-base font-semibold text-slate-900">
-                                            {{ $application->student->firstname ?? 'Student' }}
-                                            {{ $application->student->surname ?? '' }}
-                                        </h3>
+                               class="block rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center gap-2">
+                                            <h3 class="text-base font-semibold text-black truncate">
+                                                {{ trim($chatName) }}
+                                            </h3>
+
+                                            @if($application->applicationtype === 'group' && $application->group_id)
+                                                <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                                                    Group
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <p class="mt-1 text-sm text-slate-500">
+                                            {{ $chatType }}
+                                        </p>
 
                                         <p class="mt-1 text-sm text-slate-500">
                                             {{ $application->rental->housenumber ?? '' }}
@@ -70,12 +86,12 @@
                                             {{ $application->rental->county ?? '' }}
                                         </p>
 
-                                        <p class="mt-2 text-sm text-slate-700">
-                                            {{ $lastMessage ? \Illuminate\Support\Str::limit($lastMessage->content, 80) : 'No messages yet.' }}
+                                        <p class="mt-3 text-sm text-slate-700 truncate">
+                                            {{ $lastMessage ? \Illuminate\Support\Str::limit($lastMessage->content, 90) : 'No messages yet.' }}
                                         </p>
                                     </div>
 
-                                    <div class="ml-4 text-xs text-slate-400 whitespace-nowrap">
+                                    <div class="shrink-0 text-xs text-slate-400 whitespace-nowrap">
                                         {{ $lastMessage && $lastMessage->created_at ? $lastMessage->created_at->format('d M Y H:i') : '' }}
                                     </div>
                                 </div>

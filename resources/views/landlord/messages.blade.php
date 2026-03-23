@@ -6,7 +6,7 @@
         <p class="mt-1 text-sm text-blue-600">
             Manage conversations with students
         </p>
-        </div>
+        
     </x-slot>
 
 
