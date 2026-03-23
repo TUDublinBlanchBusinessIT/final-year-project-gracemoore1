@@ -6,6 +6,8 @@ use App\Models\Application;
 use App\Models\Landlord;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class LandlordMessageController extends Controller
 {
@@ -33,11 +35,11 @@ class LandlordMessageController extends Controller
         return view('landlord.messages.index', compact('applications'));
     }
 
+
     public function show($applicationId)
     {
         $application = Application::with(['student', 'rental'])->findOrFail($applicationId);
 
-        
         if ($application->applicationtype === 'group' && $application->group_id) {
 
             Message::where('group_id', $application->group_id)
@@ -51,6 +53,12 @@ class LandlordMessageController extends Controller
             $messages = Message::where('group_id', $application->group_id)
                 ->where('rentalid', $application->rentalid)
                 ->orderBy('created_at', 'asc')
+                ->get();
+
+            $groupMembers = \Illuminate\Support\Facades\DB::table('student_groups')
+                ->join('student', 'student.id', '=', 'student_groups.student_id')
+                ->where('student_groups.group_id', $application->group_id)
+                ->select('student.id', 'student.firstname', 'student.surname')
                 ->get();
 
         } else {
@@ -68,10 +76,14 @@ class LandlordMessageController extends Controller
                 ->orderBy('created_at', 'asc')
                 ->get();
 
+            $groupMembers = collect();
         }
 
-        return view('landlord.rentals.message-student', compact('application', 'messages'));
-    }
+        return view('landlord.rentals.message-student', compact('application', 'messages', 'groupMembers'));
+    }    
+
+
+    
 
     public function store(Request $request, $applicationId)
     {

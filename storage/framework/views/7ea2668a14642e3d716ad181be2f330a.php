@@ -29,6 +29,7 @@
 
                         </div>
 
+                        
                         <div>
                             <h3 class="text-lg font-semibold text-slate-900">
                                 <?php echo e($application->student->firstname ?? 'Student'); ?> <?php echo e($application->student->surname ?? ''); ?>
@@ -41,7 +42,15 @@
                                 <?php echo e($application->rental->county ?? ''); ?>
 
                             </p>
-                        </div>
+
+                            <?php if($application->applicationtype === 'group' && isset($groupMembers) && $groupMembers->count()): ?>
+                                <p class="text-xs text-slate-400 mt-1">
+                                    Group members:
+                                    <?php echo e($groupMembers->pluck('firstname')->implode(', ')); ?>
+
+                                </p>
+                            <?php endif; ?>
+                        </div>                        
                     </div>
                 </div>
 
@@ -73,6 +82,22 @@
                     <div class="flex <?php echo e($isLandlordMessage ? 'justify-end' : 'justify-start'); ?>">
                         <div class="max-w-[75%]">
 
+                            <?php if($application->applicationtype === 'group'): ?>
+
+                                <?php if($message->sender_type === 'student'): ?>
+                                    <p class="text-xs text-gray-400 mb-1 text-left">
+                                        <?php echo e(\App\Models\Student::find($message->studentid)->firstname ?? 'Student'); ?>
+
+                                    </p>
+                                <?php else: ?>
+                                    <p class="text-xs text-gray-400 mb-1 text-right">
+                                        <?php echo e($application->rental->landlord->firstname ?? 'Landlord'); ?>
+
+                                    </p>
+                                <?php endif; ?>
+
+                            <?php endif; ?>
+
                             <div class="px-4 py-3 rounded-2xl text-sm shadow-sm
                                 <?php echo e($isLandlordMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md'); ?>">
                                 <?php echo e($message->content); ?>
@@ -92,7 +117,7 @@
                             </div>
 
                         </div>
-                    </div>
+                    </div>                    
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <div class="flex justify-center items-center h-full">
                         <p class="text-sm text-slate-500">No messages yet. Start the conversation below.</p>

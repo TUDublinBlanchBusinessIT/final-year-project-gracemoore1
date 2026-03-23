@@ -19,6 +19,7 @@
                             {{ strtoupper(substr($application->student->firstname ?? 'S', 0, 1)) }}
                         </div>
 
+                        
                         <div>
                             <h3 class="text-lg font-semibold text-slate-900">
                                 {{ $application->student->firstname ?? 'Student' }} {{ $application->student->surname ?? '' }}
@@ -28,7 +29,14 @@
                                 {{ $application->rental->street ?? '' }},
                                 {{ $application->rental->county ?? '' }}
                             </p>
-                        </div>
+
+                            @if($application->applicationtype === 'group' && isset($groupMembers) && $groupMembers->count())
+                                <p class="text-xs text-slate-400 mt-1">
+                                    Group members:
+                                    {{ $groupMembers->pluck('firstname')->implode(', ') }}
+                                </p>
+                            @endif
+                        </div>                        
                     </div>
                 </div>
 
@@ -59,6 +67,20 @@
                     <div class="flex {{ $isLandlordMessage ? 'justify-end' : 'justify-start' }}">
                         <div class="max-w-[75%]">
 
+                            @if($application->applicationtype === 'group')
+
+                                @if($message->sender_type === 'student')
+                                    <p class="text-xs text-gray-400 mb-1 text-left">
+                                        {{ \App\Models\Student::find($message->studentid)->firstname ?? 'Student' }}
+                                    </p>
+                                @else
+                                    <p class="text-xs text-gray-400 mb-1 text-right">
+                                        {{ $application->rental->landlord->firstname ?? 'Landlord' }}
+                                    </p>
+                                @endif
+
+                            @endif
+
                             <div class="px-4 py-3 rounded-2xl text-sm shadow-sm
                                 {{ $isLandlordMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md' }}">
                                 {{ $message->content }}
@@ -75,7 +97,7 @@
                             </div>
 
                         </div>
-                    </div>
+                    </div>                    
                 @empty
                     <div class="flex justify-center items-center h-full">
                         <p class="text-sm text-slate-500">No messages yet. Start the conversation below.</p>
