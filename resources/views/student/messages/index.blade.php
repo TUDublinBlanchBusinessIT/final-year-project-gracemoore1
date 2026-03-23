@@ -22,7 +22,10 @@
                     <div class="space-y-4">
 
                         @foreach($applications as $application)
+                            
                             @php
+                                $loggedInStudentId = session('student_id');
+
                                 if ($application->applicationtype === 'group' && $application->group_id) {
                                     $lastMessage = \App\Models\Message::where('group_id', $application->group_id)
                                         ->where('rentalid', $application->rentalid)
@@ -31,8 +34,14 @@
 
                                     $unreadCount = \App\Models\Message::where('group_id', $application->group_id)
                                         ->where('rentalid', $application->rentalid)
-                                        ->where('sender_type', 'landlord')
                                         ->where('is_read_by_student', false)
+                                        ->where(function ($query) use ($loggedInStudentId) {
+                                            $query->where('sender_type', 'landlord')
+                                                ->orWhere(function ($subQuery) use ($loggedInStudentId) {
+                                                    $subQuery->where('sender_type', 'student')
+                                                        ->where('studentid', '!=', $loggedInStudentId);
+                                                });
+                                        })
                                         ->count();
                                 } else {
                                     $lastMessage = \App\Models\Message::where('studentid', $application->studentid)
@@ -47,7 +56,6 @@
                                         ->count();
                                 }
                             @endphp
-
                             <a href="{{ route('student.messages.show', $application->id) }}"
                                class="block rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition">
                                 <div class="flex items-start justify-between">

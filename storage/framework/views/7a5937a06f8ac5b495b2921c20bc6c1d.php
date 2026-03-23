@@ -65,8 +65,9 @@
                     <?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <?php
                             $messageDate = \Carbon\Carbon::parse($message->created_at)->format('d M Y');
-                            $isStudentMessage = $message->sender_type === 'student';
-                        ?>
+                            $loggedInStudentId = session('student_id');
+                            $isOwnMessage = $message->sender_type === 'student' && $message->studentid == $loggedInStudentId;
+                        ?>                        
 
                         <?php if($lastDate !== $messageDate): ?>
                             <div class="flex justify-center my-4">
@@ -79,13 +80,13 @@
                                 $lastDate = $messageDate;
                             ?>
                         <?php endif; ?>
-
-                        <div class="flex <?php echo e($isStudentMessage ? 'justify-end' : 'justify-start'); ?>">
+                        <div class="flex <?php echo e($isOwnMessage ? 'justify-end' : 'justify-start'); ?>">
+                        
                             <div class="max-w-[75%]">
                                 <?php if($application->applicationtype === 'group'): ?>
 
                                     <?php if($message->sender_type === 'student'): ?>
-                                        <p class="text-xs text-gray-400 mb-1 <?php echo e($isStudentMessage ? 'text-right' : 'text-left'); ?>">
+                                        <p class="text-xs text-gray-400 mb-1 <?php echo e($isOwnMessage ? 'text-right' : 'text-left'); ?>">
                                             <?php echo e(\App\Models\Student::find($message->studentid)->firstname ?? 'Student'); ?>
 
                                         </p>
@@ -99,16 +100,16 @@
                                 <?php endif; ?>
                             
                                 <div class="px-4 py-3 rounded-2xl text-sm shadow-sm
-                                    <?php echo e($isStudentMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md'); ?>">
+                                    <?php echo e($isOwnMessage ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md'); ?>">
                                     <?php echo e($message->content); ?>
 
                                 </div>
 
-                                <div class="mt-1 text-[11px] text-slate-400 <?php echo e($isStudentMessage ? 'text-right' : 'text-left'); ?>">
+                                <div class="mt-1 text-[11px] text-slate-400 <?php echo e($isOwnMessage ? 'text-right' : 'text-left'); ?>">
                                     <?php echo e(\Carbon\Carbon::parse($message->created_at)->format('H:i')); ?>
 
 
-                                    <?php if($isStudentMessage): ?>
+                                    <?php if($isOwnMessage): ?>
                                         <span class="ml-1">
                                             <?php echo e($message->is_read_by_landlord ? 'Seen' : 'Sent'); ?>
 
