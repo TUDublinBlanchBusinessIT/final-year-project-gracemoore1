@@ -31,7 +31,6 @@
                     <div class="space-y-4">
 
                         <?php $__currentLoopData = $applications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $application): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            
                             <?php
                                 $loggedInStudentId = session('student_id');
 
@@ -52,6 +51,22 @@
                                                 });
                                         })
                                         ->count();
+
+                                    $groupMembers = \Illuminate\Support\Facades\DB::table('student_groups')
+                                        ->join('student', 'student.id', '=', 'student_groups.student_id')
+                                        ->where('student_groups.group_id', $application->group_id)
+                                        ->where('student.id', '!=', $loggedInStudentId)
+                                        ->select('student.firstname', 'student.surname')
+                                        ->get();
+
+                                    $otherMemberNames = $groupMembers->map(function ($member) {
+                                        return trim(($member->firstname ?? '') . ' ' . ($member->surname ?? ''));
+                                    })->filter()->values();
+
+                                    $groupSubtitle = $otherMemberNames->count()
+                                        ? 'With ' . $otherMemberNames->implode(', ')
+                                        : 'Group application';
+
                                 } else {
                                     $lastMessage = \App\Models\Message::where('studentid', $application->studentid)
                                         ->where('rentalid', $application->rentalid)
@@ -63,18 +78,34 @@
                                         ->where('sender_type', 'landlord')
                                         ->where('is_read_by_student', false)
                                         ->count();
+
+                                    $groupSubtitle = 'Individual application';
                                 }
                             ?>
+
                             <a href="<?php echo e(route('student.messages.show', $application->id)); ?>"
                                class="block rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h3 class="text-base font-semibold text-slate-900">
-                                            <?php echo e($application->rental->landlord->firstname ?? 'Landlord'); ?>
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center gap-2">
+                                            <h3 class="text-base font-semibold text-slate-900 truncate">
+                                                <?php echo e($application->rental->landlord->firstname ?? 'Landlord'); ?>
 
-                                            <?php echo e($application->rental->landlord->surname ?? ''); ?>
+                                                <?php echo e($application->rental->landlord->surname ?? ''); ?>
 
-                                        </h3>
+                                            </h3>
+
+                                            <?php if($application->applicationtype === 'group' && $application->group_id): ?>
+                                                <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                                                    Group
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <p class="mt-1 text-sm text-slate-500">
+                                            <?php echo e($groupSubtitle); ?>
+
+                                        </p>
 
                                         <p class="mt-1 text-sm text-slate-500">
                                             <?php echo e($application->rental->housenumber ?? ''); ?>
@@ -84,13 +115,13 @@
 
                                         </p>
 
-                                        <p class="mt-2 text-sm text-slate-700">
+                                        <p class="mt-3 text-sm text-slate-700 truncate">
                                             <?php echo e($lastMessage ? \Illuminate\Support\Str::limit($lastMessage->content, 80) : 'No messages yet.'); ?>
 
                                         </p>
                                     </div>
 
-                                    <div class="ml-4 flex flex-col items-end gap-2">
+                                    <div class="ml-4 flex flex-col items-end gap-2 shrink-0">
                                         <div class="text-xs text-slate-400 whitespace-nowrap">
                                             <?php echo e($lastMessage && $lastMessage->created_at ? $lastMessage->created_at->format('d M Y H:i') : ''); ?>
 
@@ -105,8 +136,7 @@
                                     </div>
                                 </div>
                             </a>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>                       
                     </div>
                 <?php endif; ?>
 
