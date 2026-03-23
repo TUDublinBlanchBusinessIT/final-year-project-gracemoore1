@@ -14,6 +14,40 @@
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-8 text-gray-900">
 
+            <div class="p-6">
+
+    
+    <div class="mb-6 flex flex-wrap gap-3 items-center">
+
+                    @php $active = request('filter', 'all'); @endphp
+
+                    <a href="{{ request()->fullUrlWithQuery(['filter' => 'all']) }}"
+                        class="px-4 py-2 text-sm font-medium rounded-full transition
+                        {{ $active === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                        All
+                    </a>
+
+                    <a href="{{ request()->fullUrlWithQuery(['filter' => 'unread']) }}"
+                    class="px-4 py-2 text-sm font-medium rounded-full transition
+                    {{ $active === 'unread' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                        Unread
+                    </a>
+
+                    <a href="{{ request()->fullUrlWithQuery(['filter' => 'group']) }}"
+                    class="px-4 py-2 text-sm font-medium rounded-full transition
+                    {{ $active === 'group' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                        Group chats
+                    </a>
+
+                    <a href="{{ request()->fullUrlWithQuery(['filter' => 'individual']) }}"
+                    class="px-4 py-2 text-sm font-medium rounded-full transition
+                    {{ $active === 'individual' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                        Individual
+                    </a>
+
+                </div>
+                
+
                 @if($applications->count() == 0)
                     <div class="rounded-xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
                         No messages yet.

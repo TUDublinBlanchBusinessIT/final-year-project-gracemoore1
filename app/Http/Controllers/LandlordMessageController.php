@@ -14,6 +14,7 @@ class LandlordMessageController extends Controller
     public function index()
     {
         $landlordId = session('landlord_id');
+        $filter = request('filter', 'all');
 
         $applications = Application::with(['student', 'rental', 'group'])
             ->whereHas('rental', function ($query) use ($landlordId) {
@@ -30,6 +31,33 @@ class LandlordMessageController extends Controller
                 return Message::where('studentid', $application->studentid)
                     ->where('rentalid', $application->rentalid)
                     ->exists();
+            })
+            ->filter(function ($application) use ($filter) {
+                if ($filter === 'group') {
+                    return $application->applicationtype === 'group';
+                }
+
+                if ($filter === 'individual') {
+                    return $application->applicationtype !== 'group';
+                }
+
+                if ($filter === 'unread') {
+                    if ($application->applicationtype === 'group' && $application->group_id) {
+                        return Message::where('group_id', $application->group_id)
+                            ->where('rentalid', $application->rentalid)
+                            ->where('sender_type', 'student')
+                            ->where('is_read_by_landlord', false)
+                            ->exists();
+                    }
+
+                    return Message::where('studentid', $application->studentid)
+                        ->where('rentalid', $application->rentalid)
+                        ->where('sender_type', 'student')
+                        ->where('is_read_by_landlord', false)
+                        ->exists();
+                }
+
+                return true;
             })
             ->sortByDesc(function ($application) {
                 if ($application->applicationtype === 'group' && $application->group_id) {
