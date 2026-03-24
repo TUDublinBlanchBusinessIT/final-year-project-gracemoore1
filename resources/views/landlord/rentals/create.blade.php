@@ -81,8 +81,8 @@
                                 </label>
 
     {{-- Where we keep all file inputs (one per pick) --}}
-                                <div id="imagesInputs" class="hidden"></div>
-
+                                {{---<div id="imagesInputs" class="hidden"></div>---}}
+                                <div id="imagesInputs"></div>
     {{-- Previews --}}
                                 <div id="previewGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3"></div>
                             </section>
