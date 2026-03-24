@@ -85,12 +85,12 @@
                             <?php if($application->applicationtype === 'group'): ?>
 
                                 <?php if($message->sender_type === 'student'): ?>
-                                    <p class="text-xs text-gray-400 mb-1 text-left">
+                                    <p class="text-xs text-black font-medium mb-1 text-left">
                                         <?php echo e(\App\Models\Student::find($message->studentid)->firstname ?? 'Student'); ?>
 
                                     </p>
                                 <?php else: ?>
-                                    <p class="text-xs text-gray-400 mb-1 text-right">
+                                    <p class="text-xs text-black font-medium mb-1 text-right">
                                         <?php echo e($application->rental->landlord->firstname ?? 'Landlord'); ?>
 
                                     </p>

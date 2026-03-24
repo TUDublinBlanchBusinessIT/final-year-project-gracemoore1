@@ -20,6 +20,10 @@
 
                 {{-- SMALLER TITLE --}}
                 <h1 class="text-base font-semibold text-slate-700 mb-6">
+                    <a href="{{ route('landlord.dashboard') }}"
+                        class="text-gray-600 hover:text-black text-lg">
+                        ←
+                    </a>
                     Applications for
                     <span class="font-bold text-slate-900">
                         {{ $rental->housenumber ? $rental->housenumber . ' ' : '' }}
