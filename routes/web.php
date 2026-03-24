@@ -178,20 +178,16 @@ Route::post('/student/messages/{application}', [StudentMessageController::class,
 // ===============================
 
 use App\Http\Controllers\RentTrackerController;
-use App\Http\Controllers\StripeWebhookController;
+
 
 // Student (session) rent-tracker API
-Route::get('/student/rent-tracker/balance', [RentTrackerController::class, 'getBalance'])
-    ->name('student.rent.balance');
+Route::get('/student/rent-tracker/{application}', [App\Http\Controllers\RentTrackerController::class, 'page'])
+    ->name('student.rent.page');
+Route::get('/student/rent-tracker/balance', [App\Http\Controllers\RentTrackerController::class, 'getBalance']);
+Route::get('/student/rent-tracker/history', [App\Http\Controllers\RentTrackerController::class, 'getHistory']);
+Route::post('/student/rent-tracker/payment-intent', [App\Http\Controllers\RentTrackerController::class, 'createPaymentIntent']);
+Route::post('/student/rent-tracker/confirm-payment', [App\Http\Controllers\RentTrackerController::class, 'confirmPayment']);
 
-Route::get('/student/rent-tracker/history', [RentTrackerController::class, 'getHistory'])
-    ->name('student.rent.history');
-
-Route::post('/student/rent-tracker/payment-intent', [RentTrackerController::class, 'createPaymentIntent'])
-    ->name('student.rent.intent');
-
-Route::post('/student/rent-tracker/confirm-payment',[RentTrackerController::class, 'confirmPayment'])
-    ->name('student.rent.confirm');
 
 //admin
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
