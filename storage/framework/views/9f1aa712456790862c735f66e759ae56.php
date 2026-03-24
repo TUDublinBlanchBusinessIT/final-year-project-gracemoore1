@@ -16,24 +16,32 @@
 
     <div class="pb-28 lg:pl-70">
         <div class="max-w-4xl mx-auto px-4 py-6">
+
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
-                
+
                 <div class="p-6 border-b border-slate-200">
-                    <h1 class="text-2xl font-bold text-blue-600">RentConnect</h1>
-                    <p class="text-slate-700 mt-1">Landlord Virtual Assistant</p>
+                    <h1 class="text-2xl font-bold text-blue-600">
+                        RentConnect
+                    </h1>
+                    <p class="text-slate-700 mt-1">
+                        Landlord Virtual Assistant
+                    </p>
                 </div>
 
-                <div id="chat-box" class="p-6 space-y-4 min-h-[400px] bg-slate-50">
+                <div id="chat-box" class="p-6 bg-slate-50 min-h-[400px] space-y-4">
+
                     <div class="flex">
                         <div class="bg-blue-100 text-slate-800 px-4 py-3 rounded-2xl max-w-xl">
                             Hi! I’m RentConnect’s virtual assistant. How can I help you today?
                         </div>
                     </div>
+
                 </div>
 
                 <div class="p-4 border-t border-slate-200 bg-white">
                     <form id="chat-form" class="flex gap-3">
                         <?php echo csrf_field(); ?>
+
                         <input type="hidden" id="role" value="landlord">
 
                         <input
@@ -51,7 +59,9 @@
                         </button>
                     </form>
                 </div>
+
             </div>
+
         </div>
     </div>
 
@@ -66,7 +76,9 @@
             const message = messageInput.value.trim();
             const role = roleInput.value;
 
-            if (!message) return;
+            if (!message) {
+                return;
+            }
 
             chatBox.innerHTML += `
                 <div class="flex justify-end">

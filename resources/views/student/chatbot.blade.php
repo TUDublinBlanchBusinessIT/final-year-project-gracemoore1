@@ -10,7 +10,6 @@
 
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
-                <!-- HEADER -->
                 <div class="p-6 border-b border-slate-200">
                     <h1 class="text-2xl font-bold text-blue-600">
                         RentConnect
@@ -20,7 +19,6 @@
                     </p>
                 </div>
 
-                <!-- CHAT MESSAGES -->
                 <div id="chat-box" class="p-6 bg-slate-50 min-h-[400px] space-y-4">
 
                     <div class="flex">
@@ -31,9 +29,7 @@
 
                 </div>
 
-                <!-- INPUT AREA -->
                 <div class="p-4 border-t border-slate-200 bg-white">
-
                     <form id="chat-form" class="flex gap-3">
                         @csrf
 
@@ -52,9 +48,7 @@
                         >
                             Send
                         </button>
-
                     </form>
-
                 </div>
 
             </div>
@@ -62,7 +56,6 @@
         </div>
     </div>
 
-    <!-- SCRIPT -->
     <script>
         document.getElementById('chat-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -74,9 +67,10 @@
             const message = messageInput.value.trim();
             const role = roleInput.value;
 
-            if (!message) return;
+            if (!message) {
+                return;
+            }
 
-            // USER MESSAGE
             chatBox.innerHTML += `
                 <div class="flex justify-end">
                     <div class="bg-blue-600 text-white px-4 py-3 rounded-2xl max-w-xl">
@@ -87,7 +81,6 @@
 
             messageInput.value = '';
 
-            // SEND TO BACKEND
             const response = await fetch("{{ route('chatbot.ask') }}", {
                 method: "POST",
                 headers: {
@@ -103,7 +96,6 @@
 
             const data = await response.json();
 
-            // BOT RESPONSE
             chatBox.innerHTML += `
                 <div class="flex">
                     <div class="bg-blue-100 text-slate-800 px-4 py-3 rounded-2xl max-w-xl">
@@ -115,5 +107,4 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         });
     </script>
-
 </x-app-layout>

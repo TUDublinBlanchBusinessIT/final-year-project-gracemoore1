@@ -29,29 +29,44 @@ class ChatbotController extends Controller
         $faqs = Faq::where('is_active', true)
             ->where(function ($query) use ($request) {
                 $query->where('role', $request->role)
-                      ->orWhere('role', 'all');
+                    ->orWhere('role', 'all');
             })
             ->get();
 
         $bestFaq = null;
         $bestScore = 0;
 
+        $commonWords = [
+            'how', 'do', 'i', 'a', 'the', 'is', 'to', 'my', 'can',
+            'what', 'where', 'when', 'and', 'for', 'of', 'on', 'in'
+        ];
+
         foreach ($faqs as $faq) {
             $score = 0;
 
-            $questionWords = explode(' ', strtolower($faq->question));
-            $keywordWords = $faq->keywords ? explode(',', strtolower($faq->keywords)) : [];
+            $questionWords = preg_split('/\s+/', strtolower($faq->question));
+            $keywordWords = $faq->keywords
+                ? array_map('trim', explode(',', strtolower($faq->keywords)))
+                : [];
 
             foreach ($questionWords as $word) {
                 $word = trim($word);
-                if ($word !== '' && str_contains($message, $word)) {
-                    $score++;
+
+                if ($word === '' || in_array($word, $commonWords)) {
+                    continue;
+                }
+
+                if (str_contains($message, $word)) {
+                    $score += 1;
                 }
             }
 
             foreach ($keywordWords as $keyword) {
-                $keyword = trim($keyword);
-                if ($keyword !== '' && str_contains($message, $keyword)) {
+                if ($keyword === '') {
+                    continue;
+                }
+
+                if (str_contains($message, $keyword)) {
                     $score += 2;
                 }
             }
@@ -70,7 +85,7 @@ class ChatbotController extends Controller
         }
 
         return response()->json([
-            'reply' => 'Sorry, I could not find an exact answer for that. Please try asking about registration, ID verification, applications, listings, maintenance, or messaging.',
+            'reply' => 'Sorry, I could not find an answer for that yet. Please try asking another question.',
             'matched_question' => null,
         ]);
     }
