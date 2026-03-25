@@ -7,6 +7,7 @@ use App\Models\RentPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class RentTrackerController extends Controller
 {
@@ -30,7 +31,7 @@ class RentTrackerController extends Controller
         $year  = (int)($request->year  ?? now()->year);
 
         $groupFilter = $this->normalizeGroupId($application, $request->group_id);
-        [$monthlyDue, $dueDateIso] = $this->computeDue($application, $month, $year);
+        [$monthlyDue, $dueDateIso, $remindOnIso] = $this->computeDue($application, $month, $year);
 
         $paid = RentPayment::query()
             ->where('application_id', $application->id)
@@ -46,12 +47,13 @@ class RentTrackerController extends Controller
             ->sum('amount');
 
         return response()->json([
-            'monthly_due'  => number_format($monthlyDue, 2),
-            'paid'         => number_format($paid, 2),
-            'outstanding'  => number_format(max(0, $monthlyDue - $paid), 2),
-            'due_date_iso' => $dueDateIso,
-            'month'        => $month,
-            'year'         => $year,
+            'monthly_due'   => number_format($monthlyDue, 2),
+            'paid'          => number_format($paid, 2),
+            'outstanding'   => number_format(max(0, $monthlyDue - $paid), 2),
+            'due_date_iso'  => $dueDateIso,
+            'remind_on_iso' => $remindOnIso,
+            'month'         => $month,
+            'year'          => $year,
         ]);
     }
 
@@ -92,16 +94,60 @@ class RentTrackerController extends Controller
                   ->whereYear('timestamp', $year);
         }
 
-        $items = $query->orderByDesc('timestamp')
-            ->get([
-                'id',
-                'amount',
-                'status',
-                'timestamp',
-                'stripe_intent_id',
-                'studentid',   // for left/right alignment
-                'landlordid',
-            ]);
+        // Build select list dynamically to avoid errors if columns don't exist
+        $table   = (new RentPayment)->getTable();
+        $selects = ['id','amount','status','timestamp','stripe_intent_id','studentid','landlordid'];
+
+        if (Schema::hasColumn($table, 'for_date')) $selects[] = 'for_date';
+        if (Schema::hasColumn($table, 'paid_by'))  $selects[] = 'paid_by';
+
+        $items = $query->orderByDesc('timestamp')->get($selects);
+
+        // --------- Inject a virtual "reminder" bubble in the feed (left, blue) ----------
+        [$monthlyDue, $dueDateIso, $remindOnIso] = $this->computeDue($application, $month, $year);
+
+        // How much has been paid in the requested month/year (respecting group)
+        $paidThisMonth = RentPayment::query()
+            ->where('application_id', $application->id)
+            ->when($groupFilter['type'] === 'value', fn($q) => $q->where('group_id', $groupFilter['value']))
+            ->when($groupFilter['type'] === 'null_or_zero', function ($q) {
+                $q->where(function ($qq) {
+                    $qq->whereNull('group_id')->orWhere('group_id', 0);
+                });
+            })
+            ->where('status', 'succeeded')
+            ->whereMonth('timestamp', $month)
+            ->whereYear('timestamp', $year)
+            ->sum('amount');
+
+        $outstanding = max(0, $monthlyDue - $paidThisMonth);
+        $now = now();
+
+        if ($outstanding > 0) {
+            $due = Carbon::parse($dueDateIso);
+            $remindOn = Carbon::parse($remindOnIso);
+
+            // Show the reminder bubble when today is between remind_on and due_date (inclusive)
+            $isCurrentMonth = ($month === (int)$now->month && $year === (int)$now->year);
+            if (($isCurrentMonth || $request->boolean('all'))
+                && $now->greaterThanOrEqualTo($remindOn)
+                && $now->lessThanOrEqualTo($due)) {
+
+                $items->push((object)[
+                    'id'        => 'reminder-'.$year.'-'.$month,
+                    'amount'    => $outstanding,
+                    'status'    => 'reminder', // <-- frontend styles this left + blue
+                    'timestamp' => $remindOn->toIso8601String(),
+                    'for_date'  => $due->toDateString(),
+                    'paid_by'   => null,
+                    'studentid' => null,
+                    'landlordid'=> $application->rental->landlordid ?? null,
+                ]);
+            }
+        }
+
+        // Re-sort with injected item included (newest first for API payload)
+        $items = $items->sortByDesc('timestamp')->values();
 
         return response()->json([
             'month'   => $month,
@@ -117,7 +163,7 @@ class RentTrackerController extends Controller
             'application_id' => 'required|integer',
             'group_id'       => 'nullable|integer',
             'amount_eur'     => 'nullable|numeric|min:0',
-            'for_date'       => 'nullable|date', // calendar date
+            'for_date'       => 'nullable|date',  // calendar date
             'month'          => 'nullable|integer',
             'year'           => 'nullable|integer',
         ]);
@@ -128,11 +174,12 @@ class RentTrackerController extends Controller
         $application = Application::with('rental')->findOrFail($request->application_id);
         abort_unless($this->canAccess($studentId, $application), 403);
 
-        // compute against current month (or provided) for outstanding
+        // compute against current month/year for outstanding
         $month = (int)($request->month ?? now()->month);
         $year  = (int)($request->year  ?? now()->year);
 
         [$monthlyDue] = $this->computeDue($application, $month, $year);
+
         $groupFilter  = $this->normalizeGroupId($application, $request->group_id);
         $groupId      = $groupFilter['type'] === 'value' ? $groupFilter['value'] : null;
 
@@ -140,9 +187,7 @@ class RentTrackerController extends Controller
             ->where('application_id', $application->id)
             ->when($groupFilter['type'] === 'value', fn ($q) => $q->where('group_id', $groupId))
             ->when($groupFilter['type'] === 'null_or_zero', function ($q) {
-                $q->where(function ($qq) {
-                    $qq->whereNull('group_id')->orWhere('group_id', 0);
-                });
+                $q->where(function ($qq) { $qq->whereNull('group_id')->orWhere('group_id', 0); });
             })
             ->where('status', 'succeeded')
             ->whereMonth('timestamp', $month)
@@ -162,8 +207,7 @@ class RentTrackerController extends Controller
         $pi = \Stripe\PaymentIntent::create([
             'amount'                    => (int) round($amount * 100),
             'currency'                  => 'eur',
-            'payment_method_types'      => ['link', 'card'],
-            'automatic_payment_methods' => ['enabled' => true],
+            'automatic_payment_methods' => ['enabled' => true], // card, Link, wallets
             'description'               => 'Rent payment',
             'metadata'                  => [
                 'type'           => 'rent',
@@ -174,11 +218,12 @@ class RentTrackerController extends Controller
                 'group_id'       => (string) ($groupId ?? ''),
                 'month'          => (string) $month,
                 'year'           => (string) $year,
-                'for_date'       => (string) ($forDate ?? ''), // calendar date
+                'for_date'       => (string) ($forDate ?? ''),
             ],
         ]);
 
-        RentPayment::create([
+        // Create pending payment row
+        $payment = RentPayment::create([
             'amount'           => $amount,
             'status'           => $pi->status,
             'stripe_intent_id' => $pi->id,
@@ -189,6 +234,20 @@ class RentTrackerController extends Controller
             'group_id'         => $groupId,
             'application_id'   => $application->id,
         ]);
+
+        // Optional persistence of "for_date" + "paid_by" (only if columns exist)
+        $table = $payment->getTable();
+        $dirty = false;
+        if (Schema::hasColumn($table, 'for_date')) {
+            $payment->for_date = $forDate;
+            $dirty = true;
+        }
+        if (Schema::hasColumn($table, 'paid_by')) {
+            $student = \App\Models\Student::find($studentId);
+            $payment->paid_by = $student ? trim(($student->firstname ?? '').' '.($student->surname ?? '')) : null;
+            $dirty = true;
+        }
+        if ($dirty) $payment->save();
 
         return response()->json([
             'client_secret'  => $pi->client_secret,
@@ -231,14 +290,24 @@ class RentTrackerController extends Controller
         abort_unless($this->canAccess($studentId, $app), 403);
 
         $groupId = null;
+        $groupMembers = collect();
+
         if (($app->applicationtype ?? '') === 'group' && $app->group_id) {
             $groupId = (int) ($request->query('group_id') ?: $app->group_id);
+
+            // IMPORTANT: singular table names ("student"), not "students"
+            $groupMembers = DB::table('student_groups')
+                ->join('student', 'student_groups.student_id', '=', 'student.id')
+                ->where('group_id', $app->group_id)
+                ->select('student.firstname', 'student.surname', 'student.id')
+                ->get();
         }
 
         return view('student.rent-tracker', [
-            'application' => $app,
-            'groupId'     => $groupId,
-            'viewerId'    => $studentId,
+            'application'  => $app,
+            'groupId'      => $groupId,
+            'viewerId'     => $studentId,
+            'groupMembers' => $groupMembers,
         ]);
     }
 
@@ -268,6 +337,10 @@ class RentTrackerController extends Controller
         return ['type' => 'null_or_zero', 'value' => null];
     }
 
+    /**
+     * Compute per-person monthly due and dates.
+     * Returns: [ float $perPerson, string $dueDateIso, string $remindOnIso ]
+     */
     private function computeDue($app, int $month, int $year)
     {
         $rent = $app->rental->rentpermonth ?? 0;
@@ -282,9 +355,17 @@ class RentTrackerController extends Controller
 
         $perPerson = round($rent / $groupMembers, 2);
 
-        // due date (first of month at 09:00 in app TZ)
-        $dueDate = Carbon::create($year, $month, 1, 9, 0, 0, config('app.timezone'))->toIso8601String();
+        // Use rental-configured due_day if present; otherwise default to 1
+        $dueDay = (int)($app->rental->due_day ?? 1);
+        $tz = config('app.timezone');
 
-        return [$perPerson, $dueDate];
+        $eom = Carbon::create($year, $month, 1, 0, 0, 0, $tz)->endOfMonth()->day;
+        $dueDayClamped = max(1, min($dueDay, $eom));
+
+        // Due at 09:00 local time
+        $dueDate   = Carbon::create($year, $month, $dueDayClamped, 9, 0, 0, $tz);
+        $remindOn  = (clone $dueDate)->subDays(2); // e.g., 27th due -> 25th reminder
+
+        return [$perPerson, $dueDate->toIso8601String(), $remindOn->toIso8601String()];
     }
 }
