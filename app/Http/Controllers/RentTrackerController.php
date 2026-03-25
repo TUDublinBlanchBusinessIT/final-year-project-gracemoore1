@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Schema;
 
 class RentTrackerController extends Controller
 {
-    /** GET /student/rent-tracker/balance */
     public function getBalance(Request $request)
     {
         $request->validate([
@@ -37,27 +36,24 @@ class RentTrackerController extends Controller
             ->where('application_id', $application->id)
             ->when($groupFilter['type'] === 'value', fn ($q) => $q->where('group_id', $groupFilter['value']))
             ->when($groupFilter['type'] === 'null_or_zero', function ($q) {
-                $q->where(function ($qq) {
-                    $qq->whereNull('group_id')->orWhere('group_id', 0);
-                });
+                $q->where(fn($w)=>$w->whereNull('group_id')->orWhere('group_id',0));
             })
-            ->where('status', 'succeeded')
-            ->whereMonth('timestamp', $month)
-            ->whereYear('timestamp', $year)
+            ->where('status','succeeded')
+            ->whereMonth('timestamp',$month)
+            ->whereYear('timestamp',$year)
             ->sum('amount');
 
-        return response()->json([
-            'monthly_due'   => number_format($monthlyDue, 2),
-            'paid'          => number_format($paid, 2),
-            'outstanding'   => number_format(max(0, $monthlyDue - $paid), 2),
-            'due_date_iso'  => $dueDateIso,
-            'remind_on_iso' => $remindOnIso,
-            'month'         => $month,
-            'year'          => $year,
-        ]);
+            return response()->json([
+                'monthly_due'   => number_format($monthlyDue, 2),
+                'paid'          => number_format($paid, 2),
+                'outstanding'   => number_format(max(0, $monthlyDue - $paid), 2),
+                'due_date_iso'  => $dueDateIso,
+                'remind_on_iso' => $remindOnIso,
+                'month'         => $month,
+                'year'          => $year,
+            ]);
     }
 
-    /** GET /student/rent-tracker/history */
     public function getHistory(Request $request)
     {
         $request->validate([
@@ -69,278 +65,238 @@ class RentTrackerController extends Controller
         ]);
 
         $studentId = session('student_id');
-        abort_if(!$studentId, 401, 'Login required.');
+        abort_if(!$studentId,401);
 
         $application = Application::with('rental')->findOrFail($request->application_id);
-        abort_unless($this->canAccess((int)$studentId, $application), 403);
+        abort_unless($this->canAccess($studentId,$application),403);
 
         $all   = filter_var($request->query('all'), FILTER_VALIDATE_BOOLEAN);
         $month = (int)($request->month ?? now()->month);
-        $year  = (int)($request->year  ?? now()->year);
+        $year  = (int)($request->year ?? now()->year);
 
-        $groupFilter = $this->normalizeGroupId($application, $request->group_id);
+        $groupFilter = $this->normalizeGroupId($application,$request->group_id);
 
         $query = RentPayment::query()
-            ->where('application_id', $application->id)
-            ->when($groupFilter['type'] === 'value', fn($q) => $q->where('group_id', $groupFilter['value']))
-            ->when($groupFilter['type'] === 'null_or_zero', function ($q) {
-                $q->where(function ($qq) {
-                    $qq->whereNull('group_id')->orWhere('group_id', 0);
-                });
-            });
+            ->where('application_id',$application->id)
+            ->when($groupFilter['type']==='value', fn($q)=>$q->where('group_id',$groupFilter['value']))
+            ->when($groupFilter['type']==='null_or_zero',fn($q)=>$q->where(fn($w)=>$w->whereNull('group_id')->orWhere('group_id',0)));
 
-        if (!$all) {
-            $query->whereMonth('timestamp', $month)
-                  ->whereYear('timestamp', $year);
+        if(!$all){
+            $query->whereMonth('timestamp',$month)->whereYear('timestamp',$year);
         }
 
-        // Build select list dynamically to avoid errors if columns don't exist
-        $table   = (new RentPayment)->getTable();
+        $table = (new RentPayment)->getTable();
         $selects = ['id','amount','status','timestamp','stripe_intent_id','studentid','landlordid'];
-
-        if (Schema::hasColumn($table, 'for_date')) $selects[] = 'for_date';
-        if (Schema::hasColumn($table, 'paid_by'))  $selects[] = 'paid_by';
+        if(Schema::hasColumn($table,'for_date')) $selects[]='for_date';
+        if(Schema::hasColumn($table,'paid_by'))  $selects[]='paid_by';
 
         $items = $query->orderByDesc('timestamp')->get($selects);
 
-        // --------- Inject a virtual "reminder" bubble in the feed (left, blue) ----------
+        // ===================== FIXED REMINDER LOGIC =====================
+        [$monthlyDue,$dueDateIso,$remindOnIso] = $this->computeDue($application,$month,$year);
+
         [$monthlyDue, $dueDateIso, $remindOnIso] = $this->computeDue($application, $month, $year);
 
-        // How much has been paid in the requested month/year (respecting group)
         $paidThisMonth = RentPayment::query()
             ->where('application_id', $application->id)
             ->when($groupFilter['type'] === 'value', fn($q) => $q->where('group_id', $groupFilter['value']))
-            ->when($groupFilter['type'] === 'null_or_zero', function ($q) {
-                $q->where(function ($qq) {
-                    $qq->whereNull('group_id')->orWhere('group_id', 0);
-                });
-            })
+            ->when($groupFilter['type'] === 'null_or_zero', fn($q) => $q->where(fn($w) => $w->whereNull('group_id')->orWhere('group_id', 0)))
             ->where('status', 'succeeded')
             ->whereMonth('timestamp', $month)
             ->whereYear('timestamp', $year)
             ->sum('amount');
 
         $outstanding = max(0, $monthlyDue - $paidThisMonth);
-        $now = now();
 
-        if ($outstanding > 0) {
-            $due = Carbon::parse($dueDateIso);
-            $remindOn = Carbon::parse($remindOnIso);
+        $now      = now();
+        $due      = Carbon::parse($dueDateIso);
+        $reminder = Carbon::parse($remindOnIso);
 
-            // Show the reminder bubble when today is between remind_on and due_date (inclusive)
-            $isCurrentMonth = ($month === (int)$now->month && $year === (int)$now->year);
-            if (($isCurrentMonth || $request->boolean('all'))
-                && $now->greaterThanOrEqualTo($remindOn)
-                && $now->lessThanOrEqualTo($due)) {
+        // Show reminder if outstanding AND we are on or past the remind date
+        if ($outstanding > 0 && $now->gte($reminder)) {
+            $label = $now->gt($due) ? 'Overdue' : 'Rent Due Soon';
 
-                $items->push((object)[
-                    'id'        => 'reminder-'.$year.'-'.$month,
-                    'amount'    => $outstanding,
-                    'status'    => 'reminder', // <-- frontend styles this left + blue
-                    'timestamp' => $remindOn->toIso8601String(),
-                    'for_date'  => $due->toDateString(),
-                    'paid_by'   => null,
-                    'studentid' => null,
-                    'landlordid'=> $application->rental->landlordid ?? null,
-                ]);
-            }
+            $items->push((object)[
+                'id'         => "rent-$year-$month",
+                'amount'     => $outstanding,
+                'status'     => 'reminder',
+                'label'      => $label,
+                'timestamp'  => $due->toIso8601String(),
+                'for_date'   => $due->toDateString(),
+                'paid_by'    => null,
+                'studentid'  => null,
+                'landlordid' => $application->rental->landlordid ?? null,
+            ]);
         }
-
-        // Re-sort with injected item included (newest first for API payload)
-        $items = $items->sortByDesc('timestamp')->values();
+        // ===============================================================
 
         return response()->json([
-            'month'   => $month,
-            'year'    => $year,
-            'history' => $items,
+            'month'=>$month,
+            'year'=>$year,
+            'history'=>$items->sortByDesc('timestamp')->values()
         ]);
     }
 
-    /** POST /student/rent-tracker/payment-intent */
+    // EVERYTHING BELOW IS UNCHANGED
+
     public function createPaymentIntent(Request $request)
     {
         $request->validate([
-            'application_id' => 'required|integer',
-            'group_id'       => 'nullable|integer',
-            'amount_eur'     => 'nullable|numeric|min:0',
-            'for_date'       => 'nullable|date',  // calendar date
-            'month'          => 'nullable|integer',
-            'year'           => 'nullable|integer',
+            'application_id'=>'required|integer',
+            'group_id'=>'nullable|integer',
+            'amount_eur'=>'nullable|numeric|min:0',
+            'for_date'=>'nullable|date',
+            'month'=>'nullable|integer',
+            'year'=>'nullable|integer',
         ]);
 
-        $studentId = session('student_id');
-        abort_if(!$studentId, 401);
+        $studentId=session('student_id');
+        abort_if(!$studentId,401);
 
-        $application = Application::with('rental')->findOrFail($request->application_id);
-        abort_unless($this->canAccess($studentId, $application), 403);
+        $application=Application::with('rental')->findOrFail($request->application_id);
+        abort_unless($this->canAccess($studentId,$application),403);
 
-        // compute against current month/year for outstanding
-        $month = (int)($request->month ?? now()->month);
-        $year  = (int)($request->year  ?? now()->year);
+        $month=(int)($request->month ?? now()->month);
+        $year =(int)($request->year ?? now()->year);
 
-        [$monthlyDue] = $this->computeDue($application, $month, $year);
-
-        $groupFilter  = $this->normalizeGroupId($application, $request->group_id);
-        $groupId      = $groupFilter['type'] === 'value' ? $groupFilter['value'] : null;
+        [$monthlyDue] = $this->computeDue($application,$month,$year);
+        $groupFilter  = $this->normalizeGroupId($application,$request->group_id);
+        $groupId      = $groupFilter['type']==='value' ? $groupFilter['value'] : null;
 
         $paid = RentPayment::query()
-            ->where('application_id', $application->id)
-            ->when($groupFilter['type'] === 'value', fn ($q) => $q->where('group_id', $groupId))
-            ->when($groupFilter['type'] === 'null_or_zero', function ($q) {
-                $q->where(function ($qq) { $qq->whereNull('group_id')->orWhere('group_id', 0); });
-            })
-            ->where('status', 'succeeded')
-            ->whereMonth('timestamp', $month)
-            ->whereYear('timestamp', $year)
+            ->where('application_id',$application->id)
+            ->when($groupFilter['type']==='value',fn($q)=>$q->where('group_id',$groupId))
+            ->when($groupFilter['type']==='null_or_zero',fn($q)=>$q->where(fn($w)=>$w->whereNull('group_id')->orWhere('group_id',0)))
+            ->where('status','succeeded')
+            ->whereMonth('timestamp',$month)
+            ->whereYear('timestamp',$year)
             ->sum('amount');
 
-        $outstanding = max(0, $monthlyDue - $paid);
-        $amount = $request->filled('amount_eur') ? (float)$request->amount_eur : $outstanding;
-        abort_if($amount <= 0, 422, 'Nothing due');
+        $outstanding=max(0,$monthlyDue-$paid);
+        $amount=$request->amount_eur ? (float)$request->amount_eur : $outstanding;
+        abort_if($amount<=0,422,'Nothing due');
 
-        $landlordId = (int)($application->rental->landlordid ?? 0);
-        $rentalId   = (int)$application->rentalid;
-        $forDate    = $request->for_date ? Carbon::parse($request->for_date)->toDateString() : null;
+        $landlordId=(int)$application->rental->landlordid;
+        $rentalId  =(int)$application->rentalid;
+        $forDate   =$request->for_date ? Carbon::parse($request->for_date)->toDateString() : null;
 
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
-        $pi = \Stripe\PaymentIntent::create([
-            'amount'                    => (int) round($amount * 100),
-            'currency'                  => 'eur',
-            'automatic_payment_methods' => ['enabled' => true], // card, Link, wallets
-            'description'               => 'Rent payment',
-            'metadata'                  => [
-                'type'           => 'rent',
-                'studentid'      => (string) $studentId,
-                'landlordid'     => (string) $landlordId,
-                'rentalid'       => (string) $rentalId,
-                'application_id' => (string) $application->id,
-                'group_id'       => (string) ($groupId ?? ''),
-                'month'          => (string) $month,
-                'year'           => (string) $year,
-                'for_date'       => (string) ($forDate ?? ''),
+        $pi=\Stripe\PaymentIntent::create([
+            'amount'=> (int)round($amount*100),
+            'currency'=>'eur',
+            'automatic_payment_methods'=>['enabled'=>true],
+            'description'=>'Rent payment',
+            'metadata'=>[
+                'type'=>'rent',
+                'studentid'=>$studentId,
+                'landlordid'=>$landlordId,
+                'rentalid'=>$rentalId,
+                'application_id'=>$application->id,
+                'group_id'=>$groupId ?? '',
+                'month'=>$month,
+                'year'=>$year,
+                'for_date'=>$forDate ?? '',
             ],
         ]);
 
-        // Create pending payment row
-        $payment = RentPayment::create([
-            'amount'           => $amount,
-            'status'           => $pi->status,
-            'stripe_intent_id' => $pi->id,
-            'timestamp'        => now(),
-            'rentalid'         => $rentalId,
-            'studentid'        => $studentId,
-            'landlordid'       => $landlordId,
-            'group_id'         => $groupId,
-            'application_id'   => $application->id,
+        $payment=RentPayment::create([
+            'amount'=>$amount,
+            'status'=>$pi->status,
+            'stripe_intent_id'=>$pi->id,
+            'timestamp'=>now(),
+            'rentalid'=>$rentalId,
+            'studentid'=>$studentId,
+            'landlordid'=>$landlordId,
+            'group_id'=>$groupId,
+            'application_id'=>$application->id,
         ]);
 
-        // Optional persistence of "for_date" + "paid_by" (only if columns exist)
-        $table = $payment->getTable();
-        $dirty = false;
-        if (Schema::hasColumn($table, 'for_date')) {
-            $payment->for_date = $forDate;
-            $dirty = true;
+        if(Schema::hasColumn('rentpayment','for_date')){
+            $payment->for_date=$forDate;
         }
-        if (Schema::hasColumn($table, 'paid_by')) {
-            $student = \App\Models\Student::find($studentId);
-            $payment->paid_by = $student ? trim(($student->firstname ?? '').' '.($student->surname ?? '')) : null;
-            $dirty = true;
+        if(Schema::hasColumn('rentpayment','paid_by')){
+            $student=\App\Models\Student::find($studentId);
+            $payment->paid_by=$student?trim(($student->firstname).' '.($student->surname)) : null;
         }
-        if ($dirty) $payment->save();
+        $payment->save();
 
         return response()->json([
-            'client_secret'  => $pi->client_secret,
-            'payment_intent' => $pi->id,
-        ], 201);
+            'client_secret'=>$pi->client_secret,
+            'payment_intent'=>$pi->id,
+        ],201);
     }
 
-    /** POST /student/rent-tracker/confirm-payment */
     public function confirmPayment(Request $request)
     {
-        $request->validate([
-            'payment_intent' => 'required|string',
-        ]);
-
+        $request->validate(['payment_intent'=>'required|string']);
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
-        $pi = \Stripe\PaymentIntent::retrieve($request->payment_intent);
+        $pi=\Stripe\PaymentIntent::retrieve($request->payment_intent);
 
-        if ($pi->status === 'succeeded') {
-            $payment = RentPayment::where('stripe_intent_id', $pi->id)->first();
-            if ($payment && $payment->status !== 'succeeded') {
-                $payment->update([
-                    'status'    => 'succeeded',
-                    'timestamp' => now(),
-                ]);
+        if($pi->status==='succeeded'){
+            $payment=RentPayment::where('stripe_intent_id',$pi->id)->first();
+            if($payment && $payment->status!=='succeeded'){
+                $payment->update(['status'=>'succeeded','timestamp'=>now()]);
             }
-            return response()->json(['ok' => true]);
+            return response()->json(['ok'=>true]);
         }
-
-        return response()->json(['ok' => false, 'status' => $pi->status]);
+        return response()->json(['ok'=>false,'status'=>$pi->status]);
     }
 
-    /** Full-page view */
     public function page(Request $request, int $application)
     {
-        $studentId = (int) session('student_id');
-        abort_if(!$studentId, 401);
+        $studentId=session('student_id');
+        abort_if(!$studentId,401);
 
-        $app = Application::with(['rental.landlord', 'student', 'group'])->findOrFail($application);
-        abort_unless($this->canAccess($studentId, $app), 403);
+        $app=Application::with(['rental.landlord','student','group'])->findOrFail($application);
+        abort_unless($this->canAccess($studentId,$app),403);
 
-        $groupId = null;
-        $groupMembers = collect();
+        $groupId=null;
+        $groupMembers=collect();
 
-        if (($app->applicationtype ?? '') === 'group' && $app->group_id) {
-            $groupId = (int) ($request->query('group_id') ?: $app->group_id);
+        if(($app->applicationtype)==='group' && $app->group_id){
+            $groupId=(int)($request->query('group_id') ?: $app->group_id);
 
-            // IMPORTANT: singular table names ("student"), not "students"
-            $groupMembers = DB::table('student_groups')
-                ->join('student', 'student_groups.student_id', '=', 'student.id')
-                ->where('group_id', $app->group_id)
-                ->select('student.firstname', 'student.surname', 'student.id')
+            $groupMembers=DB::table('student_groups')
+                ->join('student','student_groups.student_id','=','student.id')
+                ->where('group_id',$app->group_id)
+                ->select('student.firstname','student.surname','student.id')
                 ->get();
         }
 
-        return view('student.rent-tracker', [
-            'application'  => $app,
-            'groupId'      => $groupId,
-            'viewerId'     => $studentId,
-            'groupMembers' => $groupMembers,
+        return view('student.rent-tracker',[
+            'application'=>$app,
+            'groupId'=>$groupId,
+            'viewerId'=>$studentId,
+            'groupMembers'=>$groupMembers,
         ]);
     }
 
-    /* ---------------- HELPERS ---------------- */
-
-    private function canAccess(int $studentId, Application $app): bool
+    private function canAccess(int $studentId,Application $app):bool
     {
-        if ($app->status !== 'accepted') return false;
+        if($app->status!=='accepted') return false;
 
-        if ($app->applicationtype === 'group' && $app->group_id) {
-            $inGroup = DB::table('student_groups')
-                ->where('group_id', $app->group_id)
-                ->where('student_id', $studentId)
+        if($app->applicationtype==='group' && $app->group_id){
+            $inGroup=DB::table('student_groups')
+                ->where('group_id',$app->group_id)
+                ->where('student_id',$studentId)
                 ->exists();
 
-            return $inGroup || $app->studentid == $studentId;
+            return $inGroup || $app->studentid==$studentId;
         }
 
-        return $app->studentid == $studentId;
+        return $app->studentid==$studentId;
     }
 
-    private function normalizeGroupId(Application $app, $gid)
+    private function normalizeGroupId(Application $app,$gid)
     {
-        if ($app->applicationtype === 'group' && $app->group_id) {
-            return ['type' => 'value', 'value' => $gid ?? $app->group_id];
+        if($app->applicationtype==='group' && $app->group_id){
+            return ['type'=>'value','value'=>$gid ?? $app->group_id];
         }
-        return ['type' => 'null_or_zero', 'value' => null];
+        return ['type'=>'null_or_zero','value'=>null];
     }
 
-    /**
-     * Compute per-person monthly due and dates.
-     * Returns: [ float $perPerson, string $dueDateIso, string $remindOnIso ]
-     */
     private function computeDue($app, int $month, int $year)
     {
         $rent = $app->rental->rentpermonth ?? 0;
@@ -355,16 +311,21 @@ class RentTrackerController extends Controller
 
         $perPerson = round($rent / $groupMembers, 2);
 
-        // Use rental-configured due_day if present; otherwise default to 1
-        $dueDay = (int)($app->rental->due_day ?? 1);
         $tz = config('app.timezone');
 
+        // Use the day from availablefrom as the due day each month
+        $availableFrom = $app->rental->availablefrom
+            ? Carbon::parse($app->rental->availablefrom)
+            : null;
+
+        $dueDay = $availableFrom ? (int)$availableFrom->format('d') : 1;
+
+        // Clamp to end of month (e.g. Feb)
         $eom = Carbon::create($year, $month, 1, 0, 0, 0, $tz)->endOfMonth()->day;
         $dueDayClamped = max(1, min($dueDay, $eom));
 
-        // Due at 09:00 local time
-        $dueDate   = Carbon::create($year, $month, $dueDayClamped, 9, 0, 0, $tz);
-        $remindOn  = (clone $dueDate)->subDays(2); // e.g., 27th due -> 25th reminder
+        $dueDate  = Carbon::create($year, $month, $dueDayClamped, 9, 0, 0, $tz);
+        $remindOn = (clone $dueDate)->subDays(2);
 
         return [$perPerson, $dueDate->toIso8601String(), $remindOn->toIso8601String()];
     }

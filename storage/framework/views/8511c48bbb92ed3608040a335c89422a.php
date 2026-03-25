@@ -8,13 +8,17 @@
 <?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+
     
      <?php $__env->slot('header', null, []); ?> 
         <div class="border-b border-slate-200 px-6 py-4 bg-white">
             <div class="flex items-center gap-4">
-                <a href="<?php echo e(route('student.messages.show', $application->id)); ?>" class="text-slate-500 hover:text-slate-700 text-xl">←</a>
+                <a href="<?php echo e(route('student.messages.show', $application->id)); ?>" 
+                   class="text-slate-500 hover:text-slate-700 text-xl">←</a>
 
-                <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-lg font-semibold">
+                <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center 
+                            text-slate-500 text-lg font-semibold">
                     <?php echo e(strtoupper(substr($application->rental->landlord->firstname ?? 'L', 0, 1))); ?>
 
                 </div>
@@ -26,6 +30,7 @@
                         <?php echo e($application->rental->landlord->surname ?? ''); ?>
 
                     </h3>
+
                     <p class="text-sm text-slate-500 truncate">
                         <?php echo e($application->rental->housenumber ?? ''); ?>
 
@@ -33,13 +38,6 @@
                         <?php echo e($application->rental->county ?? ''); ?>
 
                     </p>
-
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(($application->applicationtype ?? '') === 'group' && isset($groupMembers) && $groupMembers->count()): ?>
-                        <p class="text-xs text-slate-400 mt-1">
-                            Group members: <?php echo e($groupMembers->pluck('firstname')->implode(', ')); ?>
-
-                        </p>
-                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
             </div>
         </div>
@@ -54,76 +52,37 @@
                 <div class="px-6 py-3 bg-white border-b border-slate-200">
                     <div class="flex items-center gap-2">
                         <div id="rt-summary" class="text-sm text-slate-700 truncate"></div>
-                        <button id="rt-all" class="ml-auto text-xs px-2 py-1 rounded border hover:bg-slate-50">
+                        <button id="rt-all" 
+                                class="ml-auto text-xs px-2 py-1 rounded border hover:bg-slate-50">
                             All
                         </button>
                     </div>
                 </div>
 
                 
-                <div id="rt-feed" class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
-                    
+                <div id="rt-feed" 
+                     class="bg-slate-50 px-6 py-6 overflow-y-auto space-y-4"
+                     style="min-height: 200px; max-height: calc(100vh - 280px);">
                 </div>
 
                 
                 <div class="border-t border-slate-200 bg-white px-6 py-4">
                     <div class="flex items-end gap-3 flex-wrap">
-                        <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div class="flex items-center gap-2">
-                                <label for="rt-date" class="text-sm font-medium text-slate-700 shrink-0">
-                                    Rent payment for:
-                                </label>
-                                <input id="rt-date" type="date"
-                                       class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-400 focus:ring focus:ring-blue-100">
-                            </div>
-                            <input id="rt-amount" type="number" step="0.01" min="0"
-                                   class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-400 focus:ring focus:ring-blue-100"
-                                   placeholder="Amount (€)">
-                        </div>
+
+                        <input id="rt-date" type="date"
+                               class="rounded-2xl border border-slate-300 px-4 py-3 text-sm">
+
+                        <input id="rt-amount" type="number" step="0.01"
+                               class="rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+                               placeholder="Amount (€)">
 
                         <button id="rt-pay"
-                                class="rounded-2xl bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700">
-                            Pay with Stripe
+                                class="rounded-2xl bg-blue-600 px-5 py-3 text-sm text-white">
+                            Pay
                         </button>
                     </div>
                 </div>
 
-            </div>
-        </div>
-    </div>
-
-    
-    <div id="rt-payment-modal" class="hidden fixed inset-0 z-50">
-        <div class="absolute inset-0 bg-black/40" id="rt-payment-backdrop"></div>
-
-        <div class="absolute bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl sm:rounded-2xl sm:inset-auto sm:m-auto sm:w-full sm:max-w-md sm:shadow-xl">
-            <div class="flex items-start justify-between">
-                <h4 class="text-base font-semibold text-slate-900">Confirm your payment</h4>
-                <button id="rt-close" class="text-slate-500 hover:text-slate-700 text-xl leading-none">×</button>
-            </div>
-
-            
-            <div class="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <div class="flex items-center justify-between text-sm">
-                    <span class="text-slate-600">Rent for</span>
-                    <span id="rt-summary-date" class="font-medium text-slate-900"></span>
-                </div>
-                <div class="mt-1 flex items-center justify-between text-sm">
-                    <span class="text-slate-600">Amount</span>
-                    <span id="rt-summary-amount" class="font-medium text-slate-900"></span>
-                </div>
-            </div>
-
-            
-            <div class="mt-4">
-                <div id="rt-payment-element" class="py-2"></div>
-            </div>
-
-            <div class="mt-4 flex items-center justify-end gap-2">
-                <button id="rt-cancel" class="px-4 py-2 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
-                <button id="rt-confirm" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50" disabled>
-                    Pay
-                </button>
             </div>
         </div>
     </div>
@@ -131,339 +90,162 @@
     
     <script src="https://js.stripe.com/v3"></script>
 
-    
-    <script>
-    // ================== CONSTANTS ==================
-    const STRIPE_PUBLIC_KEY = <?php echo json_encode(config('services.stripe.public_key'), 15, 512) ?>;
-    const stripe = Stripe(STRIPE_PUBLIC_KEY);
+<script>
+const APP_ID = <?php echo json_encode($application->id, 15, 512) ?>;
+const GROUP_ID = <?php echo json_encode($groupId, 15, 512) ?>;
+const VIEWER_ID = <?php echo json_encode($viewerId, 15, 512) ?>;
+const VIEWER_NAME = <?php echo json_encode(optional(\App\Models\Student::find($viewerId))->firstname ?? 'You', 15, 512) ?>;
 
-    const APP_ID      = <?php echo json_encode($application->id, 15, 512) ?>;
-    const GROUP_ID    = <?php echo json_encode($groupId, 15, 512) ?>;
-    const VIEWER_ID   = <?php echo json_encode($viewerId, 15, 512) ?>;
-    const VIEWER_NAME = <?php echo json_encode(optional(\App\Models\Student::find($viewerId))->firstname ?? 'You', 15, 512) ?>;
+const feedEl = document.getElementById('rt-feed');
+const summaryEl = document.getElementById('rt-summary');
+const amountIn = document.getElementById('rt-amount');
+const payBtn = document.getElementById('rt-pay');
 
-    // ================== ELEMENTS ==================
-    const dateInp   = document.getElementById('rt-date');
-    const allBtn    = document.getElementById('rt-all');
-    const summaryEl = document.getElementById('rt-summary');
-    const feedEl    = document.getElementById('rt-feed');
-    const amountIn  = document.getElementById('rt-amount');
-    const payBtn    = document.getElementById('rt-pay');
+const OVERDUE_BG = 'bg-red-600 text-white';
+const SELF_BG = 'bg-blue-600 text-white';
+const OTHER_BG = 'bg-white text-slate-800 border border-slate-200';
+const REMINDER_BG = 'bg-blue-600 text-white';
 
-    // Payment modal elements
-    const modal         = document.getElementById('rt-payment-modal');
-    const modalClose    = document.getElementById('rt-close');
-    const modalCancel   = document.getElementById('rt-cancel');
-    const modalBackdrop = document.getElementById('rt-payment-backdrop');
-    const summaryDate   = document.getElementById('rt-summary-date');
-    const summaryAmount = document.getElementById('rt-summary-amount');
-    const confirmBtn    = document.getElementById('rt-confirm');
+let RT = { balance:null, history:[] };
 
-    // ================== STATE ==================
-    const RT = {
-      applicationId: APP_ID,
-      groupId: GROUP_ID ?? null,
-      balance: null,
-      history: [],
-    };
+async function refreshBalance(){
+    const res = await fetch(`/student/rent-tracker/balance?application_id=${APP_ID}`);
+    RT.balance = await res.json();
+    summaryEl.textContent = `Due €${RT.balance.monthly_due} • Paid €${RT.balance.paid} • Outstanding €${RT.balance.outstanding}`;
+}
 
-    // ================== LOOK & FEEL (bubbles) ==================
-    const BUBBLE_RADIUS = 'rounded-lg'; // 'rounded-md' for squarer, 'rounded-2xl' for pill
-    const SELF_BG       = 'bg-blue-600 text-white';
-    const OTHER_BG      = 'bg-white text-slate-800 border border-slate-200';
-    const REMINDER_BG   = 'bg-blue-600 text-white'; // left + blue
+async function refreshFeed(){
+    const res = await fetch(`/student/rent-tracker/history?application_id=${APP_ID}&all=1`);
+    const data = await res.json();
+    console.log('HISTORY DATA:', data);
+    RT.history = data.history;
+    renderFeed(RT.history);
+}
 
-    let userScrolledUp = false;
-    feedEl?.addEventListener('scroll', () => {
-      const stickThreshold = 60;
-      const atBottom = (feedEl.scrollHeight - feedEl.clientHeight - feedEl.scrollTop) < stickThreshold;
-      userScrolledUp = !atBottom;
-    });
-    function scrollToBottom(force = false) {
-      if (!feedEl) return;
-      if (!userScrolledUp || force) feedEl.scrollTop = feedEl.scrollHeight;
-    }
+function renderFeed(items){
+    feedEl.innerHTML = '';
+    items.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
 
-    // ================== BOOT ==================
-    async function boot() {
-      await refreshBalance();
-      setDefaultDateFromBalance();
-      await refreshFeed(true);
-      wireHandlers();
-      scrollToBottom(true);
-    }
-
-    function wireHandlers() {
-      allBtn?.addEventListener('click', () => refreshFeed(true));
-      payBtn?.addEventListener('click', onPayClick);
-      modalClose?.addEventListener('click', closeModal);
-      modalCancel?.addEventListener('click', closeModal);
-      modalBackdrop?.addEventListener('click', closeModal);
-    }
-
-    function setDefaultDateFromBalance() {
-      const dueIso = RT.balance?.due_date_iso;
-      const d = dueIso ? new Date(dueIso) : new Date();
-      const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
-      dateInp.value = `${y}-${m}-${day}`;
-    }
-
-    // ================== FETCHERS ==================
-    async function refreshBalance() {
-      const params = new URLSearchParams({ application_id: RT.applicationId });
-      if (RT.groupId !== null) params.set('group_id', RT.groupId);
-
-      const now = new Date();
-      params.set('month', now.getMonth()+1);
-      params.set('year',  now.getFullYear());
-
-      const res = await fetch(`/student/rent-tracker/balance?${params.toString()}`);
-      RT.balance = await res.json();
-      summaryEl.textContent = `Due: €${RT.balance.monthly_due} • Paid: €${RT.balance.paid} • Outstanding: €${RT.balance.outstanding}`;
-    }
-
-    async function refreshFeed(all = false) {
-      const params = new URLSearchParams({ application_id: RT.applicationId });
-      if (RT.groupId !== null) params.set('group_id', RT.groupId);
-      if (all) params.set('all', '1');
-
-      const res = await fetch(`/student/rent-tracker/history?${params.toString()}`);
-      const data = await res.json();
-      RT.history = Array.isArray(data.history) ? data.history : [];
-      renderFeed(RT.history);
-    }
-
-    // ================== AIRBNB-LIKE PAYMENT FLOW ==================
-    let elements = null;
-    let lastPI   = null; // { client_secret, payment_intent }
-    let payAmt   = null;
-    let payDate  = null;
-
-    async function onPayClick() {
-      const outstanding = parseFloat((RT?.balance?.outstanding) || '0');
-      const amt = amountIn?.value ? parseFloat(amountIn.value) : outstanding;
-
-      if (!amt || amt <= 0) { alert('Enter a valid amount'); return; }
-
-      payAmt  = Math.round(amt * 100) / 100; // 2dp
-      payDate = dateInp?.value || null;
-
-      // 1) Create PaymentIntent
-      const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-      const body = { application_id: RT.applicationId, amount_eur: payAmt, for_date: payDate };
-      if (RT.groupId !== null) body.group_id = RT.groupId;
-
-      const createRes = await fetch('/student/rent-tracker/payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(csrf ? {'X-CSRF-TOKEN': csrf} : {}) },
-        body: JSON.stringify(body)
-      });
-
-      const createJson = await createRes.json();
-      if (!createRes.ok) {
-        console.error('PI create failed', createJson);
-        alert(createJson.message || 'Unable to create payment');
-        return;
-      }
-
-      lastPI = { client_secret: createJson.client_secret, payment_intent: createJson.payment_intent };
-
-      // 2) Mount Payment Element inside the card
-      mountPaymentElement(lastPI.client_secret);
-
-      // 3) Open modal and render summary
-      summaryDate.textContent   = payDate ? formatDayMonth(new Date(payDate)) : '—';
-      summaryAmount.textContent = `€${payAmt.toFixed(2)}`;
-      confirmBtn.textContent    = `Pay €${payAmt.toFixed(2)}`;
-      confirmBtn.disabled       = false;
-      confirmBtn.onclick        = confirmPaymentElement;
-
-      openModal();
-    }
-
-    function mountPaymentElement(clientSecret) {
-      if (!clientSecret) { alert('Missing client secret'); return; }
-      try { elements?.unmount?.('#rt-payment-element'); } catch (e) {}
-
-      const appearance = {
-        theme: 'stripe',
-        variables: { colorPrimary: '#2563eb', colorText: '#0f172a', fontFamily: 'Inter, system-ui, sans-serif' }
-      };
-
-      elements = stripe.elements({ clientSecret, appearance });
-      const paymentElement = elements.create('payment', { layout: 'tabs' }); // Airbnb-like tabs UI
-      paymentElement.mount('#rt-payment-element');
-    }
-
-    async function confirmPaymentElement() {
-      confirmBtn.disabled = true;
-      confirmBtn.textContent = 'Processing...';
-
-      const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: { return_url: window.location.href },
-        redirect: 'if_required' // stay inline unless SCA/redirect is needed
-      });
-
-      if (error) {
-        console.error('Stripe confirm error', error);
-        alert(error.message || 'Payment failed');
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = `Pay €${payAmt.toFixed(2)}`;
-        return;
-      }
-
-      // 4) Server confirm + UI refresh
-      await afterConfirmed(lastPI.payment_intent, payDate, payAmt);
-      closeModal();
-    }
-
-    async function afterConfirmed(piId, forDate, amount) {
-      try {
-        const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-        const res  = await fetch('/student/rent-tracker/confirm-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...(csrf ? {'X-CSRF-TOKEN': csrf} : {}) },
-          body: JSON.stringify({ payment_intent: piId })
-        });
-        const data = await res.json();
-
-        if (res.ok && data.ok) {
-          // Optional optimistic right-side bubble
-          prependMyPaymentBubble(amount, forDate);
-          await refreshBalance();
-          await refreshFeed(true);
-          scrollToBottom(true);
-        } else {
-          console.warn('confirmPayment not ok', data);
-        }
-      } catch (e) {
-        console.error('afterConfirmed exception', e);
-      }
-    }
-
-    function openModal(){ modal.classList.remove('hidden'); }
-    function closeModal(){
-      modal.classList.add('hidden');
-      try { elements?.unmount?.('#rt-payment-element'); } catch (e) {}
-      confirmBtn.disabled = true;
-      confirmBtn.textContent = 'Pay';
-    }
-
-    // ================== FEED RENDERING ==================
-    function renderFeed(items) {
-      feedEl.innerHTML = '';
-      items.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp)); // oldest -> newest
-
-      let lastDate = '';
-      for (const it of items) {
-        const d   = new Date(it.timestamp);
-        const day = daySeparatorLabel(d);
-
-        if (day !== lastDate) {
-          feedEl.appendChild(separatorEl(day));
-          lastDate = day;
-        }
-
+    items.forEach(it=>{
         const status = (it.status || '').toLowerCase();
         const isReminder = status === 'reminder';
-        const isMine = it.studentid && Number(it.studentid) === Number(VIEWER_ID);
-        const variant = isReminder ? 'reminder' : (isMine ? 'self' : 'other');
 
-        const amountValue = `€${Number(it.amount).toFixed(2)}`;
-        const whoName = it.paid_by || (isMine ? VIEWER_NAME : 'Student');
-        const whoText = isReminder ? 'Rent reminder' : `Paid by ${whoName}`;
-        const forText = it.for_date ? `For ${formatDayMonth(new Date(it.for_date))}` : '';
-        const time    = formatTime(d);
+        if (isReminder) {
+            // Left-side reminder bubble
+            const outer = document.createElement('div');
+            outer.className = 'flex justify-start';
+            const bubble = document.createElement('div');
+            const isOverdue = (it.label || '').toLowerCase().includes('overdue');
+            bubble.className = `max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm ${isOverdue ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'}`;
+            bubble.innerHTML = `
+                <div class="text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">${it.label || 'Rent Reminder'}</div>
+                <div class="text-base font-semibold">€${Number(it.amount).toFixed(2)}</div>
+                <div class="text-xs opacity-75 mt-1">Due ${new Date(it.timestamp).toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'})}</div>
+            `;
+            outer.appendChild(bubble);
+            feedEl.appendChild(outer);
+        } else {
+            // Payment bubble — right if viewer's payment, left if someone else's
+            const fromViewer = it.studentid && Number(it.studentid) === Number(VIEWER_ID);
+            const outer = document.createElement('div');
+            outer.className = fromViewer ? 'flex justify-end' : 'flex justify-start';
+            const bubble = document.createElement('div');
+            bubble.className = `max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm ${fromViewer ? 'bg-blue-600 text-white' : 'bg-white text-slate-800 border border-slate-200'}`;
+            const paidBy = it.paid_by || (fromViewer ? VIEWER_NAME : 'Housemate');
+            bubble.innerHTML = `
+                <div class="text-base font-semibold">€${Number(it.amount).toFixed(2)}</div>
+                <div class="text-xs opacity-75">Paid by ${paidBy}</div>
+                <div class="text-[11px] opacity-60 mt-1">${new Date(it.timestamp).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}</div>
+            `;
+            outer.appendChild(bubble);
+            feedEl.appendChild(outer);
+        }
+    });
 
-        feedEl.appendChild(bubbleEl({ variant, amountValue, whoText, forText, time }));
-      }
+    if(!items.length){
+        feedEl.innerHTML = '<div class="text-sm text-slate-500 text-center py-6">No payments yet.</div>';
+    }
+}
 
-      if (!items.length) feedEl.appendChild(emptyEl('No payments yet.'));
-      scrollToBottom(false);
+function bubbleEl({variant, amountValue, whoText, time, label}){
+    const outer = document.createElement('div');
+    outer.className = 'flex justify-start';
+
+    const bubble = document.createElement('div');
+
+    let palette = OTHER_BG;
+
+    if (variant === 'reminder'){
+        if ((whoText || '').toLowerCase().includes('overdue')){
+            palette = OVERDUE_BG;
+        } else {
+            palette = REMINDER_BG;
+        }
     }
 
-    function separatorEl(label) {
-      const wrap = document.createElement('div');
-      wrap.className = 'flex justify-center my-4';
-      wrap.dataset.sep = label;
-      wrap.innerHTML = `<span class="px-4 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">${label}</span>`;
-      return wrap;
+    bubble.className = `max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm ${palette}`;
+
+    bubble.innerHTML = `
+        <div class="text-base font-semibold">${amountValue}</div>
+        <div class="text-xs">${label || whoText}</div>
+        <div class="text-[11px] opacity-70">${time}</div>
+    `;
+
+    outer.appendChild(bubble);
+    return outer;
+}
+
+payBtn.addEventListener('click', async () => {
+    const amount = parseFloat(amountIn.value || 0);
+    if (!amount || amount <= 0) { alert('Enter an amount'); return; }
+
+    try {
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+        // 1) Create payment intent
+        const res = await fetch('/student/rent-tracker/payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+            body: JSON.stringify({ application_id: APP_ID, amount_eur: amount, group_id: GROUP_ID })
+        });
+        const json = await res.json();
+        if (!res.ok) { alert(json.message || 'Could not start payment'); return; }
+
+        // 2) Launch Stripe — redirects away and back
+        const stripe = Stripe(<?php echo json_encode(config('services.stripe.public_key'), 15, 512) ?>);
+        const { error } = await stripe.confirmPayment({
+            clientSecret: json.client_secret,
+            confirmParams: { return_url: window.location.href }
+        });
+
+        if (error) { alert(error.message || 'Payment failed'); }
+
+    } catch(e) {
+        console.error(e);
+        alert('Something went wrong.');
+    }
+});
+
+async function boot() {
+    // Handle Stripe redirect return
+    const params = new URLSearchParams(window.location.search);
+    const piId = params.get('payment_intent');
+    if (piId) {
+        window.history.replaceState({}, '', window.location.pathname);
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+        await fetch('/student/rent-tracker/confirm-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+            body: JSON.stringify({ payment_intent: piId })
+        });
     }
 
-    function bubbleEl({ variant, amountValue, whoText, forText, time }) {
-      const sideRight = (variant === 'self');
-      const outer = document.createElement('div');
-      outer.className = sideRight ? 'flex justify-end' : 'flex justify-start';
+    await refreshBalance();
+    await refreshFeed();
+}
 
-      const bubble = document.createElement('div');
-      const base   = `max-w-[75%] ${BUBBLE_RADIUS} px-4 py-3 text-sm shadow-sm`;
-      const palette = variant === 'self' ? SELF_BG
-                   : variant === 'reminder' ? REMINDER_BG
-                   : OTHER_BG;
-      const corners = sideRight ? 'rounded-br-md' : 'rounded-bl-md';
-      bubble.className = [base, palette, corners].join(' ');
-
-      const lines = [];
-      lines.push(`<div class="text-base font-semibold">${amountValue}</div>`);
-      if (whoText) lines.push(`<div class="text-xs ${variant === 'other' ? 'text-slate-500' : 'text-blue-100'}">${whoText}</div>`);
-      if (forText) lines.push(`<div class="text-xs ${variant === 'other' ? 'text-slate-500' : 'text-blue-100'}">${forText}</div>`);
-      lines.push(`<div class="mt-1 ${sideRight ? 'text-right' : 'text-left'} text-[11px] ${variant === 'other' ? 'text-slate-400' : 'text-blue-100'}">${time}</div>`);
-      bubble.innerHTML = lines.join('');
-
-      outer.appendChild(bubble);
-      return outer;
-    }
-
-    function emptyEl(text) {
-      const d = document.createElement('div');
-      d.className = 'text-sm text-slate-500 text-center py-6';
-      d.textContent = text;
-      return d;
-    }
-
-    function daySeparatorLabel(date) {
-      const today = new Date(); today.setHours(0,0,0,0);
-      const that  = new Date(date); that.setHours(0,0,0,0);
-      const diff  = Math.round((that - today) / 86400000);
-      if (diff === 0)  return 'Today';
-      if (diff === -1) return 'Yesterday';
-      return `${formatDayMonth(date)} ${date.getFullYear()}`;
-    }
-
-    function formatDayMonth(date) {
-      return date.toLocaleDateString(undefined, { day: '2-digit', month: 'short' }); // “27 Mar”
-    }
-
-    function formatTime(date) {
-      return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); // “14:33”
-    }
-
-    function prependMyPaymentBubble(amountNumber, forDateStr) {
-      const d = new Date();
-      const day = daySeparatorLabel(d);
-
-      const seps = feedEl.querySelectorAll('[data-sep]');
-      const lastSep = seps.length ? seps[seps.length - 1] : null;
-      if (!lastSep || lastSep.dataset.sep !== day) feedEl.appendChild(separatorEl(day));
-
-      const amountValue = `€${Number(amountNumber).toFixed(2)}`;
-      const whoText     = `Paid by ${VIEWER_NAME}`;
-      const forText     = forDateStr ? `For ${formatDayMonth(new Date(forDateStr))}` : '';
-      const time        = formatTime(d);
-
-      feedEl.appendChild(bubbleEl({
-        variant: 'self',
-        amountValue,
-        whoText,
-        forText,
-        time
-      }));
-    }
-
-    // GO!
-    boot();
-    </script>
+boot();
+</script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
