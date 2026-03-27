@@ -67,10 +67,10 @@
 
                 
                 <div class="border-t border-slate-200 bg-white px-6 py-4">
-                    <div class="flex items-end gap-3 flex-wrap">
+                    <div class="flex items-end gap-3 justify-center flex-wrap">
                         <input id="rt-date" type="date"
                                class="rounded-2xl border border-slate-300 px-4 py-3 text-sm">
-                        <input id="rt-amount" type="number" step="0.01"
+                        <input id="rt-amount" type="number" step="100" min="0"
                                class="rounded-2xl border border-slate-300 px-4 py-3 text-sm"
                                placeholder="Amount (€)">
                         <button id="rt-pay"
@@ -82,7 +82,7 @@
 
                 
                 <div id="stripe-form" class="hidden border-t border-slate-200 bg-white px-6 py-5">
-                    <p class="text-sm font-medium text-slate-700 mb-3">Card details</p>
+                    <p class="text-sm font-medium text-slate-700 mb-3">Payment details</p>
                     <div id="payment-element"></div>
                     <div id="payment-message" class="hidden text-red-600 text-sm mt-3"></div>
                     <div class="flex gap-3 mt-4">
@@ -139,11 +139,40 @@
             renderFeed(RT.history);
         }
 
+        // ── DAY SEPARATOR HELPERS ────────────────────────────────
+        function daySeparatorLabel(date) {
+            const today = new Date(); today.setHours(0,0,0,0);
+            const that  = new Date(date); that.setHours(0,0,0,0);
+            const diff  = Math.round((that - today) / 86400000);
+            if (diff === 0)  return 'Today';
+            if (diff === -1) return 'Yesterday';
+            return date.toLocaleDateString(undefined, { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function separatorEl(label) {
+            const wrap = document.createElement('div');
+            wrap.className = 'flex justify-center my-2';
+            wrap.innerHTML = `<span class="px-3 py-0.5 rounded-full bg-slate-200 text-slate-600 text-xs">${label}</span>`;
+            return wrap;
+        }
+
+        // ── RENDER FEED ──────────────────────────────────────────
         function renderFeed(items) {
             feedEl.innerHTML = '';
             items.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
+            let lastDay = '';
+
             items.forEach(it => {
+                const date   = new Date(it.timestamp);
+                const dayLabel = daySeparatorLabel(date);
+
+                // Insert day separator when day changes
+                if (dayLabel !== lastDay) {
+                    feedEl.appendChild(separatorEl(dayLabel));
+                    lastDay = dayLabel;
+                }
+
                 const status     = (it.status || '').toLowerCase();
                 const isReminder = status === 'reminder';
 
@@ -152,14 +181,27 @@
                     const outer  = document.createElement('div');
                     outer.className = 'flex justify-start';
                     const bubble = document.createElement('div');
-                    bubble.className = `max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm ${isOverdue ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'}`;
-                    bubble.innerHTML = `
-                        <div class="text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">${it.label || 'Rent Reminder'}</div>
-                        <div class="text-base font-semibold">€${Number(it.amount).toFixed(2)}</div>
-                        <div class="text-xs opacity-75 mt-1">Due ${new Date(it.timestamp).toLocaleDateString(undefined, {day: '2-digit', month: 'short', year: 'numeric'})}</div>
-                    `;
+
+                    if (isOverdue) {
+                        bubble.className = 'max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm bg-red-600 text-white';
+                        bubble.innerHTML = `
+                            <div class="text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">Overdue</div>
+                            <div class="text-base font-semibold">Rent Due: €${Number(it.amount).toFixed(2)}</div>
+                            <div class="text-xs opacity-75 mt-1">Outstanding: €${Number(it.amount).toFixed(2)}</div>
+                            <div class="text-xs opacity-75">Was due ${date.toLocaleDateString(undefined, {day: '2-digit', month: 'short', year: 'numeric'})}</div>
+                        `;
+                    } else {
+                        bubble.className = 'max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm bg-blue-600 text-white';
+                        bubble.innerHTML = `
+                            <div class="text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">Rent Reminder</div>
+                            <div class="text-base font-semibold">€${Number(it.amount).toFixed(2)}</div>
+                            <div class="text-xs opacity-75 mt-1">Due ${date.toLocaleDateString(undefined, {day: '2-digit', month: 'short', year: 'numeric'})}</div>
+                        `;
+                    }
+
                     outer.appendChild(bubble);
                     feedEl.appendChild(outer);
+
                 } else {
                     const fromViewer = it.studentid && Number(it.studentid) === Number(VIEWER_ID);
                     const outer  = document.createElement('div');
@@ -170,7 +212,7 @@
                     bubble.innerHTML = `
                         <div class="text-base font-semibold">€${Number(it.amount).toFixed(2)}</div>
                         <div class="text-xs opacity-75">Paid by ${paidBy}</div>
-                        <div class="text-[11px] opacity-60 mt-1">${new Date(it.timestamp).toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'})}</div>
+                        <div class="text-[11px] opacity-60 mt-1">${date.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'})}</div>
                     `;
                     outer.appendChild(bubble);
                     feedEl.appendChild(outer);
@@ -182,7 +224,7 @@
             }
         }
 
-        // ── PAY BUTTON — create intent and show card form ─────────
+        // ── PAY BUTTON ───────────────────────────────────────────
         payBtn.addEventListener('click', async () => {
             const amount = parseFloat(amountIn.value || 0);
             if (!amount || amount <= 0) { alert('Enter an amount'); return; }
@@ -212,17 +254,20 @@
                     return;
                 }
 
-                // Mount Stripe Payment Element
                 stripeInstance = Stripe(STRIPE_KEY);
-                stripeElements = stripeInstance.elements({ clientSecret: json.client_secret });
-                const paymentElement = stripeElements.create('payment');
+                stripeElements = stripeInstance.elements({
+                    clientSecret: json.client_secret,
+                    appearance: { theme: 'stripe' }
+                });
+
+                const paymentElement = stripeElements.create('payment', {
+                    paymentMethodOrder: ['apple_pay', 'card'],
+                    wallets: { applePay: 'auto', googlePay: 'never' }
+                });
+
                 document.getElementById('payment-element').innerHTML = '';
                 paymentElement.mount('#payment-element');
-
-                // Store client secret on submit button for later
                 submitBtn.dataset.clientSecret = json.client_secret;
-
-                // Show the card form
                 stripeForm.classList.remove('hidden');
                 messageEl.classList.add('hidden');
 
@@ -251,7 +296,6 @@
                 confirmParams: { return_url: window.location.href }
             });
 
-            // If we get here, payment failed (success redirects away)
             if (error) {
                 messageEl.textContent = error.message;
                 messageEl.classList.remove('hidden');
@@ -262,7 +306,6 @@
 
         // ── BOOT ─────────────────────────────────────────────────
         async function boot() {
-            // Handle Stripe redirect return after successful payment
             const params = new URLSearchParams(window.location.search);
             const piId   = params.get('payment_intent');
             if (piId) {
