@@ -8,6 +8,8 @@
 <?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
 
     
      <?php $__env->slot('header', null, []); ?> 
@@ -78,6 +80,23 @@
                     </div>
                 </div>
 
+                
+                <div id="stripe-form" class="hidden border-t border-slate-200 bg-white px-6 py-5">
+                    <p class="text-sm font-medium text-slate-700 mb-3">Card details</p>
+                    <div id="payment-element"></div>
+                    <div id="payment-message" class="hidden text-red-600 text-sm mt-3"></div>
+                    <div class="flex gap-3 mt-4">
+                        <button id="rt-submit"
+                                class="flex-1 rounded-2xl bg-blue-600 px-5 py-3 text-sm text-white">
+                            Confirm Payment
+                        </button>
+                        <button id="rt-cancel"
+                                class="rounded-2xl border border-slate-300 px-5 py-3 text-sm text-slate-700">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -92,12 +111,18 @@
         const STRIPE_KEY  = <?php echo json_encode(config('services.stripe.public_key'), 15, 512) ?>;
         const CSRF_TOKEN  = '<?php echo e(csrf_token()); ?>';
 
-        const feedEl    = document.getElementById('rt-feed');
-        const summaryEl = document.getElementById('rt-summary');
-        const amountIn  = document.getElementById('rt-amount');
-        const payBtn    = document.getElementById('rt-pay');
+        const feedEl      = document.getElementById('rt-feed');
+        const summaryEl   = document.getElementById('rt-summary');
+        const amountIn    = document.getElementById('rt-amount');
+        const payBtn      = document.getElementById('rt-pay');
+        const stripeForm  = document.getElementById('stripe-form');
+        const submitBtn   = document.getElementById('rt-submit');
+        const cancelBtn   = document.getElementById('rt-cancel');
+        const messageEl   = document.getElementById('payment-message');
 
         let RT = { balance: null, history: [] };
+        let stripeInstance = null;
+        let stripeElements = null;
 
         // ── BALANCE ──────────────────────────────────────────────
         async function refreshBalance() {
@@ -157,10 +182,13 @@
             }
         }
 
-        // ── PAY ──────────────────────────────────────────────────
+        // ── PAY BUTTON — create intent and show card form ─────────
         payBtn.addEventListener('click', async () => {
             const amount = parseFloat(amountIn.value || 0);
             if (!amount || amount <= 0) { alert('Enter an amount'); return; }
+
+            payBtn.disabled = true;
+            payBtn.textContent = 'Loading...';
 
             try {
                 const res = await fetch('/student/rent-tracker/payment-intent', {
@@ -177,23 +205,64 @@
                 });
 
                 const json = await res.json();
-                if (!res.ok) { alert(json.message || 'Could not start payment'); return; }
+                if (!res.ok) {
+                    alert(json.message || 'Could not start payment');
+                    payBtn.disabled = false;
+                    payBtn.textContent = 'Pay';
+                    return;
+                }
 
-                const stripe = Stripe(STRIPE_KEY);
-                const { error } = await stripe.confirmPayment({
-                    clientSecret: json.client_secret,
-                    confirmParams: { return_url: window.location.href }
-                });
+                // Mount Stripe Payment Element
+                stripeInstance = Stripe(STRIPE_KEY);
+                stripeElements = stripeInstance.elements({ clientSecret: json.client_secret });
+                const paymentElement = stripeElements.create('payment');
+                document.getElementById('payment-element').innerHTML = '';
+                paymentElement.mount('#payment-element');
 
-                if (error) { alert(error.message || 'Payment failed'); }
+                // Store client secret on submit button for later
+                submitBtn.dataset.clientSecret = json.client_secret;
+
+                // Show the card form
+                stripeForm.classList.remove('hidden');
+                messageEl.classList.add('hidden');
 
             } catch (e) {
                 alert('ERROR: ' + e.message);
+            } finally {
+                payBtn.disabled = false;
+                payBtn.textContent = 'Pay';
+            }
+        });
+
+        // ── CANCEL ───────────────────────────────────────────────
+        cancelBtn.addEventListener('click', () => {
+            stripeForm.classList.add('hidden');
+            messageEl.classList.add('hidden');
+        });
+
+        // ── CONFIRM PAYMENT ──────────────────────────────────────
+        submitBtn.addEventListener('click', async () => {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            messageEl.classList.add('hidden');
+
+            const { error } = await stripeInstance.confirmPayment({
+                elements: stripeElements,
+                confirmParams: { return_url: window.location.href }
+            });
+
+            // If we get here, payment failed (success redirects away)
+            if (error) {
+                messageEl.textContent = error.message;
+                messageEl.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Confirm Payment';
             }
         });
 
         // ── BOOT ─────────────────────────────────────────────────
         async function boot() {
+            // Handle Stripe redirect return after successful payment
             const params = new URLSearchParams(window.location.search);
             const piId   = params.get('payment_intent');
             if (piId) {
