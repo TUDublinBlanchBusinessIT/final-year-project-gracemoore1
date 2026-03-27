@@ -218,10 +218,18 @@
 
 
     
-    <button id="chatbotBtn"
-        class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 
-               text-white w-14 h-14 rounded-full shadow-xl flex items-center 
-               justify-center z-[99999]">
+        <a href="<?php echo e(route('student.chatbot')); ?>"
+            class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700
+                text-white w-14 h-14 rounded-full shadow-xl flex items-center
+                justify-center z-[9999]">
+
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24" stroke="white" class="w-8 h-8">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 8h10M7 12h6m1 8-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v6a2 2 0 01-2 2h-3l-4 4z"/>
+            </svg>
+
+        </a>
 
         
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
@@ -233,30 +241,7 @@
 
     </button>
 
-    
-    <div id="chatbotModal"
-         class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center 
-                justify-center z-[99998]">
-        <div class="bg-white p-6 rounded-xl shadow-xl w-80 text-center">
-            <h2 class="text-xl font-bold text-slate-900 mb-3">AI Chatbot (Coming Soon)</h2>
-            <p class="text-slate-600 text-sm mb-4">
-                This feature will be available in a future update.
-            </p>
-            <button onclick="document.getElementById('chatbotModal').classList.add('hidden')"
-                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Close
-            </button>
-        </div>
-    </div>
-
-    <script>
-        const btn = document.getElementById('chatbotBtn');
-        const modal = document.getElementById('chatbotModal');
-
-        btn.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-        });
-    </script>
+  
 
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
