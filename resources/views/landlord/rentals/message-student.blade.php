@@ -36,7 +36,15 @@
                                     {{ $groupMembers->pluck('firstname')->implode(', ') }}
                                 </p>
                             @endif
-                        </div>                        
+                        </div>  
+                        {{-- RENT TRACKER BUTTON --}}
+                        @if($application->status === 'accepted')
+                            <a href="{{ route('landlord.rent.page', ['application' => $application->id]) }}{{ $application->group_id ? ('?group_id=' . $application->group_id) : '' }}"
+                               class="ml-auto h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
+                               title="Rent Tracker">
+                                <span class="text-emerald-600 text-xl font-semibold">€</span>
+                            </a>
+                        @endif               
                     </div>
                 </div>
 

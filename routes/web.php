@@ -187,6 +187,13 @@ Route::post('/student/rent-tracker/confirm-payment', [RentTrackerController::cla
 Route::get('/student/rent-tracker/{application}', [RentTrackerController::class, 'page'])
     ->name('student.rent.page');
 
+// Landlord rent tracker (read-only)
+use App\Http\Controllers\Landlord\LandlordRentTrackerController;
+Route::get('/landlord/rent-tracker/balance', [LandlordRentTrackerController::class, 'getBalance']);
+Route::get('/landlord/rent-tracker/history', [LandlordRentTrackerController::class, 'getHistory']);
+Route::get('/landlord/rent-tracker/{application}', [LandlordRentTrackerController::class, 'page'])
+    ->name('landlord.rent.page');
+
 //admin
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
