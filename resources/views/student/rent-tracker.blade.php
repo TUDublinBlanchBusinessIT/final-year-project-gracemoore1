@@ -34,13 +34,7 @@
 
                 {{-- SUMMARY --}}
                 <div class="px-6 py-3 bg-white border-b border-slate-200">
-                    <div class="flex items-center gap-2">
-                        <div id="rt-summary" class="text-sm text-slate-700 truncate"></div>
-                        <button id="rt-all"
-                                class="ml-auto text-xs px-2 py-1 rounded border hover:bg-slate-50">
-                            All
-                        </button>
-                    </div>
+                    <div id="rt-summary" class="text-sm text-slate-700"></div>
                 </div>
 
                 {{-- FEED --}}
@@ -64,12 +58,20 @@
                     </div>
                 </div>
 
-                {{-- STRIPE PAYMENT FORM (hidden until Pay clicked) --}}
+                {{-- STRIPE CARD FORM (hidden until Pay clicked) --}}
                 <div id="stripe-form" class="hidden border-t border-slate-200 bg-white px-6 py-5">
-                    <p class="text-sm font-medium text-slate-700 mb-3">Payment details</p>
-                    <div id="payment-element"></div>
+                    <p class="text-sm font-medium text-slate-700 mb-3">Card details</p>
+                    <div id="payment-element"
+                         class="border border-slate-300 rounded-xl px-4 py-3 bg-white"></div>
                     <div id="payment-message" class="hidden text-red-600 text-sm mt-3"></div>
-                    <div class="flex gap-3 mt-4">
+                    <div class="flex items-center gap-2 mt-4 mb-2">
+                        <input type="checkbox" id="rt-save"
+                               class="rounded border-slate-300 text-blue-600">
+                        <label for="rt-save" class="text-xs text-slate-600">
+                            Save my card details for future payments
+                        </label>
+                    </div>
+                    <div class="flex gap-3 mt-2">
                         <button id="rt-submit"
                                 class="flex-1 rounded-2xl bg-blue-600 px-5 py-3 text-sm text-white">
                             Confirm Payment
@@ -95,14 +97,14 @@
         const STRIPE_KEY  = @json(config('services.stripe.public_key'));
         const CSRF_TOKEN  = '{{ csrf_token() }}';
 
-        const feedEl      = document.getElementById('rt-feed');
-        const summaryEl   = document.getElementById('rt-summary');
-        const amountIn    = document.getElementById('rt-amount');
-        const payBtn      = document.getElementById('rt-pay');
-        const stripeForm  = document.getElementById('stripe-form');
-        const submitBtn   = document.getElementById('rt-submit');
-        const cancelBtn   = document.getElementById('rt-cancel');
-        const messageEl   = document.getElementById('payment-message');
+        const feedEl     = document.getElementById('rt-feed');
+        const summaryEl  = document.getElementById('rt-summary');
+        const amountIn   = document.getElementById('rt-amount');
+        const payBtn     = document.getElementById('rt-pay');
+        const stripeForm = document.getElementById('stripe-form');
+        const submitBtn  = document.getElementById('rt-submit');
+        const cancelBtn  = document.getElementById('rt-cancel');
+        const messageEl  = document.getElementById('payment-message');
 
         let RT = { balance: null, history: [] };
         let stripeInstance = null;
@@ -130,7 +132,7 @@
             const diff  = Math.round((that - today) / 86400000);
             if (diff === 0)  return 'Today';
             if (diff === -1) return 'Yesterday';
-            return date.toLocaleDateString(undefined, { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' });
+            return new Date(date).toLocaleDateString(undefined, { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' });
         }
 
         function separatorEl(label) {
@@ -148,10 +150,9 @@
             let lastDay = '';
 
             items.forEach(it => {
-                const date   = new Date(it.timestamp);
+                const date     = new Date(it.timestamp);
                 const dayLabel = daySeparatorLabel(date);
 
-                // Insert day separator when day changes
                 if (dayLabel !== lastDay) {
                     feedEl.appendChild(separatorEl(dayLabel));
                     lastDay = dayLabel;
@@ -172,27 +173,27 @@
                             <div class="text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">Overdue</div>
                             <div class="text-base font-semibold">Rent Due: €${Number(it.amount).toFixed(2)}</div>
                             <div class="text-xs opacity-75 mt-1">Outstanding: €${Number(it.amount).toFixed(2)}</div>
-                            <div class="text-xs opacity-75">Was due ${date.toLocaleDateString(undefined, {day: '2-digit', month: 'short', year: 'numeric'})}</div>
+                            <div class="text-xs opacity-75">Was due ${new Date(it.for_date).toLocaleDateString(undefined, {day: '2-digit', month: 'short', year: 'numeric'})}</div>
                         `;
                     } else {
-                        bubble.className = 'max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm bg-blue-600 text-white';
+                        bubble.className = 'max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm bg-green-600 text-white';
                         bubble.innerHTML = `
                             <div class="text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">Rent Reminder</div>
                             <div class="text-base font-semibold">€${Number(it.amount).toFixed(2)}</div>
-                            <div class="text-xs opacity-75 mt-1">Due ${date.toLocaleDateString(undefined, {day: '2-digit', month: 'short', year: 'numeric'})}</div>
+                            <div class="text-xs opacity-75 mt-1">Due ${new Date(it.for_date).toLocaleDateString(undefined, {day: '2-digit', month: 'short', year: 'numeric'})}</div>
                         `;
                     }
 
                     outer.appendChild(bubble);
                     feedEl.appendChild(outer);
 
-                } else {
+                } else if (status === 'succeeded') {
                     const fromViewer = it.studentid && Number(it.studentid) === Number(VIEWER_ID);
                     const outer  = document.createElement('div');
                     outer.className = fromViewer ? 'flex justify-end' : 'flex justify-start';
                     const bubble = document.createElement('div');
                     bubble.className = `max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm ${fromViewer ? 'bg-blue-600 text-white' : 'bg-white text-slate-800 border border-slate-200'}`;
-                    const paidBy = it.paid_by || (fromViewer ? VIEWER_NAME : 'Housemate');
+                    const paidBy = it.paid_by || 'Unknown';
                     bubble.innerHTML = `
                         <div class="text-base font-semibold">€${Number(it.amount).toFixed(2)}</div>
                         <div class="text-xs opacity-75">Paid by ${paidBy}</div>
@@ -239,18 +240,24 @@
                 }
 
                 stripeInstance = Stripe(STRIPE_KEY);
-                stripeElements = stripeInstance.elements({
-                    clientSecret: json.client_secret,
-                    appearance: { theme: 'stripe' }
-                });
+                stripeElements = stripeInstance.elements();
 
-                const paymentElement = stripeElements.create('payment', {
-                    paymentMethodOrder: ['apple_pay', 'card'],
-                    wallets: { applePay: 'auto', googlePay: 'never' }
+                const cardElement = stripeElements.create('card', {
+                    hidePostalCode: true,
+                    disableLink: true,
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#424770',
+                            fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+                            '::placeholder': { color: '#aab7c4' }
+                        },
+                        invalid: { color: '#dc2626' }
+                    }
                 });
 
                 document.getElementById('payment-element').innerHTML = '';
-                paymentElement.mount('#payment-element');
+                cardElement.mount('#payment-element');
                 submitBtn.dataset.clientSecret = json.client_secret;
                 stripeForm.classList.remove('hidden');
                 messageEl.classList.add('hidden');
@@ -275,9 +282,11 @@
             submitBtn.textContent = 'Processing...';
             messageEl.classList.add('hidden');
 
-            const { error } = await stripeInstance.confirmPayment({
-                elements: stripeElements,
-                confirmParams: { return_url: window.location.href }
+            const clientSecret = submitBtn.dataset.clientSecret;
+            const cardElement  = stripeElements.getElement('card');
+
+            const { error, paymentIntent } = await stripeInstance.confirmCardPayment(clientSecret, {
+                payment_method: { card: cardElement }
             });
 
             if (error) {
@@ -285,25 +294,25 @@
                 messageEl.classList.remove('hidden');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Confirm Payment';
-            }
-        });
-
-        // ── BOOT ─────────────────────────────────────────────────
-        async function boot() {
-            const params = new URLSearchParams(window.location.search);
-            const piId   = params.get('payment_intent');
-            if (piId) {
-                window.history.replaceState({}, '', window.location.pathname);
+            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
                 await fetch('/student/rent-tracker/confirm-payment', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': CSRF_TOKEN
                     },
-                    body: JSON.stringify({ payment_intent: piId })
+                    body: JSON.stringify({ payment_intent: paymentIntent.id })
                 });
-            }
 
+                stripeForm.classList.add('hidden');
+                amountIn.value = '';
+                await refreshBalance();
+                await refreshFeed();
+            }
+        });
+
+        // ── BOOT ─────────────────────────────────────────────────
+        async function boot() {
             await refreshBalance();
             await refreshFeed();
         }
