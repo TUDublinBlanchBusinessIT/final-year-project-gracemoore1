@@ -7,13 +7,15 @@ use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\ProfileController;
 
+//chatbot
+use App\Http\Controllers\ChatbotController;
+
 // Landlord controllers
 use App\Http\Controllers\Auth\LandlordRegisterController;
 use App\Http\Controllers\Auth\LandlordCodeVerificationController; 
 use App\Http\Controllers\Auth\LandlordOCRController;
 use App\Http\Controllers\LandlordController;
 use App\Http\Controllers\LandlordMessageController;
-
 
 
 // Student controllers
@@ -32,6 +34,14 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Models\Listing;
 use App\Http\Controllers\Landlord\LandlordRentalController;
 use App\Http\Controllers\PartnershipController;
+
+
+//chatbot
+Route::get('/student/chatbot', [ChatbotController::class, 'studentChat'])->name('student.chatbot');
+Route::get('/landlord/chatbot', [ChatbotController::class, 'landlordChat'])->name('landlord.chatbot');
+Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+
+
 
 Route::get('/landlord/register', [LandlordRegisterController::class, 'create'])
     ->name('landlord.register.show');
