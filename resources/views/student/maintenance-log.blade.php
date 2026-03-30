@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Facades\Storage; @endphp
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-base text-gray-800 leading-tight">
@@ -61,10 +62,12 @@
                                 </div>
 
                                 @if(!empty($log->images))
-                                    <div class="mt-4">
-                                        <img src="{{ asset('storage/' . $log->images) }}"
-                                             alt="Maintenance issue image"
-                                             class="rounded-2xl max-h-52 w-auto border border-white/20">
+                                    <div class="mt-3">
+                                        <a href="{{ asset('storage/' . $log->images) }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $log->images) }}"
+                                                alt="Maintenance issue image"
+                                                class="mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
+                                        </a>
                                     </div>
                                 @endif
 

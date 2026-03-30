@@ -1,3 +1,4 @@
+<?php use Illuminate\Support\Facades\Storage; ?>
 <?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
 <?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -76,10 +77,12 @@
                                 </div>
 
                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->images)): ?>
-                                    <div class="mt-4">
-                                        <img src="<?php echo e(asset('storage/' . $log->images)); ?>"
-                                             alt="Maintenance issue image"
-                                             class="rounded-2xl max-h-52 w-auto border border-white/20">
+                                    <div class="mt-3">
+                                        <a href="<?php echo e(asset('storage/' . $log->images)); ?>" target="_blank">
+                                            <img src="<?php echo e(asset('storage/' . $log->images)); ?>"
+                                                alt="Maintenance issue image"
+                                                class="mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
+                                        </a>
                                     </div>
                                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 

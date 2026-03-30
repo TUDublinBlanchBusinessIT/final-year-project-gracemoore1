@@ -40,11 +40,21 @@ class StudentMaintenanceController extends Controller
         $request->validate([
             'description' => 'required|string|max:1000',
             'priority' => 'required|in:high,medium,low',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+
+        $imagePath = null;
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('storage/maintenance-images'), $filename);
+            $imagePath = 'maintenance-images/' . $filename;
+        }
 
         Maintenancelog::create([
             'description'   => $request->description,
-            'images'        => null,
+            'images'        => $imagePath,
             'status'        => 'open',
             'priority'      => $request->priority,
             'timestamp'     => now(),
