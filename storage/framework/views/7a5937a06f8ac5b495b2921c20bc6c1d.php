@@ -57,13 +57,23 @@
                         </div>
                     </div>
                     
+                
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($application->status === 'accepted'): ?>
+                        <div class="flex items-center gap-3">
                         <a href="<?php echo e(route('student.rent.page', ['application' => $application->id])); ?><?php echo e($application->group_id ? ('?group_id=' . $application->group_id) : ''); ?>"
-                        class="ml-auto h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
-                        title="Rent Tracker">
+                            class="ml-auto h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
+                            title="Rent Tracker">
                             <span class="text-emerald-600 text-xl font-semibold">€</span>
                         </a>
+
+                        <a href="<?php echo e(route('student.maintenance-log', $application->id)); ?>"
+                            class="ml-3 h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
+                            title="Maintenance Log">
+                            <span class="text-slate-600 text-xl">🛠</span>
+                        </a>
+
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    
                 </div>
 
                 <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
