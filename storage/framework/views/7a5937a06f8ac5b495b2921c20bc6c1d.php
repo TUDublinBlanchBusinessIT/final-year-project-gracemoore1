@@ -66,7 +66,7 @@
                             <span class="text-emerald-600 text-xl font-semibold">€</span>
                         </a>
 
-                        <a href="<?php echo e(route('student.maintenance.log', $application->id)); ?>"
+                        <a href="<?php echo e(route('student.maintenance-log', $application->id)); ?>"
                             class="ml-3 h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
                             title="Maintenance Log">
                             <span class="text-slate-600 text-xl">🛠</span>

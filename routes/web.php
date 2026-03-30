@@ -187,7 +187,9 @@ Route::post('/student/messages/{application}', [StudentMessageController::class,
 
     //student maintenance log 
 Route::get('/student/maintenance/{application}', [StudentMaintenanceController::class, 'page'])->name('student.maintenance.log');
+Route::get('/student/maintenance/{application}', [StudentMaintenanceController::class, 'page'])->name('student.maintenance-log');
 
+Route::post('/student/maintenance/{application}', [StudentMaintenanceController::class, 'store'])->name('student.maintenance-log.store');
 
 // ===============================
 // RENT TRACKER ROUTES (SESSION-BASED)
