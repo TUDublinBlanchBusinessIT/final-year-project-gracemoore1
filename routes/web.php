@@ -23,6 +23,8 @@ use App\Http\Controllers\StudentRegisterController;
 use App\Http\Controllers\StudentPasswordResetController;
 //student messaging
 use App\Http\Controllers\StudentMessageController;
+//student maintenance log
+use App\Http\Controllers\Student\StudentMaintenanceController;
 
 // Breeze / Laravel User Controllers
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -184,9 +186,7 @@ Route::get('/student/messages/{application}', [StudentMessageController::class, 
 Route::post('/student/messages/{application}', [StudentMessageController::class, 'store'])->name('student.messages.store');
 
     //student maintenance log 
-Route::get('/student/maintenance/{application}', 
-    [StudentMaintenanceController::class, 'page']
-)->name('student.maintenance-log');
+Route::get('/student/maintenance/{application}', [StudentMaintenanceController::class, 'page'])->name('student.maintenance.log');
 
 
 // ===============================

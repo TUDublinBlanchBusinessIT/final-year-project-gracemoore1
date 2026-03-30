@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
@@ -13,10 +15,10 @@ class StudentMaintenanceController extends Controller
 
         $app = Application::with('rental')->findOrFail($application);
         abort_unless($app->studentid == $studentId, 403);
+        abort_unless($app->status === 'accepted', 403);
 
         return view('student.maintenance-log', [
             'application' => $app,
         ]);
     }
 }
- 
