@@ -108,6 +108,13 @@
                                                     Group
                                                 </span>
                                             @endif
+
+                                            @if($application->status === 'accepted')
+                                                <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
+                                                    Current Tenant
+                                                </span>
+                                            @endif
+
                                         </div>
 
                                         <p class="mt-1 text-sm text-slate-500">

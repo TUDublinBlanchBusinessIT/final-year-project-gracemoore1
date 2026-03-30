@@ -269,7 +269,7 @@ Route::prefix('admin/accounts')->group(function () {
                     // match "Western Road 5"
                     ->orWhereRaw("CONCAT(street, ' ', housenumber) LIKE ?", [$like])
 
-                    // ⭐ match "5 Western Road, Cork"
+                    // match "5 Western Road, Cork"
                     ->orWhereRaw("CONCAT(
                                         COALESCE(housenumber,''), ' ',
                                         COALESCE(street,''), ', ',

@@ -20,11 +20,24 @@ class RentTrackerController extends Controller
             'year'           => 'nullable|integer|min:2000|max:2100',
         ]);
 
-        $studentId = session('student_id');
-        abort_if(!$studentId, 401);
+        $studentId  = session('student_id');
+        $landlordId = session('landlord_id');
+        abort_if(!$studentId && !$landlordId, 401);
 
         $application = Application::with('rental')->findOrFail($request->application_id);
-        abort_unless($this->canAccess($studentId, $application), 403);
+
+        if ($studentId) {
+            abort_unless($this->canAccess($studentId, $application), 403);
+        }
+
+        if ($landlordId) {
+            abort_unless((int) $application->rental->landlordid === (int) $landlordId, 403);
+        }
+        //$studentId = session('student_id') ?? session('landlord_id');
+        //abort_if(!$studentId, 401);
+
+        //$application = Application::with('rental')->findOrFail($request->application_id);
+        //abort_unless($this->canAccess($studentId, $application), 403);
 
         $month = (int)($request->month ?? now()->month);
         $year  = (int)($request->year  ?? now()->year);
@@ -51,8 +64,11 @@ class RentTrackerController extends Controller
             'remind_on_iso'  => $remindOnIso,
             'overdue_on_iso' => $overdueOnIso,
             'month'          => $month,
-            'year'           => $year,
+            'year'           => $year,        
+
+        
         ]);
+        
     }
 
     public function getHistory(Request $request)
@@ -65,7 +81,7 @@ class RentTrackerController extends Controller
             'all'            => 'nullable|boolean',
         ]);
 
-        $studentId = session('student_id');
+        $studentId = session('student_id') ?? session('landlord_id');
         abort_if(!$studentId, 401);
 
         $application = Application::with('rental')->findOrFail($request->application_id);
@@ -170,7 +186,7 @@ class RentTrackerController extends Controller
             'year'           => 'nullable|integer',
         ]);
 
-        $studentId = session('student_id');
+        $studentId = session('student_id')?? session('landlord_id');
         abort_if(!$studentId, 401);
 
         $application = Application::with('rental')->findOrFail($request->application_id);
@@ -267,7 +283,7 @@ class RentTrackerController extends Controller
 
     public function page(Request $request, int $application)
     {
-        $studentId = session('student_id');
+        $studentId = session('student_id') ?? session('landlord_id');
         abort_if(!$studentId, 401);
 
         $app = Application::with(['rental.landlord', 'student', 'group'])->findOrFail($application);

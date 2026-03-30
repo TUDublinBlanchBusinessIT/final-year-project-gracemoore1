@@ -81,22 +81,22 @@
 <div class="min-h-screen bg-gray-100">
 
     
-    <?php if($isAdmin || $isServiceProvider || $isLandlord || $isStudent): ?>
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isAdmin || $isServiceProvider || $isLandlord || $isStudent): ?>
         
     <?php elseif(Auth::check()): ?>
         <?php echo $__env->make('layouts.navigation', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-    <?php endif; ?>
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
     
-    <?php if(isset($header)): ?>
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($header)): ?>
     <header class="bg-white shadow <?php echo e($hasFixedSidebar ? 'lg:pl-60' : ''); ?>">
 
-        <?php if($isSuspendedBanner): ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isSuspendedBanner): ?>
             <div class="bg-red-600 text-white px-4 py-3 w-full text-center font-semibold">
                 Your <?php echo e(ucfirst($currentRole)); ?> account is suspended —
                 contact <strong>rentconnect.app@gmail.com</strong>
             </div>
-        <?php endif; ?>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         <div class="
             <?php if($isStudent || $isAdmin || $isServiceProvider || $isLandlord): ?>
@@ -110,11 +110,11 @@
 
         </div>
     </header>
-    <?php endif; ?>
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
     
     <main class="<?php echo e($hasFixedSidebar ? 'lg:pl-60' : ''); ?> pb-24 lg:pb-0">
-        <?php if($isStudent || $isAdmin || $isServiceProvider || $isLandlord): ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isStudent || $isAdmin || $isServiceProvider || $isLandlord): ?>
             <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
                 <?php echo e($slot ?? ''); ?>
 
@@ -124,11 +124,11 @@
                 <?php echo e($slot ?? ''); ?>
 
             </div>
-        <?php endif; ?>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </main>
 
     
-    <?php if($isStudent): ?>
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isStudent): ?>
         <?php echo $__env->make('partials.student-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php elseif($isLandlord): ?>
         <?php echo $__env->make('partials.landlord-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -136,7 +136,7 @@
         <?php echo $__env->make('partials.admin-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php elseif($isServiceProvider): ?>
         <?php echo $__env->make('partials.serviceprovider-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-    <?php endif; ?>
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
 </div>
 </body>

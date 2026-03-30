@@ -29,6 +29,8 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['align' => 'left','width' => '48']); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
                  <?php $__env->slot('trigger', null, []); ?> 
                     <button type="button"
                         class="w-full flex items-center justify-between gap-2 rounded-xl px-3 py-2
@@ -62,6 +64,8 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('logout')),'onclick' => 'event.preventDefault(); this.closest(\'form\').submit();']); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
                             Log Out
                          <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -100,12 +104,12 @@
            class="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition
            <?php echo e(request()->routeIs('student.messages') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'); ?>">
             💬 <span class="font-semibold">Messages</span>
-                <?php if($studentUnreadCount > 0): ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($studentUnreadCount > 0): ?>
                     <span class="inline-flex items-center justify-center min-w-[20px] h-[20px] rounded-full bg-red-500 px-1.5 text-[11px] font-semibold text-white">
                         <?php echo e($studentUnreadCount); ?>
 
                     </span>
-                <?php endif; ?>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         </a>
 

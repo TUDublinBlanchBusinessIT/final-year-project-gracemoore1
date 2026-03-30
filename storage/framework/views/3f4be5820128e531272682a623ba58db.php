@@ -32,6 +32,8 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['align' => 'left','width' => '48']); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
              <?php $__env->slot('trigger', null, []); ?> 
                 <button type="button"
                     class="w-full flex items-center justify-between gap-2 rounded-xl px-3 py-1
@@ -55,6 +57,8 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('profile.edit'))]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
                     <?php echo e(__('Profile')); ?>
 
                  <?php echo $__env->renderComponent(); ?>
@@ -80,6 +84,8 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('logout')),'onclick' => 'event.preventDefault(); this.closest(\'form\').submit();']); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
                         <?php echo e(__('Log Out')); ?>
 
                      <?php echo $__env->renderComponent(); ?>
@@ -130,12 +136,12 @@
             </svg>
             <span class="font-semibold">Messages</span>
         
-            <?php if($landlordUnreadCount > 0): ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($landlordUnreadCount > 0): ?>
                 <span class="inline-flex items-center justify-center min-w-[20px] h-[20px] rounded-full bg-red-500 px-1.5 text-[11px] font-semibold text-white">
                     <?php echo e($landlordUnreadCount); ?>
 
                 </span>
-            <?php endif; ?>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     
         </a>
 
