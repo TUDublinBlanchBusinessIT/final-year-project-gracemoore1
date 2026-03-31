@@ -9,9 +9,9 @@
         <div class="space-y-3 text-gray-800 mb-6">
 
             {{-- Subject (clean display) --}}
-            <div class="mb-3">
-                <p class="text-sm text-slate-500">Subject</p>
-                <p class="text-lg font-semibold text-slate-900">
+            <div class="mb-6">
+                <p class="text-slate-500">Subject</p>
+                <p class="font-medium text-slate-900">
                     {{ $subject }}
                 </p>
             </div>
@@ -29,24 +29,25 @@
         <div class="mb-6">
             <h3 class="font-semibold text-gray-900 mb-2">Full Report</h3>
             <pre class="bg-slate-50 p-4 rounded-lg text-sm whitespace-pre-wrap">
-{{ $report->description }}
+            {{ $cleanDescription }}
             </pre>
         </div>
 
         <div class="mb-6">
             <h3 class="font-semibold text-gray-900 mb-2">Evidence</h3>
 
-            @if(empty($evidencePaths))
-                <p class="text-sm text-gray-600">No evidence uploaded.</p>
-            @else
+            @if(!empty($evidencePaths))
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                     @foreach($evidencePaths as $path)
                         <img
                             src="{{ asset('storage/'.$path) }}"
-                            class="rounded-lg border"
+                            class="rounded-lg border object-cover"
+                            alt="Uploaded evidence"
                         >
                     @endforeach
                 </div>
+            @else
+                <p class="text-sm text-gray-600">No evidence uploaded.</p>
             @endif
         </div>
 

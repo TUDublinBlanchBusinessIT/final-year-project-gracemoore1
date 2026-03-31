@@ -88,20 +88,30 @@ class AdminReportController extends Controller
         $reporterName = $this->fullName($report->reporter_role, $report->reporter_id);
         $reportedName = $this->fullName($report->reported_user_role, $report->reported_user_id);
 
-        // ✅ Extract subject from description
-        $subject = 'No subject provided';
-        if (preg_match('/^SUBJECT:\s*(.+)$/m', $report->description, $matches)) {
-            $subject = trim($matches[1]);
-        }
+        // Extract subject
+        $subject = $this->extractSubject($report->description);
+
+        // Extract evidence paths
+        $evidencePaths = $this->extractEvidence($report->description);
+
+        // Remove EVIDENCE section from description for display
+        $cleanDescription = preg_replace(
+            '/EVIDENCE:\s*(?:- .*\s*)*/i',
+            '',
+            $report->description
+        );
 
         return view('admin.reports.show', [
-            'report'        => $report,
-            'reporterName'  => $reporterName,
-            'reportedName'  => $reportedName,
-            'subject'       => $subject,        // ✅ NOW DEFINED
-            'activeTab'     => 'pending',
+            'report'           => $report,
+            'reporterName'     => $reporterName,
+            'reportedName'     => $reportedName,
+            'subject'          => $subject,
+            'evidencePaths'    => $evidencePaths,
+            'cleanDescription' => trim($cleanDescription),
+            'activeTab'        => 'pending',
         ]);
     }
+
 
     public function noAction($id)
     {
