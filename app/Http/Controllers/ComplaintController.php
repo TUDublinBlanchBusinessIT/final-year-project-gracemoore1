@@ -20,11 +20,26 @@ class ComplaintController extends Controller
         $me = $this->reporterFromSession();
         abort_if(!$me, 403);
 
+        // Get reporter name
+        $reporterName = DB::table($me['role'])
+            ->where('id', $me['id'])
+            ->select('firstname', 'surname')
+            ->first();
+
+        // Get reported user name
+        $reported = DB::table($request->reported_user_role)
+            ->where('id', $request->reported_user_id)
+            ->select('firstname', 'surname')
+            ->first();
+
         return view('complaint.create', [
-            'reported_user_id' => $request->query('reported_user_id'),
-            'reported_user_role' => $request->query('reported_user_role'),
+            'reported_user_id'   => $request->reported_user_id,
+            'reported_user_role' => $request->reported_user_role,
+            'reporterDisplay'    => trim(($reporterName->firstname ?? '') . ' ' . ($reporterName->surname ?? '')) . " ({$me['role']})",
+            'reportedDisplay'    => trim(($reported->firstname ?? '') . ' ' . ($reported->surname ?? '')) . " ({$request->reported_user_role})",
         ]);
     }
+
 
     public function store(Request $request)
     {

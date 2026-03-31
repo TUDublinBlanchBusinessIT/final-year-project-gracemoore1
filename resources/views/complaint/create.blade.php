@@ -1,40 +1,127 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">Report account</h2>
+        <h2 class="font-semibold text-base text-gray-800 leading-tight">
+            Report an Account
+        </h2>
     </x-slot>
 
-    <div class="max-w-2xl mx-auto px-4 py-8">
-        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+    <div class="flex justify-center px-4 py-2">
+        <div class="w-full max-w-3xl">
 
-            @if(session('success'))
-                <div class="mb-4 p-3 rounded-xl bg-green-50 text-green-700 text-sm">
-                    {{ session('success') }}
+            {{-- Info banner --}}
+            <div class="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-900">
+                <p class="font-medium mb-1">
+                    Creating a safe and respectful platform
+                </p>
+                <p class="text-blue-800">
+                    RentConnect reviews all reports carefully. If you believe a user has breached our
+                    platform standards or code of conduct, please submit a report so our team can investigate.
+                </p>
+            </div>
+
+            {{-- Main card --}}
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-8">
+
+                {{-- Report summary --}}
+                <div class="mb-8">
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                        Report details
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm">
+                        <div>
+                            <p class="text-slate-500">Reporter</p>
+                            <p class="font-medium text-slate-900">
+                                {{ $reporterDisplay }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-slate-500">Reported account</p>
+                            <p class="font-medium text-slate-900">
+                                {{ $reportedDisplay }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            @endif
 
-            <form action="{{ route('complaint.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+                {{-- Form --}}
+                <form action="{{ route('complaint.store') }}"
+                      method="POST"
+                      enctype="multipart/form-data"
+                      class="space-y-6">
+                    @csrf
 
-                <input type="hidden" name="reported_user_id" value="{{ $reported_user_id }}">
-                <input type="hidden" name="reported_user_role" value="{{ $reported_user_role }}">
+                    <input type="hidden" name="reported_user_id" value="{{ $reported_user_id }}">
+                    <input type="hidden" name="reported_user_role" value="{{ $reported_user_role }}">
 
-                <label class="block text-sm font-medium text-slate-700">Subject</label>
-                <input name="subject" required maxlength="150"
-                       class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2 text-sm">
+                    {{-- Subject --}}
+                    <div>
+                        <label class="block text-sm font-medium text-slate-800 mb-1">
+                            Subject
+                        </label>
+                        <p class="text-xs text-slate-500 mb-2">
+                            A short, one‑sentence summary of the issue.
+                        </p>
+                        <input
+                            type="text"
+                            name="subject"
+                            maxlength="150"
+                            required
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm
+                                   focus:border-blue-400 focus:ring focus:ring-blue-100"
+                            placeholder="e.g. Inappropriate or abusive messages"
+                        >
+                    </div>
 
-                <label class="block text-sm font-medium text-slate-700 mt-4">Description</label>
-                <textarea name="details" required rows="6"
-                          class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2 text-sm"></textarea>
+                    {{-- Details --}}
+                    <div>
+                        <label class="block text-sm font-medium text-slate-800 mb-1">
+                            Description
+                        </label>
+                        <p class="text-xs text-slate-500 mb-2">
+                            Please describe what happened, including any relevant dates or context.
+                        </p>
+                        <textarea
+                            name="details"
+                            rows="6"
+                            required
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm
+                                   focus:border-blue-400 focus:ring focus:ring-blue-100"
+                            placeholder="Provide as much detail as possible to help our team review this report."
+                        ></textarea>
+                    </div>
 
-                <label class="block text-sm font-medium text-slate-700 mt-4">Evidence (up to 5 images)</label>
-                <input type="file" name="images[]" multiple accept="image/*"
-                       class="mt-1 block w-full text-sm">
+                    {{-- Evidence --}}
+                    <div>
+                        <label class="block text-sm font-medium text-slate-800 mb-1">
+                            Supporting evidence (optional)
+                        </label>
+                        <p class="text-xs text-slate-500 mb-2">
+                            You may upload up to 5 images if you wish to provide supporting evidence.
+                        </p>
+                        <input
+                            type="file"
+                            name="images[]"
+                            multiple
+                            accept="image/*"
+                            class="block w-full text-sm text-slate-700"
+                        >
+                    </div>
 
-                <button type="submit"
-                        class="mt-6 rounded-2xl bg-red-600 px-5 py-3 text-sm font-medium text-white hover:bg-red-700">
-                    Submit report
-                </button>
-            </form>
+                    {{-- Submit --}}
+                    <div class="pt-6 flex justify-center">
+                        <button
+                            type="submit"
+                            class="rounded-xl bg-red-600 px-8 py-3 text-sm font-medium text-white
+                                   hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300"
+                        >
+                            Submit report
+                        </button>
+                    </div>
+
+                </form>
+            </div>
         </div>
     </div>
 </x-app-layout>
