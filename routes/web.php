@@ -16,6 +16,7 @@ use App\Http\Controllers\Auth\LandlordCodeVerificationController;
 use App\Http\Controllers\Auth\LandlordOCRController;
 use App\Http\Controllers\LandlordController;
 use App\Http\Controllers\LandlordMessageController;
+use App\Http\Controllers\Landlord\LandlordMaintenanceController;
 
 
 // Student controllers
@@ -191,6 +192,8 @@ Route::get('/student/maintenance/{application}', [StudentMaintenanceController::
 
 Route::post('/student/maintenance/{application}', [StudentMaintenanceController::class, 'store'])->name('student.maintenance-log.store');
 
+// Landlord maintenance log
+Route::get('/landlord/maintenance/{application}', [LandlordMaintenanceController::class, 'page'])->name('landlord.maintenance-log');
 // ===============================
 // RENT TRACKER ROUTES (SESSION-BASED)
 // ===============================
