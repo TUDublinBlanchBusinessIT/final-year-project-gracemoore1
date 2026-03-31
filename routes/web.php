@@ -227,8 +227,8 @@ Route::prefix('admin/reports')->group(function () {
     Route::get('/{id}', [AdminReportController::class, 'show'])
         ->name('admin.reports.view');
 
-    Route::post('/{id}/no-action', [AdminReportController::class, 'markNoAction'])
-        ->name('admin.reports.markNoAction');
+    Route::post('/admin/reports/{id}/no-action', [AdminReportController::class, 'noAction'])
+        ->name('admin.reports.noaction.submit');
 
     Route::post('/{id}/suspend', [AdminReportController::class, 'suspend'])
         ->name('admin.reports.suspend');

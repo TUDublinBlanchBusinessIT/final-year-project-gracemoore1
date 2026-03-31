@@ -33,10 +33,35 @@
 
                         
                         <div>
-                            <h3 class="text-lg font-semibold text-slate-900">
-                                <?php echo e($application->student->firstname ?? 'Student'); ?> <?php echo e($application->student->surname ?? ''); ?>
+                            <div class="relative inline-block">
+                                <div class="group">
 
-                            </h3>
+                                    <h3 class="text-lg font-semibold text-slate-900 cursor-pointer">
+                                        <?php echo e($application->student->firstname ?? 'Student'); ?>
+
+                                        <?php echo e($application->student->surname ?? ''); ?>
+
+                                    </h3>
+
+                                    <div
+                                        class="absolute left-0 top-full mt-1 w-44
+                                            bg-white border border-slate-200 rounded-lg shadow-lg
+                                            opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                                            transition-all duration-150 z-50">
+
+                                        <a
+                                            href="<?php echo e(route('complaint.create', [
+                                                'reported_user_id' => $application->student->id,
+                                                'reported_user_role' => 'student'
+                                            ])); ?>"
+                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-lg"
+                                        >
+                                            Report account
+                                        </a>
+
+                                    </div>
+                                </div>
+                            </div>
                             <p class="text-sm text-slate-500">
                                 <?php echo e($application->rental->housenumber ?? ''); ?>
 
