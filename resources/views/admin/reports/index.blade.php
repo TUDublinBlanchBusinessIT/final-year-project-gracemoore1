@@ -23,7 +23,9 @@
                     @foreach($reports as $r)
                         <tr class="border-b">
                             <td class="py-2">{{ $r->id }}</td>
-                            <td class="py-2">{{ \Illuminate\Support\Str::limit($r->description, 60) }}</td>
+                            <td class="py-2 font-medium text-slate-900">
+                                {{ $r->subject_preview }}
+                            </td>
                             <td class="py-2">
                                 {{ \Carbon\Carbon::parse($r->created_at)->format('d/m/Y') }}
                             </td>

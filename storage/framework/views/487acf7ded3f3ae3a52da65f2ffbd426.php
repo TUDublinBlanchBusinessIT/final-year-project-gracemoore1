@@ -1,3 +1,33 @@
+<?php $attributes ??= new \Illuminate\View\ComponentAttributeBag;
+
+$__newAttributes = [];
+$__propNames = \Illuminate\View\ComponentAttributeBag::extractPropNames((['activeTab' => 'pending']));
+
+foreach ($attributes->all() as $__key => $__value) {
+    if (in_array($__key, $__propNames)) {
+        $$__key = $$__key ?? $__value;
+    } else {
+        $__newAttributes[$__key] = $__value;
+    }
+}
+
+$attributes = new \Illuminate\View\ComponentAttributeBag($__newAttributes);
+
+unset($__propNames);
+unset($__newAttributes);
+
+foreach (array_filter((['activeTab' => 'pending']), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
+    $$__key = $$__key ?? $__value;
+}
+
+$__defined_vars = get_defined_vars();
+
+foreach ($attributes->all() as $__key => $__value) {
+    if (array_key_exists($__key, $__defined_vars)) unset($$__key);
+}
+
+unset($__defined_vars, $__key, $__value); ?>
+
 <?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
 <?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -32,7 +62,7 @@
 
                 <li>
                     <a href="<?php echo e(route('admin.reports')); ?>"
-                       class="<?php echo e($activeTab === 'pending'
+                       class="<?php echo e(($activeTab ?? 'pending') === 'pending'
                             ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
                             : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300'); ?>">
                         Reports to be handled
@@ -41,7 +71,7 @@
 
                 <li>
                     <a href="<?php echo e(route('admin.reports.action')); ?>"
-                       class="<?php echo e($activeTab === 'action'
+                       class="<?php echo e(($activeTab ?? 'pending') === 'action'
                             ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
                             : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300'); ?>">
                         Action required
@@ -50,7 +80,7 @@
 
                 <li>
                     <a href="<?php echo e(route('admin.reports.noaction')); ?>"
-                       class="<?php echo e($activeTab === 'noaction'
+                       class="<?php echo e(($activeTab ?? 'pending') === 'noaction'
                             ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
                             : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300'); ?>">
                         No action required

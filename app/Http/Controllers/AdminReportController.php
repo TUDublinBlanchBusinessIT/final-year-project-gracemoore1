@@ -82,18 +82,25 @@ class AdminReportController extends Controller
 
     public function show($id)
     {
-        $this->adminGuard();
-
         $report = DB::table('complaint')->where('id', $id)->first();
         abort_if(!$report, 404);
 
         $reporterName = $this->fullName($report->reporter_role, $report->reporter_id);
         $reportedName = $this->fullName($report->reported_user_role, $report->reported_user_id);
 
-        $subject = $this->extractSubject($report->description);
-        $evidencePaths = $this->extractEvidence($report->description);
+        // ✅ Extract subject from description
+        $subject = 'No subject provided';
+        if (preg_match('/^SUBJECT:\s*(.+)$/m', $report->description, $matches)) {
+            $subject = trim($matches[1]);
+        }
 
-        return view('admin.reports.show', compact('report','reporterName','reportedName','subject','evidencePaths'));
+        return view('admin.reports.show', [
+            'report'        => $report,
+            'reporterName'  => $reporterName,
+            'reportedName'  => $reportedName,
+            'subject'       => $subject,        // ✅ NOW DEFINED
+            'activeTab'     => 'pending',
+        ]);
     }
 
     public function noAction($id)
@@ -128,12 +135,15 @@ class AdminReportController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
+        foreach ($reports as $r) {
+            $r->subject_preview = $this->extractSubject($r->description);
+        }
+
         return view('admin.reports.index', [
-            'reports' => $reports,
-            'activeTab' => 'pending'
+            'reports'   => $reports,
+            'activeTab' => 'pending',
         ]);
     }
-
     public function actionRequired()
     {
         $reports = DB::table('complaint')
@@ -146,11 +156,17 @@ class AdminReportController extends Controller
                     ->exists();
             });
 
+        // ✅ Extract subject for preview (NO "SUBJECT:")
+        foreach ($reports as $r) {
+            $r->subject_preview = $this->extractSubject($r->description);
+        }
+
         return view('admin.reports.index', [
-            'reports' => $reports,
-            'activeTab' => 'action'
+            'reports'   => $reports,
+            'activeTab' => 'action',
         ]);
     }
+
 
     public function noActionList()
     {
@@ -164,9 +180,14 @@ class AdminReportController extends Controller
                     ->exists();
             });
 
+        // ✅ Extract subject for preview (NO "SUBJECT:")
+        foreach ($reports as $r) {
+            $r->subject_preview = $this->extractSubject($r->description);
+        }
+
         return view('admin.reports.index', [
-            'reports' => $reports,
-            'activeTab' => 'noaction'
+            'reports'   => $reports,
+            'activeTab' => 'noaction',
         ]);
     }
     public function suspend($id)

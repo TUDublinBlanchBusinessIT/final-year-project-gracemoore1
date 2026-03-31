@@ -34,7 +34,10 @@
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $reports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
                         <tr class="border-b">
                             <td class="py-2"><?php echo e($r->id); ?></td>
-                            <td class="py-2"><?php echo e(\Illuminate\Support\Str::limit($r->description, 60)); ?></td>
+                            <td class="py-2 font-medium text-slate-900">
+                                <?php echo e($r->subject_preview); ?>
+
+                            </td>
                             <td class="py-2">
                                 <?php echo e(\Carbon\Carbon::parse($r->created_at)->format('d/m/Y')); ?>
 

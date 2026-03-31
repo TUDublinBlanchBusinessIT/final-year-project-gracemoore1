@@ -7,10 +7,19 @@
         </h2>
 
         <div class="space-y-3 text-gray-800 mb-6">
-            <p><strong>Subject:</strong> {{ $subject }}</p>
+
+            {{-- Subject (clean display) --}}
+            <div class="mb-3">
+                <p class="text-sm text-slate-500">Subject</p>
+                <p class="text-lg font-semibold text-slate-900">
+                    {{ $subject }}
+                </p>
+            </div>
+
             <p><strong>Reporter:</strong> {{ $reporterName }} ({{ $report->reporter_role }})</p>
             <p><strong>Reported user:</strong> {{ $reportedName }} ({{ $report->reported_user_role }})</p>
-            <p><strong>Submitted:</strong>
+            <p>
+                <strong>Submitted:</strong>
                 {{ \Carbon\Carbon::parse($report->created_at)->format('d/m/Y H:i') }}
             </p>
         </div>
@@ -27,13 +36,15 @@
         <div class="mb-6">
             <h3 class="font-semibold text-gray-900 mb-2">Evidence</h3>
 
-            @if(count($evidencePaths) === 0)
+            @if(empty($evidencePaths))
                 <p class="text-sm text-gray-600">No evidence uploaded.</p>
             @else
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                     @foreach($evidencePaths as $path)
-                        <img src="{{ asset('storage/'.$path) }}"
-                             class="rounded-lg border">
+                        <img
+                            src="{{ asset('storage/'.$path) }}"
+                            class="rounded-lg border"
+                        >
                     @endforeach
                 </div>
             @endif

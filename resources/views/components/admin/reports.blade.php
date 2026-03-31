@@ -1,3 +1,5 @@
+@props(['activeTab' => 'pending'])
+
 <x-app-layout>
 
     <x-slot name="header">
@@ -21,7 +23,7 @@
 
                 <li>
                     <a href="{{ route('admin.reports') }}"
-                       class="{{ $activeTab === 'pending'
+                       class="{{ ($activeTab ?? 'pending') === 'pending'
                             ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
                             : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
                         Reports to be handled
@@ -30,7 +32,7 @@
 
                 <li>
                     <a href="{{ route('admin.reports.action') }}"
-                       class="{{ $activeTab === 'action'
+                       class="{{ ($activeTab ?? 'pending') === 'action'
                             ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
                             : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
                         Action required
@@ -39,7 +41,7 @@
 
                 <li>
                     <a href="{{ route('admin.reports.noaction') }}"
-                       class="{{ $activeTab === 'noaction'
+                       class="{{ ($activeTab ?? 'pending') === 'noaction'
                             ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
                             : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
                         No action required

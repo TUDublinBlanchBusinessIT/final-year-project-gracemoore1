@@ -84,6 +84,7 @@ class ComplaintController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Report submitted successfully.');
+        return redirect()->route('dashboard')
+    ->with('success', 'Your report has been submitted successfully. Our team will review it shortly.');
     }
 }
