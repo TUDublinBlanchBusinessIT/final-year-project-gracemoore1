@@ -23,6 +23,8 @@ use App\Http\Controllers\StudentRegisterController;
 use App\Http\Controllers\StudentPasswordResetController;
 //student messaging
 use App\Http\Controllers\StudentMessageController;
+use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\AdminReportController;
 
 // Breeze / Laravel User Controllers
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -119,6 +121,10 @@ Route::get('/landlord/messages/{application}', [LandlordMessageController::class
 Route::post('/landlord/messages/{application}', [LandlordMessageController::class, 'store'])->name('landlord.messages.store');
 Route::get('/landlord/messages', [LandlordMessageController::class, 'index'])->name('landlord.messages');
 
+
+//report 
+Route::get('/complaint/create', [ComplaintController::class, 'create'])->name('complaint.create');
+Route::post('/complaint', [ComplaintController::class, 'store'])->name('complaint.store');
 // STUDENT LOGIN
 Route::get('/student/login', function() {
     return view('auth.login');
@@ -207,9 +213,27 @@ Route::get('/landlord/rent-tracker/{application}', [LandlordRentTrackerControlle
 //admin
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
-Route::get('/admin/reports', function () {
-    return view('admin.reports');
-})->name('admin.reports');
+Route::prefix('admin/reports')->group(function () {
+
+    Route::get('/', [AdminReportController::class, 'toBeHandled'])
+        ->name('admin.reports');
+
+    Route::get('/action-required', [AdminReportController::class, 'actionRequired'])
+        ->name('admin.reports.action');
+
+    Route::get('/no-action', [AdminReportController::class, 'noActionList'])
+        ->name('admin.reports.noaction');
+
+    Route::get('/{id}', [AdminReportController::class, 'show'])
+        ->name('admin.reports.view');
+
+    Route::post('/{id}/no-action', [AdminReportController::class, 'markNoAction'])
+        ->name('admin.reports.markNoAction');
+
+    Route::post('/{id}/suspend', [AdminReportController::class, 'suspend'])
+        ->name('admin.reports.suspend');
+});
+
 
 // ADMIN ACCOUNT MANAGEMENT ROUTES
 Route::prefix('admin/accounts')->group(function () {
