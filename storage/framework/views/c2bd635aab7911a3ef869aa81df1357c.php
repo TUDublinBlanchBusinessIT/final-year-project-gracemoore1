@@ -119,7 +119,7 @@
                                 </div>
                             </div>
 
-                            <div class="flex justify-start">
+                           <div class="flex justify-start">
                                 <div class="max-w-md rounded-3xl bg-white border border-slate-200 px-6 py-5 shadow-sm">
                                     <div class="flex items-center justify-between gap-3 mb-3">
                                         <h4 class="text-sm font-semibold text-slate-900">
@@ -141,6 +141,19 @@
                                             <?php echo e($log->landlord_note); ?>
 
                                         </p>
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->landlord_image)): ?>
+                                        <div class="mt-3">
+                                            <a href="<?php echo e(asset('storage/' . $log->landlord_image)); ?>" target="_blank">
+                                                <img src="<?php echo e(asset('storage/' . $log->landlord_image)); ?>"
+                                                    alt="Landlord update image"
+                                                    class="rounded-xl max-h-40 w-auto object-cover border border-slate-200 shadow-sm cursor-pointer">
+                                            </a>
+                                        </div>
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->landlord_note) || !empty($log->landlord_image)): ?>
                                         <p class="text-xs text-slate-400 mt-3">
                                             Last updated: <?php echo e(optional($log->updated_at)->format('d M Y H:i')); ?>
 
@@ -151,7 +164,7 @@
                                         </p>
                                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </div>
-                            </div>
+                            </div> 
                         </div>
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                         <div class="flex flex-col items-center justify-center text-center text-slate-400 py-12">

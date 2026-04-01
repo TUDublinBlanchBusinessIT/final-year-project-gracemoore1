@@ -102,7 +102,7 @@
                                 </div>
                             </div>
 
-                            <div class="flex justify-start">
+                           <div class="flex justify-start">
                                 <div class="max-w-md rounded-3xl bg-white border border-slate-200 px-6 py-5 shadow-sm">
                                     <div class="flex items-center justify-between gap-3 mb-3">
                                         <h4 class="text-sm font-semibold text-slate-900">
@@ -122,6 +122,19 @@
                                         <p class="text-sm text-slate-700 leading-6">
                                             {{ $log->landlord_note }}
                                         </p>
+                                    @endif
+
+                                    @if(!empty($log->landlord_image))
+                                        <div class="mt-3">
+                                            <a href="{{ asset('storage/' . $log->landlord_image) }}" target="_blank">
+                                                <img src="{{ asset('storage/' . $log->landlord_image) }}"
+                                                    alt="Landlord update image"
+                                                    class="rounded-xl max-h-40 w-auto object-cover border border-slate-200 shadow-sm cursor-pointer">
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($log->landlord_note) || !empty($log->landlord_image))
                                         <p class="text-xs text-slate-400 mt-3">
                                             Last updated: {{ optional($log->updated_at)->format('d M Y H:i') }}
                                         </p>
@@ -131,7 +144,7 @@
                                         </p>
                                     @endif
                                 </div>
-                            </div>
+                            </div> 
                         </div>
                     @empty
                         <div class="flex flex-col items-center justify-center text-center text-slate-400 py-12">

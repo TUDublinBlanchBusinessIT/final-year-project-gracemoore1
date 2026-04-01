@@ -101,7 +101,7 @@
                                 </div>
                             </div>
 
-                            @if(!empty($log->landlord_note))
+                            @if(!empty($log->landlord_note) || !empty($log->landlord_image))
                                 <div class="flex justify-end">
                                     <div class="max-w-md rounded-3xl bg-white border border-slate-200 px-6 py-5 shadow-sm">
                                         <div class="flex items-center justify-between gap-3 mb-3">
@@ -118,9 +118,21 @@
                                             </span>
                                         </div>
 
-                                        <p class="text-sm text-slate-700 leading-6">
-                                            {{ $log->landlord_note }}
-                                        </p>
+                                        @if(!empty($log->landlord_note))
+                                            <p class="text-sm text-slate-700 leading-6">
+                                                {{ $log->landlord_note }}
+                                            </p>
+                                        @endif
+
+                                        @if(!empty($log->landlord_image))
+                                            <div class="mt-3">
+                                                <a href="{{ asset('storage/' . $log->landlord_image) }}" target="_blank">
+                                                    <img src="{{ asset('storage/' . $log->landlord_image) }}"
+                                                        alt="Landlord update image"
+                                                        class="rounded-xl max-h-40 w-auto object-cover border border-slate-200 shadow-sm cursor-pointer">
+                                                </a>
+                                            </div>
+                                        @endif
 
                                         <p class="text-xs text-slate-400 mt-3">
                                             Last updated: {{ optional($log->updated_at)->format('d M Y H:i') }}
@@ -139,7 +151,7 @@
                                         </a>
                                     </div>
 
-                                    <form action="{{ route('landlord.maintenance-log.update', [$application->id, $log->id]) }}" method="POST">
+                                    <form action="{{ route('landlord.maintenance-log.update', [$application->id, $log->id]) }}" method="POST" enctype="multipart/form-data">
                                         @csrf
 
                                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
@@ -181,6 +193,24 @@
                                                 </select>
                                             </div>
 
+                                            <div class="lg:col-span-3">
+                                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                                    Add image
+                                                </label>
+
+                                                <input
+                                                    type="file"
+                                                    name="landlord_image"
+                                                    accept="image/*"
+                                                    class="block w-full text-sm text-slate-600
+                                                        file:mr-3 file:py-2 file:px-4
+                                                        file:rounded-xl file:border-0
+                                                        file:text-sm file:font-medium
+                                                        file:bg-slate-100 file:text-slate-700
+                                                        hover:file:bg-slate-200"
+                                                    >
+                                                </div>
+
                                             <div class="lg:col-span-2">
                                                 <button
                                                     type="submit"
@@ -196,6 +226,10 @@
                                         @enderror
 
                                         @error('status')
+                                            <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                                        @enderror
+
+                                        @error('landlord_image')
                                             <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                                         @enderror
 

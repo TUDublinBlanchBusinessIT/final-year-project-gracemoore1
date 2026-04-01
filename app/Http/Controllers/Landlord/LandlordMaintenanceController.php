@@ -53,11 +53,22 @@ class LandlordMaintenanceController extends Controller
         $request->validate([
             'status' => 'required|in:pending,in_progress,resolved',
             'landlord_note' => 'nullable|string|max:1000',
+            'landlord_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+
+        $landlordImagePath = $maintenanceLog->landlord_image;
+
+        if ($request->hasFile('landlord_image')) {
+            $image = $request->file('landlord_image');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('storage/maintenance-images'), $filename);
+            $landlordImagePath = 'maintenance-images/' . $filename;
+        }
 
         $maintenanceLog->update([
             'status' => $request->status,
             'landlord_note' => $request->landlord_note,
+            'landlord_image' => $landlordImagePath,
         ]);
 
         Message::create([

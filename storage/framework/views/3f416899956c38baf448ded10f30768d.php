@@ -118,7 +118,7 @@
                                 </div>
                             </div>
 
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->landlord_note)): ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->landlord_note) || !empty($log->landlord_image)): ?>
                                 <div class="flex justify-end">
                                     <div class="max-w-md rounded-3xl bg-white border border-slate-200 px-6 py-5 shadow-sm">
                                         <div class="flex items-center justify-between gap-3 mb-3">
@@ -136,10 +136,22 @@
                                             </span>
                                         </div>
 
-                                        <p class="text-sm text-slate-700 leading-6">
-                                            <?php echo e($log->landlord_note); ?>
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->landlord_note)): ?>
+                                            <p class="text-sm text-slate-700 leading-6">
+                                                <?php echo e($log->landlord_note); ?>
 
-                                        </p>
+                                            </p>
+                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->landlord_image)): ?>
+                                            <div class="mt-3">
+                                                <a href="<?php echo e(asset('storage/' . $log->landlord_image)); ?>" target="_blank">
+                                                    <img src="<?php echo e(asset('storage/' . $log->landlord_image)); ?>"
+                                                        alt="Landlord update image"
+                                                        class="rounded-xl max-h-40 w-auto object-cover border border-slate-200 shadow-sm cursor-pointer">
+                                                </a>
+                                            </div>
+                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                                         <p class="text-xs text-slate-400 mt-3">
                                             Last updated: <?php echo e(optional($log->updated_at)->format('d M Y H:i')); ?>
@@ -159,7 +171,7 @@
                                         </a>
                                     </div>
 
-                                    <form action="<?php echo e(route('landlord.maintenance-log.update', [$application->id, $log->id])); ?>" method="POST">
+                                    <form action="<?php echo e(route('landlord.maintenance-log.update', [$application->id, $log->id])); ?>" method="POST" enctype="multipart/form-data">
                                         <?php echo csrf_field(); ?>
 
                                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
@@ -201,6 +213,24 @@
                                                 </select>
                                             </div>
 
+                                            <div class="lg:col-span-3">
+                                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                                    Add image
+                                                </label>
+
+                                                <input
+                                                    type="file"
+                                                    name="landlord_image"
+                                                    accept="image/*"
+                                                    class="block w-full text-sm text-slate-600
+                                                        file:mr-3 file:py-2 file:px-4
+                                                        file:rounded-xl file:border-0
+                                                        file:text-sm file:font-medium
+                                                        file:bg-slate-100 file:text-slate-700
+                                                        hover:file:bg-slate-200"
+                                                    >
+                                                </div>
+
                                             <div class="lg:col-span-2">
                                                 <button
                                                     type="submit"
@@ -223,6 +253,17 @@ endif;
 unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                                         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['status'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <p class="text-red-500 text-sm mt-2"><?php echo e($message); ?></p>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['landlord_image'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
