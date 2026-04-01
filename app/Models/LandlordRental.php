@@ -25,6 +25,10 @@ class LandlordRental extends Model
         'availableuntil',
         'landlordid',
         'application_type',
+        'is_premium',
+        'premium_paid_at',
+        'premium_payment_intent',
+
         // 'studentid',
         // 'propertyid',
 

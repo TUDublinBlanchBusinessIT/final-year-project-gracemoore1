@@ -147,28 +147,40 @@
             </form>
         </div>
 
-        @if ($premiumListings->count())
         <div class="mt-10">
             <h2 class="text-xl font-bold text-slate-900 mb-3">Premium listings</h2>
 
-            <div class="relative">
-                <button onclick="scrollRow('premium', -1)"
-                    class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow">‹</button>
+            @if ($premiumListings->count())
+                <div class="relative">
+                    <button onclick="scrollRow('premium', -1)"
+                        class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow">
+                        ‹
+                    </button>
 
-                <button onclick="scrollRow('premium', 1)"
-                    class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow">›</button>
+                    <button onclick="scrollRow('premium', 1)"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow">
+                        ›
+                    </button>
 
-                <div class="overflow-hidden px-12">
-                    <div id="premium-track" class="flex gap-6 transition-transform duration-300 ease-out">
-                        @foreach ($premiumListings as $rental)
-                            @include('partials.listing-card', ['rental' => $rental, 'trackPrefix' => 'premium'])
-                        @endforeach
+                    <div class="overflow-hidden px-12">
+                        <div id="premium-track"
+                            class="flex gap-6 transition-transform duration-300 ease-out">
+                            @foreach ($premiumListings as $rental)
+                                @include('partials.listing-card', [
+                                    'rental' => $rental,
+                                    'trackPrefix' => 'premium'
+                                ])
+                            @endforeach
+                        </div>
                     </div>
                 </div>
-            </div>
+            @else
+                <p class="text-sm text-slate-500">
+                    No premium listings available at the moment.
+                </p>
+            @endif
         </div>
-        @endif
-        </div>
+
 
         @if ($allListings->count())
         <div class="mt-10">

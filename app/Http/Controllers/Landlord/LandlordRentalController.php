@@ -84,25 +84,27 @@ class LandlordRentalController extends Controller
             }
         }
 
-        $isPremium = $request->input('premium_listing') === '1';
+        $isPremium = $request->filled('premium_payment_intent');
+
+        // If they selected premium but didn't pay, block it (server-side safety net)
+        if ($request->input('premium_listing') === '1' && !$isPremium) {
+            return back()->withErrors([
+                'premium_listing' => 'You must complete payment before saving a premium listing.'
+            ]);
+        }
 
         if ($isPremium) {
-            if (!$request->filled('premium_payment_intent')) {
-                return back()->withErrors([
-                    'premium_listing' => 'Premium payment is required.'
-                ]);
-            }
-
             Stripe::setApiKey(config('services.stripe.secret'));
 
             $pi = PaymentIntent::retrieve($request->premium_payment_intent);
 
-            if ($pi->status !== 'succeeded' || (int)$pi->amount !== 499) {
+            if ($pi->status !== 'succeeded' || (int)$pi->amount !== 499 || strtolower($pi->currency) !== 'eur') {
                 return back()->withErrors([
                     'premium_listing' => 'Premium payment was not successful.'
                 ]);
             }
         }
+
 
 
         LandlordRental::create([

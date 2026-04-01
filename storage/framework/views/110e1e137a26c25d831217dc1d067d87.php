@@ -16,16 +16,16 @@
 
     
     <div class="relative" data-carousel
-         data-key="<?php echo e($trackPrefix); ?>-<?php echo e($rental->id); ?>"
-         data-count="<?php echo e($imgCount); ?>">
+        data-key="<?php echo e($trackPrefix); ?>-<?php echo e($rental->id); ?>"
+        data-count="<?php echo e($imgCount); ?>">
 
         <div class="overflow-hidden rounded-lg">
             <div id="track-<?php echo e($trackPrefix); ?>-<?php echo e($rental->id); ?>"
-                 class="flex transition-transform duration-300 ease-out">
+                class="flex transition-transform duration-300 ease-out">
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $img): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
                     <div class="w-full shrink-0">
                         <img src="<?php echo e(asset('storage/' . $img)); ?>"
-                             class="w-full h-48 object-cover rounded-lg" />
+                            class="w-full h-48 object-cover rounded-lg" />
                     </div>
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                     <div class="w-full h-48 bg-slate-100 flex items-center justify-center text-slate-500">
@@ -34,6 +34,21 @@
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
         </div>
+
+        
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($imgCount > 1): ?>
+            <button type="button"
+                onclick="prevImage('<?php echo e($trackPrefix); ?>', <?php echo e($rental->id); ?>)"
+                class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">
+                ‹
+            </button>
+
+            <button type="button"
+                onclick="nextImage('<?php echo e($trackPrefix); ?>', <?php echo e($rental->id); ?>)"
+                class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">
+                ›
+            </button>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
 
     

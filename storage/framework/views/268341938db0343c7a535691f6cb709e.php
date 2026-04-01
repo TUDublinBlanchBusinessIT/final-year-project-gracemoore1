@@ -302,7 +302,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                                     Cancel
                                 </a>
 
-                                <button type="submit" id="saveListingBtn"
+                                <button type="button" id="saveListingBtn"
                                     class="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">
                                     Save Listing
                                 </button>
@@ -479,7 +479,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         piInput.value = paymentIntent.id;
         successEl.classList.remove('hidden');
-        setSave(true);
+
+        // ✅ submit only AFTER payment is confirmed
+        document.querySelector('form').submit();
     });
 
 });

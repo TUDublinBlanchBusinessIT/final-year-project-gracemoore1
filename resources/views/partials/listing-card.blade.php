@@ -15,16 +15,16 @@
 
     {{-- IMAGE CAROUSEL --}}
     <div class="relative" data-carousel
-         data-key="{{ $trackPrefix }}-{{ $rental->id }}"
-         data-count="{{ $imgCount }}">
+        data-key="{{ $trackPrefix }}-{{ $rental->id }}"
+        data-count="{{ $imgCount }}">
 
         <div class="overflow-hidden rounded-lg">
             <div id="track-{{ $trackPrefix }}-{{ $rental->id }}"
-                 class="flex transition-transform duration-300 ease-out">
+                class="flex transition-transform duration-300 ease-out">
                 @forelse ($images as $img)
                     <div class="w-full shrink-0">
                         <img src="{{ asset('storage/' . $img) }}"
-                             class="w-full h-48 object-cover rounded-lg" />
+                            class="w-full h-48 object-cover rounded-lg" />
                     </div>
                 @empty
                     <div class="w-full h-48 bg-slate-100 flex items-center justify-center text-slate-500">
@@ -33,6 +33,21 @@
                 @endforelse
             </div>
         </div>
+
+        {{-- ✅ ADD IMAGE NAV ARROWS (same behaviour as county cards) --}}
+        @if ($imgCount > 1)
+            <button type="button"
+                onclick="prevImage('{{ $trackPrefix }}', {{ $rental->id }})"
+                class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">
+                ‹
+            </button>
+
+            <button type="button"
+                onclick="nextImage('{{ $trackPrefix }}', {{ $rental->id }})"
+                class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 text-slate-700 px-2 py-1 rounded-full shadow">
+                ›
+            </button>
+        @endif
     </div>
 
     {{-- DETAILS --}}
