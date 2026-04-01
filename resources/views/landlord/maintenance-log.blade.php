@@ -29,13 +29,34 @@
                                 {{ $application->rental->street ?? '' }},
                                 {{ $application->rental->county ?? '' }}
                             </p>
-                            
                         </div>
                     </div>
                 </div>
 
-                <div class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
+                <div id="maintenanceContainer" class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
+
+                    @php
+                        $lastDate = null;
+                    @endphp
+
                     @forelse($logs as $log)
+
+                        @php
+                            $logDate = optional($log->timestamp)->format('d M Y') 
+                                ?? optional($log->created_at)->format('d M Y');
+                        @endphp
+
+                        @if($lastDate !== $logDate)
+                            <div class="flex justify-center my-4">
+                                <span class="px-4 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">
+                                    {{ $logDate }}
+                                </span>
+                            </div>
+                            @php
+                                $lastDate = $logDate;
+                            @endphp
+                        @endif
+
                         <div class="flex justify-start mb-6">
                             <div class="max-w-md rounded-3xl px-6 py-5 shadow-sm
                                 @if($log->priority === 'high') bg-red-500 text-white
@@ -66,10 +87,13 @@
                                 @endif
 
                                 <div class="text-xs mt-4 opacity-90">
-                                    {{ optional($log->timestamp)->format('H:i') ?? optional($log->created_at)->format('H:i') }}
+                                    {{ optional($log->timestamp)->format('d M Y H:i') 
+                                        ?? optional($log->created_at)->format('d M Y H:i') }}
                                 </div>
+
                             </div>
                         </div>
+
                     @empty
                         <div class="flex flex-col items-center justify-center text-center text-slate-400 py-12">
                             <div class="text-4xl mb-3">🛠</div>
@@ -77,9 +101,19 @@
                             <p class="text-sm text-slate-400 mt-1">Any issues submitted by the student will appear here.</p>
                         </div>
                     @endforelse
+
                 </div>
 
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const container = document.getElementById("maintenanceContainer");
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        });
+    </script>
 </x-app-layout>

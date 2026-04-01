@@ -42,13 +42,35 @@
                                 <?php echo e($application->rental->county ?? ''); ?>
 
                             </p>
-                            
                         </div>
                     </div>
                 </div>
 
-                <div class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
+                <div id="maintenanceContainer" class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
+
+                    <?php
+                        $lastDate = null;
+                    ?>
+
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $logs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+
+                        <?php
+                            $logDate = optional($log->timestamp)->format('d M Y') 
+                                ?? optional($log->created_at)->format('d M Y');
+                        ?>
+
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($lastDate !== $logDate): ?>
+                            <div class="flex justify-center my-4">
+                                <span class="px-4 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">
+                                    <?php echo e($logDate); ?>
+
+                                </span>
+                            </div>
+                            <?php
+                                $lastDate = $logDate;
+                            ?>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
                         <div class="flex justify-start mb-6">
                             <div class="max-w-md rounded-3xl px-6 py-5 shadow-sm
                                 <?php if($log->priority === 'high'): ?> bg-red-500 text-white
@@ -80,11 +102,14 @@
                                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                                 <div class="text-xs mt-4 opacity-90">
-                                    <?php echo e(optional($log->timestamp)->format('H:i') ?? optional($log->created_at)->format('H:i')); ?>
+                                    <?php echo e(optional($log->timestamp)->format('d M Y H:i') 
+                                        ?? optional($log->created_at)->format('d M Y H:i')); ?>
 
                                 </div>
+
                             </div>
                         </div>
+
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                         <div class="flex flex-col items-center justify-center text-center text-slate-400 py-12">
                             <div class="text-4xl mb-3">🛠</div>
@@ -92,11 +117,21 @@
                             <p class="text-sm text-slate-400 mt-1">Any issues submitted by the student will appear here.</p>
                         </div>
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
                 </div>
 
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const container = document.getElementById("maintenanceContainer");
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        });
+    </script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
