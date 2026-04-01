@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Landlord;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Maintenancelog;
+use App\Models\Message;
 use Illuminate\Http\Request;
 
 class LandlordMaintenanceController extends Controller
@@ -57,6 +58,19 @@ class LandlordMaintenanceController extends Controller
         $maintenanceLog->update([
             'status' => $request->status,
             'landlord_note' => $request->landlord_note,
+        ]);
+
+        Message::create([
+            'content' => '🛠 Maintenance update: ' . ($request->status === 'in_progress' ? 'In Progress' : ucfirst($request->status)) . '. Please check the maintenance tracker.',
+            'sender_type' => 'system',
+            'timestamp' => now(),
+            'studentid' => $app->studentid,
+            'group_id' => $app->group_id,
+            'landlordid' => $app->rental->landlordid,
+            'rentalid' => $app->rentalid,
+            'serviceproviderpartnershipid' => null,
+            'is_read_by_student' => false,
+            'is_read_by_landlord' => true,
         ]);
 
         return redirect()

@@ -8,7 +8,7 @@
 
     if ($student) {
         $studentUnreadCount = \App\Models\Message::where('studentid', $student->id)
-            ->where('sender_type', 'landlord')
+            ->where('sender_type', '!=', 'student')
             ->where('is_read_by_student', false)
             ->count();
     }
