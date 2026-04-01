@@ -38,11 +38,37 @@ use App\Models\Listing;
 use App\Http\Controllers\Landlord\LandlordRentalController;
 use App\Http\Controllers\PartnershipController;
 
+//service provider
+use App\Http\Controllers\LandlordServiceRequestController;
+use App\Http\Controllers\ServiceProviderRequestedJobsController;
+
 
 //chatbot
 Route::get('/student/chatbot', [ChatbotController::class, 'studentChat'])->name('student.chatbot');
 Route::get('/landlord/chatbot', [ChatbotController::class, 'landlordChat'])->name('landlord.chatbot');
 Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+
+//landlord/serviceprovider messaging
+Route::middleware(['landlord'])->group(function () {
+    Route::get('/landlord/maintenance/{id}/book-service-provider', [LandlordServiceRequestController::class, 'create'])
+        ->name('landlord.service-request.create');
+
+    Route::post('/landlord/maintenance/{id}/book-service-provider', [LandlordServiceRequestController::class, 'store'])
+        ->name('landlord.service-request.store');
+});
+
+//sp
+Route::middleware(['serviceprovider'])->group(function () {
+    Route::get('/serviceprovider/requested', [ServiceProviderRequestedJobsController::class, 'index'])
+        ->name('serviceprovider.requested');
+
+    Route::post('/serviceprovider/requested/{id}/accept', [ServiceProviderRequestedJobsController::class, 'accept'])
+        ->name('serviceprovider.requested.accept');
+
+    Route::post('/serviceprovider/requested/{id}/decline', [ServiceProviderRequestedJobsController::class, 'decline'])
+        ->name('serviceprovider.requested.decline');
+});
+
 
 
 
@@ -525,10 +551,8 @@ Route::get('/serviceprovider/completed', function () {
     return view('serviceprovider.completed');
 })->name('serviceprovider.completed');
 
-Route::get('/serviceprovider/requested', function () {
-    if (!session('serviceprovider_id')) return redirect('/login');
-    return view('serviceprovider.requested');
-})->name('serviceprovider.requested');
+Route::get('/serviceprovider/requested', [ServiceProviderRequestedJobsController::class, 'index'])
+    ->name('serviceprovider.requested');
 
 Route::get('/serviceprovider/messages', function () {
     if (!session('serviceprovider_id')) return redirect('/login');

@@ -165,7 +165,7 @@
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($log->status !== 'resolved'): ?>
                                 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                                     <div class="mb-4">
-                                        <a href="#"
+                                        <a href="<?php echo e(route('landlord.service-request.create', $log->id)); ?>"
                                         class="inline-flex items-center rounded-2xl border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">
                                             Book Service Provider
                                         </a>
