@@ -302,7 +302,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                                     Cancel
                                 </a>
 
-                                <button type="button" id="saveListingBtn"
+                                <button type="submit" id="saveListingBtn"
                                     class="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">
                                     Save Listing
                                 </button>
@@ -429,6 +429,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     const piInput = document.getElementById('premium_payment_intent');
     const errorEl = document.getElementById('premium-error');
     const successEl = document.getElementById('premiumSuccess');
+    // ✅ SUBMIT GUARD — blocks saving premium listings without payment
+    const formEl = document.querySelector('form');
+
+    formEl.addEventListener('submit', (e) => {
+        if (premiumFlag.value === '1' && !piInput.value) {
+            e.preventDefault();
+
+            errorEl.textContent =
+                "Please complete the €4.99 premium payment before saving.";
+
+            box.classList.remove('hidden');
+            setSave(false);
+        }
+    });
 
     card.mount('#premium-card');
 
@@ -480,8 +494,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         piInput.value = paymentIntent.id;
         successEl.classList.remove('hidden');
 
-        // ✅ submit only AFTER payment is confirmed
-        document.querySelector('form').submit();
+        // ✅ allow user to click Save Listing manually
+        setSave(true);
+
+        // ✅ optional: lock the pay button so they don’t pay twice
+        payBtn.disabled = true;
     });
 
 });
