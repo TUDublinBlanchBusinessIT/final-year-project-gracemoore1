@@ -87,6 +87,13 @@ Route::middleware(['landlord'])
         Route::delete('/rentals/{rental}', [LandlordRentalController::class, 'destroy'])->name('rentals.destroy');
     });
 
+
+Route::post(
+    '/landlord/rentals/premium-intent',
+    [LandlordRentalController::class, 'createPremiumIntent']
+)->name('landlord.rentals.premium.intent');
+
+
 Route::get('/landlord/applications/{rental}', [LandlordRentalController::class, 'applications'])
     ->name('landlord.applications.index');
 

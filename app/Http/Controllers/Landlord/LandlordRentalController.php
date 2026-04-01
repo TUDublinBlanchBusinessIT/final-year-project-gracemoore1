@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Landlord;
 use Illuminate\Support\Facades\DB;
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
+
 
 class LandlordRentalController extends Controller
 {
@@ -22,9 +25,31 @@ class LandlordRentalController extends Controller
         return view('landlord.rentals.index', compact('rentals'));
     }
 
+
     public function create()
     {
         return view('landlord.rentals.create');
+    }
+
+    public function createPremiumIntent()
+    {
+        $landlordId = $this->getCurrentLandlordId();
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $intent = PaymentIntent::create([
+            'amount' => 499, // €4.99
+            'currency' => 'eur',
+            'payment_method_types' => ['card'], // ✅ CARD ONLY
+            'metadata' => [
+                'type' => 'premium_listing',
+                'landlord_id' => $landlordId,
+            ],
+        ]);
+
+        return response()->json([
+            'client_secret' => $intent->client_secret,
+        ]);
     }
 
     public function store(Request $request)
@@ -45,6 +70,8 @@ class LandlordRentalController extends Controller
             'availableuntil'      => ['required','date','after_or_equal:availablefrom'],
             'images.*'            => ['nullable','image','mimes:jpg,jpeg,png,webp','max:4096'],
             'application_type'    => ['required', 'in:single,group'],
+            'premium_listing'     => ['nullable','in:0,1'],
+            'premium_payment_intent' => ['nullable','string','max:255'],
         ]);
 
         $landlordId = $this->getCurrentLandlordId();
@@ -56,6 +83,27 @@ class LandlordRentalController extends Controller
                 $imagePaths[] = $img->store('rentals', 'public');
             }
         }
+
+        $isPremium = $request->input('premium_listing') === '1';
+
+        if ($isPremium) {
+            if (!$request->filled('premium_payment_intent')) {
+                return back()->withErrors([
+                    'premium_listing' => 'Premium payment is required.'
+                ]);
+            }
+
+            Stripe::setApiKey(config('services.stripe.secret'));
+
+            $pi = PaymentIntent::retrieve($request->premium_payment_intent);
+
+            if ($pi->status !== 'succeeded' || (int)$pi->amount !== 499) {
+                return back()->withErrors([
+                    'premium_listing' => 'Premium payment was not successful.'
+                ]);
+            }
+        }
+
 
         LandlordRental::create([
             'landlordid'         => $landlordId,
@@ -74,6 +122,9 @@ class LandlordRentalController extends Controller
             'availablefrom'      => $request->availablefrom,
             'availableuntil'     => $request->availableuntil,
             'application_type'   => $request->string('application_type'),
+            'is_premium' => $isPremium ? 1 : 0,
+            'premium_paid_at' => $isPremium ? now() : null,
+            'premium_payment_intent' => $isPremium ? $request->premium_payment_intent : null,
         ]);
 
         return redirect()->route('dashboard')->with('status', 'Listing created!');

@@ -55,6 +55,9 @@
                               enctype="multipart/form-data">
                             <?php echo csrf_field(); ?>
 
+                            <input type="hidden" name="premium_listing" id="premium_listing" value="0">
+                            <input type="hidden" name="premium_payment_intent" id="premium_payment_intent">
+
                             
                             
                             <section class="space-y-3">
@@ -250,6 +253,48 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                                         class="mt-2 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="Brief description about the accommodation..."><?php echo e(old('description')); ?></textarea>
                             </section>
+                            <section class="rounded-2xl border border-slate-200 bg-slate-50 p-6 space-y-4">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <h2 class="text-lg font-bold text-slate-900">Premium listing</h2>
+                                        <p class="text-sm text-slate-600 mt-1">
+                                            Premium listings appear at the top of the student homepage.
+                                        </p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-semibold text-slate-900">€4.99</div>
+                                        <div class="text-xs text-slate-500">one‑time payment</div>
+                                    </div>
+                                </div>
+
+                                <label class="flex items-center gap-3">
+                                    <input type="checkbox" id="premiumToggle" class="rounded border-slate-300">
+                                    <span class="text-sm text-slate-800">Make this a premium listing</span>
+                                </label>
+
+                                <div id="premiumStripeBox"
+                                    class="hidden border border-slate-200 bg-white rounded-xl p-4 space-y-3">
+
+                                    <p class="text-sm text-slate-700 font-medium">Card details</p>
+
+                                    <div id="premium-card"
+                                        class="border border-slate-300 rounded-xl px-4 py-3 bg-white"></div>
+
+                                    <p id="premium-error" class="text-sm text-red-600"></p>
+
+                                    <button type="button" id="premiumPayBtn"
+                                        class="rounded-2xl bg-blue-600 px-5 py-3 text-sm text-white">
+                                        Pay €4.99
+                                    </button>
+
+                                    <p id="premiumSuccess"
+                                    class="hidden text-sm text-green-700 font-semibold">
+                                        Premium payment completed.
+                                    </p>
+
+                                </div>
+                            </section>
+
                             
                             <div class="flex items-center justify-end gap-3 pt-2">
                                 <a href="<?php echo e(route('dashboard')); ?>"
@@ -257,8 +302,8 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                                     Cancel
                                 </a>
 
-                                <button type="submit"
-                                        class="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
+                                <button type="submit" id="saveListingBtn"
+                                    class="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">
                                     Save Listing
                                 </button>
                             </div>
@@ -357,6 +402,89 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
         }
     });
 </script>
+<script src="https://js.stripe.com/v3"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const stripe = Stripe("<?php echo e(config('services.stripe.public_key')); ?>");
+    const elements = stripe.elements();
+
+    const card = elements.create('card', {
+        hidePostalCode: true,
+        style: {
+            base: {
+                fontSize: '16px',
+                fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+                color: '#374151'
+            }
+        }
+    });
+
+    const toggle = document.getElementById('premiumToggle');
+    const box = document.getElementById('premiumStripeBox');
+    const payBtn = document.getElementById('premiumPayBtn');
+    const saveBtn = document.getElementById('saveListingBtn');
+    const premiumFlag = document.getElementById('premium_listing');
+    const piInput = document.getElementById('premium_payment_intent');
+    const errorEl = document.getElementById('premium-error');
+    const successEl = document.getElementById('premiumSuccess');
+
+    card.mount('#premium-card');
+
+    function setSave(enabled) {
+        saveBtn.disabled = !enabled;
+        saveBtn.classList.toggle('opacity-60', !enabled);
+    }
+
+    toggle.addEventListener('change', () => {
+        if (toggle.checked) {
+            box.classList.remove('hidden');
+            premiumFlag.value = '1';
+            setSave(false);
+        } else {
+            box.classList.add('hidden');
+            premiumFlag.value = '0';
+            piInput.value = '';
+            successEl.classList.add('hidden');
+            errorEl.textContent = '';
+            setSave(true);
+        }
+    });
+
+    payBtn.addEventListener('click', async () => {
+        errorEl.textContent = '';
+        payBtn.disabled = true;
+
+        const res = await fetch("<?php echo e(route('landlord.rentals.premium.intent')); ?>", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await res.json();
+
+        const { error, paymentIntent } = await stripe.confirmCardPayment(
+            data.client_secret,
+            { payment_method: { card } }
+        );
+
+        if (error) {
+            errorEl.textContent = error.message;
+            payBtn.disabled = false;
+            return;
+        }
+
+        piInput.value = paymentIntent.id;
+        successEl.classList.remove('hidden');
+        setSave(true);
+    });
+
+});
+</script>
+
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
