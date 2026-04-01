@@ -18,6 +18,7 @@ class Maintenancelog extends Model
         'rentalid',
         'applicationid',
         'landlordid',
+        'is_seen_by_landlord',
     ];
 
     protected $casts = [

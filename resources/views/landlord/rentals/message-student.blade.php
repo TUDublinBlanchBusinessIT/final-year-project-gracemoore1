@@ -1,3 +1,8 @@
+@php
+    $hasUnreadMaintenance = \App\Models\Maintenancelog::where('applicationid', $application->id)
+        ->where('is_seen_by_landlord', false)
+        ->exists();
+@endphphp
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-base text-gray-800 leading-tight">
@@ -46,9 +51,14 @@
                             </a>
 
                             <a href="{{ route('landlord.maintenance-log', $application->id) }}"
-                                class="ml-3 h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
+                                class="relative ml-3 h-9 w-9 flex items-center justify-center rounded-full transition
+                                        {{ $hasUnreadMaintenance ? 'bg-red-50 ring-2 ring-red-200 text-red-500' : 'hover:bg-gray-100 text-slate-600' }}"
                                 title="Maintenance Log">
-                                    <span class="text-slate-600 text-xl">🛠</span>
+                                <span class="text-xl">🛠</span>
+
+                                @if($hasUnreadMaintenance)
+                                    <span class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 border-2 border-white"></span>
+                                @endif
                             </a>
                         @endif               
                     </div>
@@ -77,6 +87,14 @@
                             $lastDate = $messageDate;
                         @endphp
                     @endif
+
+                    @if($message->sender_type === 'system')
+                        <div class="flex justify-center my-4">
+                            <div class="inline-block px-4 py-2 rounded-full bg-slate-100 border border-slate-200 text-sm text-slate-500 text-center">
+                                {{ $message->content }}
+                            </div>
+                        </div>
+                    @else
 
                     <div class="flex {{ $isLandlordMessage ? 'justify-end' : 'justify-start' }}">
                         <div class="max-w-[75%]">
@@ -111,7 +129,8 @@
                             </div>
 
                         </div>
-                    </div>                    
+                    </div>
+                    @endif                   
                 @empty
                     <div class="flex justify-center items-center h-full">
                         <p class="text-sm text-slate-500">No messages yet. Start the conversation below.</p>

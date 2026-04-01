@@ -64,6 +64,12 @@
                                         ->latest('created_at')
                                         ->first();
 
+                                    $unreadCount = \App\Models\Message::where('group_id', $application->group_id)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->where('is_read_by_landlord', false)
+                                        ->where('sender_type', '!=', 'landlord')
+                                        ->count();
+
                                     $groupMembers = \Illuminate\Support\Facades\DB::table('student_groups')
                                         ->join('student', 'student.id', '=', 'student_groups.student_id')
                                         ->where('student_groups.group_id', $application->group_id)
@@ -82,14 +88,23 @@
 
                                 } else {
 
+                                    
                                     $lastMessage = \App\Models\Message::where('studentid', $application->studentid)
                                         ->where('rentalid', $application->rentalid)
                                         ->latest('created_at')
                                         ->first();
 
+                                    $unreadCount = \App\Models\Message::where('studentid', $application->studentid)
+                                        ->where('rentalid', $application->rentalid)
+                                        ->where('is_read_by_landlord', false)
+                                        ->where('sender_type', '!=', 'landlord')
+                                        ->count();
+
                                     $chatName = ($application->student->firstname ?? 'Student') . ' ' . ($application->student->surname ?? '');
 
                                     $chatType = 'Individual application';
+
+                            
 
                                 }
                             @endphp
@@ -132,8 +147,16 @@
                                         </p>
                                     </div>
 
-                                    <div class="shrink-0 text-xs text-slate-400 whitespace-nowrap">
-                                        {{ $lastMessage && $lastMessage->created_at ? $lastMessage->created_at->format('d M Y H:i') : '' }}
+                                    <div class="ml-4 flex flex-col items-end gap-2 shrink-0">
+                                        <div class="text-xs text-slate-400 whitespace-nowrap">
+                                            {{ $lastMessage && $lastMessage->created_at ? $lastMessage->created_at->format('d M Y H:i') : '' }}
+                                        </div>
+
+                                        @if($unreadCount > 0)
+                                            <span class="inline-flex items-center justify-center min-w-[22px] h-[22px] rounded-full bg-red-500 px-2 text-xs font-semibold text-white">
+                                                {{ $unreadCount }}
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                             </a>

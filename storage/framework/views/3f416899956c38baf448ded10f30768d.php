@@ -42,10 +42,7 @@
                                 <?php echo e($application->rental->county ?? ''); ?>
 
                             </p>
-                            <p class="text-sm text-slate-400 mt-1">
-                                Tenant: <?php echo e($application->student->name ?? 'Student'); ?>
-
-                            </p>
+                            
                         </div>
                     </div>
                 </div>

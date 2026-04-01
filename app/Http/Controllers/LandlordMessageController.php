@@ -16,6 +16,13 @@ class LandlordMessageController extends Controller
         $landlordId = session('landlord_id');
         $filter = request('filter', 'all');
 
+        Message::where('landlordid', $landlordId)
+            ->where('sender_type', '!=', 'landlord')
+            ->where('is_read_by_landlord', false)
+            ->update([
+                'is_read_by_landlord' => true,
+            ]);
+
         $applications = Application::with(['student', 'rental', 'group'])
             ->whereHas('rental', function ($query) use ($landlordId) {
                 $query->where('landlordid', $landlordId);
@@ -84,7 +91,7 @@ class LandlordMessageController extends Controller
 
             Message::where('group_id', $application->group_id)
                 ->where('rentalid', $application->rentalid)
-                ->where('sender_type', 'student')
+                ->where('sender_type', 'landlord')
                 ->where('is_read_by_landlord', false)
                 ->update([
                     'is_read_by_landlord' => true,
@@ -105,7 +112,7 @@ class LandlordMessageController extends Controller
 
             Message::where('studentid', $application->studentid)
                 ->where('rentalid', $application->rentalid)
-                ->where('sender_type', 'student')
+                ->where('sender_type', 'landlord')
                 ->where('is_read_by_landlord', false)
                 ->update([
                     'is_read_by_landlord' => true,

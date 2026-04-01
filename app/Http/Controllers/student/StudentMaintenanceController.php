@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Maintenancelog;
 use Illuminate\Http\Request;
+use App\Models\Message;
 
 class StudentMaintenanceController extends Controller
 {
@@ -62,6 +63,21 @@ class StudentMaintenanceController extends Controller
             'rentalid'      => $app->rentalid,
             'applicationid' => $app->id,
             'landlordid'    => $app->rental->landlordid ?? null,
+            'is_seen_by_landlord' => false,
+
+        ]);
+
+        Message::create([
+            'content' => '🛠 ' . ($app->student->firstname ?? 'Student') . ' opened the maintenance log. Please review it now.',
+            'sender_type' => 'system',
+            'timestamp' => now(),
+            'studentid' => $studentId,
+            'group_id' => $app->group_id,
+            'landlordid' => $app->rental->landlordid,
+            'rentalid' => $app->rentalid,
+            'serviceproviderpartnershipid' => null,
+            'is_read_by_student' => true,
+            'is_read_by_landlord' => false,
         ]);
 
         return redirect()
