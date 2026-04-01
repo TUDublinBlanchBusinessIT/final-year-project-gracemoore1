@@ -1,4 +1,7 @@
-<?php use Illuminate\Support\Facades\Storage; ?>
+<?php
+    use Illuminate\Support\Facades\Storage;
+?>
+
 <?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
 <?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -47,7 +50,7 @@
                     </div>
                 </div>
 
-                <div class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
+                <div id="maintenanceContainer" class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
                         <div class="mb-6 rounded-xl bg-green-100 text-green-800 px-4 py-3">
                             <?php echo e(session('success')); ?>
@@ -55,7 +58,28 @@
                         </div>
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
+                    <?php
+                        $lastDate = null;
+                    ?>
+
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $logs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                        <?php
+                            $logDate = optional($log->timestamp)->format('d M Y')
+                                ?? optional($log->created_at)->format('d M Y');
+                        ?>
+
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($lastDate !== $logDate): ?>
+                            <div class="flex justify-center my-4">
+                                <span class="px-4 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">
+                                    <?php echo e($logDate); ?>
+
+                                </span>
+                            </div>
+                            <?php
+                                $lastDate = $logDate;
+                            ?>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
                         <div class="flex justify-end mb-6">
                             <div class="max-w-md rounded-3xl px-6 py-5 shadow-sm
                                 <?php if($log->priority === 'high'): ?> bg-red-500 text-white
@@ -80,14 +104,15 @@
                                     <div class="mt-3">
                                         <a href="<?php echo e(asset('storage/' . $log->images)); ?>" target="_blank">
                                             <img src="<?php echo e(asset('storage/' . $log->images)); ?>"
-                                                alt="Maintenance issue image"
-                                                class="mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
+                                                 alt="Maintenance issue image"
+                                                 class="mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
                                         </a>
                                     </div>
                                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                                 <div class="text-xs mt-4 opacity-90">
-                                    <?php echo e(optional($log->timestamp)->format('H:i') ?? optional($log->created_at)->format('H:i')); ?>
+                                    <?php echo e(optional($log->timestamp)->format('d M Y H:i')
+                                        ?? optional($log->created_at)->format('d M Y H:i')); ?>
 
                                 </div>
                             </div>
@@ -197,6 +222,15 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const container = document.getElementById("maintenanceContainer");
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        });
+    </script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>

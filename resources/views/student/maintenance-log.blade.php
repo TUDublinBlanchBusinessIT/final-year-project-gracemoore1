@@ -1,4 +1,7 @@
-@php use Illuminate\Support\Facades\Storage; @endphp
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-base text-gray-800 leading-tight">
@@ -34,14 +37,34 @@
                     </div>
                 </div>
 
-                <div class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
+                <div id="maintenanceContainer" class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
                     @if(session('success'))
                         <div class="mb-6 rounded-xl bg-green-100 text-green-800 px-4 py-3">
                             {{ session('success') }}
                         </div>
                     @endif
 
+                    @php
+                        $lastDate = null;
+                    @endphp
+
                     @forelse($logs as $log)
+                        @php
+                            $logDate = optional($log->timestamp)->format('d M Y')
+                                ?? optional($log->created_at)->format('d M Y');
+                        @endphp
+
+                        @if($lastDate !== $logDate)
+                            <div class="flex justify-center my-4">
+                                <span class="px-4 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">
+                                    {{ $logDate }}
+                                </span>
+                            </div>
+                            @php
+                                $lastDate = $logDate;
+                            @endphp
+                        @endif
+
                         <div class="flex justify-end mb-6">
                             <div class="max-w-md rounded-3xl px-6 py-5 shadow-sm
                                 @if($log->priority === 'high') bg-red-500 text-white
@@ -65,14 +88,15 @@
                                     <div class="mt-3">
                                         <a href="{{ asset('storage/' . $log->images) }}" target="_blank">
                                             <img src="{{ asset('storage/' . $log->images) }}"
-                                                alt="Maintenance issue image"
-                                                class="mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
+                                                 alt="Maintenance issue image"
+                                                 class="mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
                                         </a>
                                     </div>
                                 @endif
 
                                 <div class="text-xs mt-4 opacity-90">
-                                    {{ optional($log->timestamp)->format('H:i') ?? optional($log->created_at)->format('H:i') }}
+                                    {{ optional($log->timestamp)->format('d M Y H:i')
+                                        ?? optional($log->created_at)->format('d M Y H:i') }}
                                 </div>
                             </div>
                         </div>
@@ -160,4 +184,13 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const container = document.getElementById("maintenanceContainer");
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        });
+    </script>
 </x-app-layout>
