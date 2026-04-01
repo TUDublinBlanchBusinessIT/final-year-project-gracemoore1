@@ -80,40 +80,76 @@
                             ?>
                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                        <div class="flex justify-end mb-6">
-                            <div class="max-w-md rounded-3xl px-6 py-5 shadow-sm
-                                <?php if($log->priority === 'high'): ?> bg-red-500 text-white
-                                <?php elseif($log->priority === 'medium'): ?> bg-orange-400 text-white
-                                <?php else: ?> bg-green-500 text-white
-                                <?php endif; ?>">
+                        <div class="mb-8 space-y-4">
+                            <div class="flex justify-end">
+                                <div class="max-w-md rounded-3xl px-6 py-5 shadow-sm
+                                    <?php if($log->priority === 'high'): ?> bg-red-500 text-white
+                                    <?php elseif($log->priority === 'medium'): ?> bg-orange-400 text-white
+                                    <?php else: ?> bg-green-500 text-white
+                                    <?php endif; ?>">
 
-                                <div class="text-sm font-semibold uppercase tracking-wide mb-2">
-                                    <?php echo e($log->priority); ?> priority
-                                </div>
-
-                                <div class="text-lg font-semibold mb-2">
-                                    Maintenance Issue
-                                </div>
-
-                                <div class="text-sm leading-6">
-                                    <?php echo e($log->description); ?>
-
-                                </div>
-
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->images)): ?>
-                                    <div class="mt-3">
-                                        <a href="<?php echo e(asset('storage/' . $log->images)); ?>" target="_blank">
-                                            <img src="<?php echo e(asset('storage/' . $log->images)); ?>"
-                                                 alt="Maintenance issue image"
-                                                 class="mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
-                                        </a>
+                                    <div class="text-sm font-semibold uppercase tracking-wide mb-2">
+                                        <?php echo e($log->priority); ?> priority
                                     </div>
-                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                                <div class="text-xs mt-4 opacity-90">
-                                    <?php echo e(optional($log->timestamp)->format('d M Y H:i')
-                                        ?? optional($log->created_at)->format('d M Y H:i')); ?>
+                                    <div class="text-lg font-semibold mb-2">
+                                        Maintenance Issue
+                                    </div>
 
+                                    <div class="text-sm leading-6">
+                                        <?php echo e($log->description); ?>
+
+                                    </div>
+
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->images)): ?>
+                                        <div class="mt-3">
+                                            <a href="<?php echo e(asset('storage/' . $log->images)); ?>" target="_blank">
+                                                <img src="<?php echo e(asset('storage/' . $log->images)); ?>"
+                                                     alt="Maintenance issue image"
+                                                     class="mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
+                                            </a>
+                                        </div>
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                                    <div class="text-xs mt-4 opacity-90">
+                                        <?php echo e(optional($log->timestamp)->format('d M Y H:i')
+                                            ?? optional($log->created_at)->format('d M Y H:i')); ?>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-start">
+                                <div class="max-w-md rounded-3xl bg-white border border-slate-200 px-6 py-5 shadow-sm">
+                                    <div class="flex items-center justify-between gap-3 mb-3">
+                                        <h4 class="text-sm font-semibold text-slate-900">
+                                            Landlord Update
+                                        </h4>
+
+                                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
+                                            <?php if($log->status === 'resolved'): ?> bg-green-100 text-green-700
+                                            <?php elseif($log->status === 'in_progress'): ?> bg-blue-100 text-blue-700
+                                            <?php else: ?> bg-yellow-100 text-yellow-700
+                                            <?php endif; ?>">
+                                            <?php echo e($log->status === 'in_progress' ? 'In Progress' : ucfirst($log->status)); ?>
+
+                                        </span>
+                                    </div>
+
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($log->landlord_note)): ?>
+                                        <p class="text-sm text-slate-700 leading-6">
+                                            <?php echo e($log->landlord_note); ?>
+
+                                        </p>
+                                        <p class="text-xs text-slate-400 mt-3">
+                                            Last updated: <?php echo e(optional($log->updated_at)->format('d M Y H:i')); ?>
+
+                                        </p>
+                                    <?php else: ?>
+                                        <p class="text-sm text-slate-400">
+                                            No landlord update yet.
+                                        </p>
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </div>
                             </div>
                         </div>

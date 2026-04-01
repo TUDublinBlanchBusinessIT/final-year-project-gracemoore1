@@ -56,7 +56,8 @@ class StudentMaintenanceController extends Controller
         Maintenancelog::create([
             'description'   => $request->description,
             'images'        => $imagePath,
-            'status'        => 'open',
+            'status'        => 'pending',
+            'landlord_note' => null,
             'priority'      => $request->priority,
             'timestamp'     => now(),
             'studentid'     => $studentId,

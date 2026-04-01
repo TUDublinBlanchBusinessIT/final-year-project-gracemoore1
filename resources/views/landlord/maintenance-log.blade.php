@@ -33,7 +33,13 @@
                     </div>
                 </div>
 
-                <div id="maintenanceContainer" class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
+                <div id="maintenanceContainer" class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[520px] overflow-y-auto">
+
+                    @if(session('success'))
+                        <div class="mb-6 rounded-xl bg-green-100 text-green-800 px-4 py-3">
+                            {{ session('success') }}
+                        </div>
+                    @endif
 
                     @php
                         $lastDate = null;
@@ -42,7 +48,7 @@
                     @forelse($logs as $log)
 
                         @php
-                            $logDate = optional($log->timestamp)->format('d M Y') 
+                            $logDate = optional($log->timestamp)->format('d M Y')
                                 ?? optional($log->created_at)->format('d M Y');
                         @endphp
 
@@ -57,41 +63,146 @@
                             @endphp
                         @endif
 
-                        <div class="flex justify-start mb-6">
-                            <div class="max-w-md rounded-3xl px-6 py-5 shadow-sm
-                                @if($log->priority === 'high') bg-red-500 text-white
-                                @elseif($log->priority === 'medium') bg-orange-400 text-white
-                                @else bg-green-500 text-white
-                                @endif">
+                        <div class="mb-8 space-y-4">
 
-                                <div class="text-sm font-semibold uppercase tracking-wide mb-2">
-                                    {{ $log->priority }} priority
+                            <div class="flex justify-start">
+                                <div class="max-w-md rounded-3xl px-6 py-5 shadow-sm
+                                    @if($log->priority === 'high') bg-red-500 text-white
+                                    @elseif($log->priority === 'medium') bg-orange-400 text-white
+                                    @else bg-green-500 text-white
+                                    @endif">
+
+                                    <div class="text-sm font-semibold uppercase tracking-wide mb-2">
+                                        {{ $log->priority }} priority
+                                    </div>
+
+                                    <div class="text-lg font-semibold mb-2">
+                                        Maintenance Issue
+                                    </div>
+
+                                    <div class="text-sm leading-6">
+                                        {{ $log->description }}
+                                    </div>
+
+                                    @if(!empty($log->images))
+                                        <div class="mt-3">
+                                            <a href="{{ asset('storage/' . $log->images) }}" target="_blank">
+                                                <img src="{{ asset('storage/' . $log->images) }}"
+                                                     alt="Maintenance issue image"
+                                                     class="block mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    <div class="text-xs mt-4 opacity-90">
+                                        {{ optional($log->timestamp)->format('d M Y H:i')
+                                            ?? optional($log->created_at)->format('d M Y H:i') }}
+                                    </div>
                                 </div>
+                            </div>
 
-                                <div class="text-lg font-semibold mb-2">
-                                    Maintenance Issue
+                            @if(!empty($log->landlord_note))
+                                <div class="flex justify-end">
+                                    <div class="max-w-md rounded-3xl bg-white border border-slate-200 px-6 py-5 shadow-sm">
+                                        <div class="flex items-center justify-between gap-3 mb-3">
+                                            <h4 class="text-sm font-semibold text-slate-900">
+                                                Landlord Update
+                                            </h4>
+
+                                            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
+                                                @if($log->status === 'resolved') bg-green-100 text-green-700
+                                                @elseif($log->status === 'in_progress') bg-blue-100 text-blue-700
+                                                @else bg-yellow-100 text-yellow-700
+                                                @endif">
+                                                {{ $log->status === 'in_progress' ? 'In Progress' : ucfirst($log->status) }}
+                                            </span>
+                                        </div>
+
+                                        <p class="text-sm text-slate-700 leading-6">
+                                            {{ $log->landlord_note }}
+                                        </p>
+
+                                        <p class="text-xs text-slate-400 mt-3">
+                                            Last updated: {{ optional($log->updated_at)->format('d M Y H:i') }}
+                                        </p>
+                                    </div>
                                 </div>
+                            @endif
 
-                                <div class="text-sm leading-6">
-                                    {{ $log->description }}
-                                </div>
-
-                                @if(!empty($log->images))
-                                    <div class="mt-3">
-                                        <a href="{{ asset('storage/' . $log->images) }}" target="_blank">
-                                            <img src="{{ asset('storage/' . $log->images) }}"
-                                                 alt="Maintenance issue image"
-                                                 class="block mt-3 rounded-xl max-h-40 w-auto object-cover border border-white/20 shadow-sm cursor-pointer">
+                            
+                            @if($log->status !== 'resolved')
+                                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                                    <div class="mb-4">
+                                        <a href="#"
+                                        class="inline-flex items-center rounded-2xl border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">
+                                            Book Service Provider
                                         </a>
                                     </div>
-                                @endif
 
-                                <div class="text-xs mt-4 opacity-90">
-                                    {{ optional($log->timestamp)->format('d M Y H:i') 
-                                        ?? optional($log->created_at)->format('d M Y H:i') }}
+                                    <form action="{{ route('landlord.maintenance-log.update', [$application->id, $log->id]) }}" method="POST">
+                                        @csrf
+
+                                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+
+                                            <div class="lg:col-span-7">
+                                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                                    Add update for student
+                                                </label>
+
+                                                <textarea
+                                                    name="landlord_note"
+                                                    rows="3"
+                                                    class="w-full rounded-2xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    placeholder="Example: I will come by this evening and get this fixed."
+                                                >{{ old('landlord_note', $log->landlord_note) }}</textarea>
+                                            </div>
+
+                                            <div class="lg:col-span-3">
+                                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                                    Issue Status
+                                                </label>
+
+                                                <select
+                                                    name="status"
+                                                    class="w-full rounded-2xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+
+                                                    <option value="pending" {{ $log->status === 'pending' ? 'selected' : '' }}>
+                                                        Pending
+                                                    </option>
+
+                                                    <option value="in_progress" {{ $log->status === 'in_progress' ? 'selected' : '' }}>
+                                                        In Progress
+                                                    </option>
+
+                                                    <option value="resolved" {{ $log->status === 'resolved' ? 'selected' : '' }}>
+                                                        Resolved
+                                                    </option>
+
+                                                </select>
+                                            </div>
+
+                                            <div class="lg:col-span-2">
+                                                <button
+                                                    type="submit"
+                                                    class="w-full inline-flex items-center justify-center rounded-2xl bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700 transition">
+                                                    Save
+                                                </button>
+                                            </div>
+
+                                        </div>
+
+                                        @error('landlord_note')
+                                            <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                                        @enderror
+
+                                        @error('status')
+                                            <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                                        @enderror
+
+                                    </form>
                                 </div>
+                            @endif
 
-                            </div>
                         </div>
 
                     @empty

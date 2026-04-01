@@ -12,6 +12,7 @@ class Maintenancelog extends Model
         'description',
         'images',
         'status',
+        'landlord_note',
         'priority',
         'timestamp',
         'studentid',

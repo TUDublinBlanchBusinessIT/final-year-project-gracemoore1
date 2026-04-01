@@ -194,6 +194,7 @@ Route::post('/student/maintenance/{application}', [StudentMaintenanceController:
 
 // Landlord maintenance log
 Route::get('/landlord/maintenance/{application}', [LandlordMaintenanceController::class, 'page'])->name('landlord.maintenance-log');
+Route::post('/landlord/maintenance/{application}/{log}', [LandlordMaintenanceController::class, 'update'])->name('landlord.maintenance-log.update');
 // ===============================
 // RENT TRACKER ROUTES (SESSION-BASED)
 // ===============================
