@@ -560,6 +560,9 @@ Route::get('/serviceprovider/messages', [ServiceProviderMessageController::class
 Route::get('/serviceprovider/messages/{id}', [ServiceProviderMessageController::class, 'show'])
     ->name('serviceprovider.messages.show');
 
+Route::post('/serviceprovider/messages/{id}', [ServiceProviderMessageController::class, 'store'])
+    ->name('serviceprovider.messages.store');
+
 Route::get('/serviceprovider/profile', function () {
     if (!session('serviceprovider_id')) return redirect('/login');
     return view('serviceprovider.profile');
