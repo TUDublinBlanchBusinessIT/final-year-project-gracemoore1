@@ -90,15 +90,25 @@
 
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
                         <div class="mb-4 flex <?php echo e($message->sender_type === 'service_provider' ? 'justify-end' : 'justify-start'); ?>">
-                            <div class="<?php echo e($message->sender_type === 'service_provider' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-800'); ?> max-w-xl rounded-3xl px-5 py-3 shadow-sm">
-                                <p class="text-sm leading-6"><?php echo e($message->content); ?></p>
-                                <p class="mt-2 text-xs <?php echo e($message->sender_type === 'service_provider' ? 'text-blue-100' : 'text-slate-400'); ?>">
-                                    <?php echo e(optional($message->timestamp)->format('d M Y H:i') ?? optional($message->created_at)->format('d M Y H:i')); ?>
+                            <div>
+                                <div class="<?php echo e($message->sender_type === 'service_provider' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-800'); ?> max-w-xl rounded-3xl px-5 py-3 shadow-sm">
+                                    <p class="text-sm leading-6"><?php echo e($message->content); ?></p>
+                                    <p class="mt-2 text-xs <?php echo e($message->sender_type === 'service_provider' ? 'text-blue-100' : 'text-slate-400'); ?>">
+                                        <?php echo e(optional($message->timestamp)->format('d M Y H:i') ?? optional($message->created_at)->format('d M Y H:i')); ?>
 
-                                </p>
+                                    </p>
+                                </div>
+
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->sender_type === 'service_provider'): ?>
+                                    <p class="mt-1 text-xs text-right text-slate-400">
+                                        <?php echo e($message->is_read_by_landlord ? 'Seen' : 'Sent'); ?>
+
+                                    </p>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             </div>
                         </div>
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                
                         <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500">
                             No messages yet. Start the conversation with the landlord about this job.
                         </div>

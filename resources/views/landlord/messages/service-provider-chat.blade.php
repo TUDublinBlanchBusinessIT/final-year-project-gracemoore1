@@ -73,14 +73,22 @@
 
                     @forelse($messages as $message)
                         <div class="mb-4 flex {{ $message->sender_type === 'landlord' ? 'justify-end' : 'justify-start' }}">
-                            <div class="{{ $message->sender_type === 'landlord' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-800' }} max-w-xl rounded-3xl px-5 py-3 shadow-sm">
-                                <p class="text-sm leading-6">{{ $message->content }}</p>
-                                <p class="mt-2 text-xs {{ $message->sender_type === 'landlord' ? 'text-blue-100' : 'text-slate-400' }}">
-                                    {{ optional($message->timestamp)->format('d M Y H:i') ?? optional($message->created_at)->format('d M Y H:i') }}
-                                </p>
+                            <div>
+                                <div class="{{ $message->sender_type === 'landlord' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-800' }} max-w-xl rounded-3xl px-5 py-3 shadow-sm">
+                                    <p class="text-sm leading-6">{{ $message->content }}</p>
+                                    <p class="mt-2 text-xs {{ $message->sender_type === 'landlord' ? 'text-blue-100' : 'text-slate-400' }}">
+                                        {{ optional($message->timestamp)->format('d M Y H:i') ?? optional($message->created_at)->format('d M Y H:i') }}
+                                    </p>
+                                </div>
+
+                                @if($message->sender_type === 'landlord')
+                                    <p class="mt-1 text-xs text-right text-slate-400">
+                                        {{ $message->is_read_by_service_provider ? 'Seen' : 'Sent' }}
+                                    </p>
+                                @endif
                             </div>
                         </div>
-                    @empty
+                    @empty                    
                         <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500">
                             No messages yet.
                         </div>
