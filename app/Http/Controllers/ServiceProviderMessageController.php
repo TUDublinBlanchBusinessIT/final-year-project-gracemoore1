@@ -11,14 +11,15 @@ class ServiceProviderMessageController extends Controller
 {
     public function index()
     {
-        $serviceProviderId = session('serviceprovider_id');
-        abort_if(!$serviceProviderId, 401);
+        $providerId = session('serviceprovider_id');
 
-        $conversations = ServiceRequestProvider::with(['serviceRequest'])
-            ->where('serviceproviderpartnershipid', $serviceProviderId)
-            ->whereIn('status', ['pending', 'messaged', 'assigned'])
-            ->latest()
-            ->get();
+        $conversations = \App\Models\Message::where('serviceproviderpartnershipid', $providerId)
+            ->whereNull('studentid')
+            ->whereNull('group_id')
+            ->get()
+            ->groupBy(function ($message) {
+                return $message->landlordid . '_' . $message->rentalid;
+            });
 
         return view('serviceprovider.messages', compact('conversations'));
     }
@@ -34,6 +35,15 @@ class ServiceProviderMessageController extends Controller
             ->firstOrFail();
 
         $job = $conversation->serviceRequest;
+
+        Message::where('serviceproviderpartnershipid', $serviceProviderId)
+            ->where('landlordid', $job->landlordid)
+            ->where('rentalid', $job->rentalid)
+            ->where('sender_type', '!=', 'service_provider')
+            ->where('is_read_by_service_provider', false)
+            ->update([
+                'is_read_by_service_provider' => true,
+            ]);
 
         $landlord = Landlord::find($job->landlordid);
 
@@ -76,6 +86,7 @@ class ServiceProviderMessageController extends Controller
             'serviceproviderpartnershipid' => $serviceProviderId,
             'is_read_by_student' => true,
             'is_read_by_landlord' => false,
+            'is_read_by_service_provider' => true,
         ]);
 
         if ($conversation->status === 'pending') {
@@ -86,7 +97,6 @@ class ServiceProviderMessageController extends Controller
         }
 
         return redirect()
-            ->route('serviceprovider.messages.show', $conversation->id)
-            ->with('success', 'Message sent successfully.');
+            ->route('serviceprovider.messages.show', $conversation->id);
     }
 }

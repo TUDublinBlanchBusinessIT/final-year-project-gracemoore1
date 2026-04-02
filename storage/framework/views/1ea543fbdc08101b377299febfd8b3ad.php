@@ -4,6 +4,11 @@
 
     // Name from session (same key as dashboard header)
     $spName = session('serviceprovider_firstname') ?? 'Service Provider';
+    
+    $serviceProviderUnreadMessages = \App\Models\Message::where('serviceproviderpartnershipid', session('serviceprovider_id'))
+        ->where('sender_type', '!=', 'service_provider')
+        ->where('is_read_by_service_provider', false)
+        ->count();
 
     // Build nav items (always show on dashboard too)
     $items = [
@@ -142,7 +147,16 @@
                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition
                    <?php echo e(!empty($item['active']) && $item['active'] ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'); ?>">
                     <span class="<?php echo e(!empty($item['active']) && $item['active'] ? 'text-blue-600' : 'text-slate-500'); ?>"><?php echo $icon($item['svg']); ?></span>
-                    <span><?php echo e($item['label']); ?></span>
+                    <div class="flex items-center gap-2">
+                        <span><?php echo e($item['label']); ?></span>
+
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($item['route'] === 'serviceprovider.messages' && $serviceProviderUnreadMessages > 0): ?>
+                            <span class="inline-flex items-center justify-center min-w-[22px] h-[22px] rounded-full bg-red-500 px-2 text-xs font-semibold text-white">
+                                <?php echo e($serviceProviderUnreadMessages); ?>
+
+                            </span>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </div>
                 </a>
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         </nav>

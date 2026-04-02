@@ -217,10 +217,11 @@ class LandlordMessageController extends Controller
             'serviceproviderpartnershipid' => $providerRequest->serviceproviderpartnershipid,
             'is_read_by_student' => true,
             'is_read_by_landlord' => true,
+            'is_read_by_service_provider' => false,
         ]);
 
         return redirect()
-            ->route('landlord.service-provider.messages.show', $providerRequest->id)
-            ->with('success', 'Message sent successfully.');
+            ->route('landlord.service-provider.messages.show', $providerRequest->id);
+            
     }
 }
