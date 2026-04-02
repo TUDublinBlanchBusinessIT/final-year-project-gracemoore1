@@ -7,6 +7,7 @@ use App\Models\Application;
 use App\Models\Maintenancelog;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use App\Models\ServiceRequest;
 
 class LandlordMaintenanceController extends Controller
 {
@@ -30,9 +31,14 @@ class LandlordMaintenanceController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
+            $requestedLogIds = ServiceRequest::whereNotNull('maintenancelogid')
+                ->pluck('maintenancelogid')
+                ->toArray();
+
         return view('landlord.maintenance-log', [
             'application' => $app,
             'logs' => $logs,
+            'requestedLogIds' => $requestedLogIds,
         ]);
     }
 

@@ -45,11 +45,18 @@
                                     </p>
                                 </div>
 
-                                @if($job->requestimage)
+                                @php
+                                    $requestImageUrl = $job->requestimage
+                                        ? \Illuminate\Support\Facades\Storage::disk('public')->url($job->requestimage)
+                                        : null;
+                                @endphp
+
+                                @if($requestImageUrl)
                                     <img
-                                        src="{{ asset('storage/' . $job->requestimage) }}"
+                                        src="{{ $requestImageUrl }}"
                                         alt="Request image"
                                         class="w-32 h-32 object-cover rounded-xl border border-slate-200"
+                                        onerror="this.style.display='none';"
                                     >
                                 @endif
                             </div>

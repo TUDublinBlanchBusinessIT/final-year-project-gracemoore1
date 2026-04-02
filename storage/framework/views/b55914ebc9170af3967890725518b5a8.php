@@ -1,1 +1,0 @@
-<?php echo $__env->make('admin.accounts', ['slot' => $slot], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\moyak\final-year-project-gracemoore1\resources\views/components/admin/accounts.blade.php ENDPATH**/ ?>

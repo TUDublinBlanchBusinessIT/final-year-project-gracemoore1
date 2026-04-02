@@ -7,6 +7,19 @@
 
     <div class="pb-20 lg:pl-70">
         <div class="max-w-5xl mx-auto">
+
+            @if(session('success'))
+                <div class="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
                 <div class="border-b border-slate-200 px-8 py-5 bg-white">
@@ -34,12 +47,6 @@
                 </div>
 
                 <div id="maintenanceContainer" class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[520px] overflow-y-auto">
-
-                    @if(session('success'))
-                        <div class="mb-6 rounded-xl bg-green-100 text-green-800 px-4 py-3">
-                            {{ session('success') }}
-                        </div>
-                    @endif
 
                     @php
                         $lastDate = null;
@@ -128,8 +135,8 @@
                                             <div class="mt-3">
                                                 <a href="{{ asset('storage/' . $log->landlord_image) }}" target="_blank">
                                                     <img src="{{ asset('storage/' . $log->landlord_image) }}"
-                                                        alt="Landlord update image"
-                                                        class="rounded-xl max-h-40 w-auto object-cover border border-slate-200 shadow-sm cursor-pointer">
+                                                         alt="Landlord update image"
+                                                         class="rounded-xl max-h-40 w-auto object-cover border border-slate-200 shadow-sm cursor-pointer">
                                                 </a>
                                             </div>
                                         @endif
@@ -141,14 +148,26 @@
                                 </div>
                             @endif
 
-                            
                             @if($log->status !== 'resolved')
-                                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                                <div class="border-t border-slate-200 pt-4">
+
                                     <div class="mb-4">
-                                        <a href="{{ route('landlord.service-request.create', $log->id) }}"
-                                        class="inline-flex items-center rounded-2xl border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition">
-                                            Book Service Provider
-                                        </a>
+                                        @if(in_array($log->id, $requestedLogIds ?? []))
+                                            <button
+                                                type="button"
+                                                disabled
+                                                class="inline-flex items-center px-4 py-2 rounded-xl bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed"
+                                            >
+                                                Service Provider Requested
+                                            </button>
+                                        @else
+                                            <a
+                                                href="{{ route('landlord.service-request.create', $log->id) }}"
+                                                class="inline-flex items-center px-4 py-2 rounded-xl bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition"
+                                            >
+                                                Book Service Provider
+                                            </a>
+                                        @endif
                                     </div>
 
                                     <form action="{{ route('landlord.maintenance-log.update', [$application->id, $log->id]) }}" method="POST" enctype="multipart/form-data">
@@ -177,7 +196,6 @@
                                                 <select
                                                     name="status"
                                                     class="w-full rounded-2xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-
                                                     <option value="pending" {{ $log->status === 'pending' ? 'selected' : '' }}>
                                                         Pending
                                                     </option>
@@ -189,7 +207,6 @@
                                                     <option value="resolved" {{ $log->status === 'resolved' ? 'selected' : '' }}>
                                                         Resolved
                                                     </option>
-
                                                 </select>
                                             </div>
 
@@ -208,8 +225,8 @@
                                                         file:text-sm file:font-medium
                                                         file:bg-slate-100 file:text-slate-700
                                                         hover:file:bg-slate-200"
-                                                    >
-                                                </div>
+                                                >
+                                            </div>
 
                                             <div class="lg:col-span-2">
                                                 <button

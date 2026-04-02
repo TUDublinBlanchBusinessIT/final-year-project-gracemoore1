@@ -63,6 +63,7 @@ class LandlordServiceRequestController extends Controller
                 'address_county' => $validated['county'],
                 'address_postcode' => $validated['postcode'] ?? null,
                 'requestimage' => $imagePath,
+                'maintenancelogid' => $log->id,
             ]);
 
             $matchingProviders = ServiceProviderPartnership::where('county', $validated['county'])
@@ -79,19 +80,20 @@ class LandlordServiceRequestController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with(
+            return redirect()->route('landlord.maintenance-log', [
+                'application' => $log->applicationid,
+            ])->with(
                 'success',
-                $matchingProviders->isEmpty()
-                    ? 'Request created, but no matching service providers were found in that county.'
-                    : 'Service request created and matching providers have been notified.'
+                'Your service provider request was sent successfully. Matching service providers have been notified and can now respond through the app.'
             );
+                
         } catch (\Throwable $e) {
             DB::rollBack();
 
             return back()
                 ->withInput()
-                //->with('error', 'Error: ' . $e->getMessage());
-                ->with('error', 'Something went wrong while creating the service request.');
+                ->with('error', 'Error: ' . $e->getMessage());
+                //->with('error', 'Something went wrong while creating the service request.');
         }
     }
 }
