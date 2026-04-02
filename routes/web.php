@@ -41,7 +41,7 @@ use App\Http\Controllers\PartnershipController;
 //service provider
 use App\Http\Controllers\LandlordServiceRequestController;
 use App\Http\Controllers\ServiceProviderRequestedJobsController;
-
+use App\Http\Controllers\ServiceProviderMessageController;
 
 //chatbot
 Route::get('/student/chatbot', [ChatbotController::class, 'studentChat'])->name('student.chatbot');
@@ -554,10 +554,11 @@ Route::get('/serviceprovider/completed', function () {
 Route::get('/serviceprovider/requested', [ServiceProviderRequestedJobsController::class, 'index'])
     ->name('serviceprovider.requested');
 
-Route::get('/serviceprovider/messages', function () {
-    if (!session('serviceprovider_id')) return redirect('/login');
-    return view('serviceprovider.messages');
-})->name('serviceprovider.messages');
+Route::get('/serviceprovider/messages', [ServiceProviderMessageController::class, 'index'])
+    ->name('serviceprovider.messages');
+
+Route::get('/serviceprovider/messages/{id}', [ServiceProviderMessageController::class, 'show'])
+    ->name('serviceprovider.messages.show');
 
 Route::get('/serviceprovider/profile', function () {
     if (!session('serviceprovider_id')) return redirect('/login');

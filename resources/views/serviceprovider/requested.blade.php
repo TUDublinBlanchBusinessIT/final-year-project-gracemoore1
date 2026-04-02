@@ -64,7 +64,7 @@
 
                             <div class="mt-5 flex flex-wrap gap-3">
                                 @if(in_array($providerRequest->status, ['pending', 'messaged']))
-                                    <a href="{{ route('serviceprovider.messages') }}"
+                                    <a href="{{ route('serviceprovider.messages.show', $providerRequest->id) }}"
                                     class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
                                         Message Landlord
                                     </a>

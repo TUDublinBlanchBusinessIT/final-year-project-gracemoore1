@@ -20,6 +20,7 @@ class ServiceRequestProvider extends Model
         return $this->belongsTo(ServiceRequest::class, 'servicerequestid');
     }
 
+
     public function provider()
     {
         return $this->belongsTo(ServiceProviderPartnership::class, 'serviceproviderpartnershipid');

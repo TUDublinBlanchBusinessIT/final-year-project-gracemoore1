@@ -79,7 +79,7 @@
 
                             <div class="mt-5 flex flex-wrap gap-3">
                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(in_array($providerRequest->status, ['pending', 'messaged'])): ?>
-                                    <a href="<?php echo e(route('serviceprovider.messages')); ?>"
+                                    <a href="<?php echo e(route('serviceprovider.messages.show', $providerRequest->id)); ?>"
                                     class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
                                         Message Landlord
                                     </a>
