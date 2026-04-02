@@ -44,6 +44,7 @@ use App\Http\Controllers\ServiceProviderRequestedJobsController;
 use App\Http\Controllers\ServiceProviderMessageController;
 use App\Http\Controllers\ServiceProviderUpcomingJobsController;
 
+
 //chatbot
 Route::get('/student/chatbot', [ChatbotController::class, 'studentChat'])->name('student.chatbot');
 Route::get('/landlord/chatbot', [ChatbotController::class, 'landlordChat'])->name('landlord.chatbot');
@@ -69,7 +70,6 @@ Route::middleware(['serviceprovider'])->group(function () {
     Route::post('/serviceprovider/requested/{id}/decline', [ServiceProviderRequestedJobsController::class, 'decline'])
         ->name('serviceprovider.requested.decline');
 });
-
 
 
 
@@ -557,10 +557,11 @@ Route::get('/serviceprovider/dashboard', function () {
 Route::get('/serviceprovider/upcoming', [ServiceProviderUpcomingJobsController::class, 'index'])
     ->name('serviceprovider.upcoming');
 
-Route::get('/serviceprovider/completed', function () {
-    if (!session('serviceprovider_id')) return redirect('/login');
-    return view('serviceprovider.completed');
-})->name('serviceprovider.completed');
+Route::post('/serviceprovider/upcoming/{id}/complete', [ServiceProviderUpcomingJobsController::class, 'markCompleted'])
+    ->name('serviceprovider.upcoming.complete');
+
+Route::get('/serviceprovider/completed', [ServiceProviderUpcomingJobsController::class, 'completed'])
+    ->name('serviceprovider.completed');
 
 Route::get('/serviceprovider/requested', [ServiceProviderRequestedJobsController::class, 'index'])
     ->name('serviceprovider.requested');
