@@ -147,6 +147,12 @@ Route::get('/home', [StudentRegisterController::class, 'dashboard'])
 Route::get('/landlord/messages/{application}', [LandlordMessageController::class, 'show'])->name('landlord.messages.show');
 Route::post('/landlord/messages/{application}', [LandlordMessageController::class, 'store'])->name('landlord.messages.store');
 Route::get('/landlord/messages', [LandlordMessageController::class, 'index'])->name('landlord.messages');
+    //service provider for landlord
+Route::get('/landlord/service-provider-messages/{providerRequest}', [LandlordMessageController::class, 'showServiceProvider'])
+    ->name('landlord.service-provider.messages.show');
+
+Route::post('/landlord/service-provider-messages/{providerRequest}', [LandlordMessageController::class, 'storeServiceProvider'])
+    ->name('landlord.service-provider.messages.store');
 
 // STUDENT LOGIN
 Route::get('/student/login', function() {

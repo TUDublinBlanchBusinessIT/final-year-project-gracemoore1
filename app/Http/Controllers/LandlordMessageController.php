@@ -6,6 +6,9 @@ use App\Models\Application;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\ServiceRequestProvider;
+use App\Models\LandlordRental;
+use App\Models\ServiceProviderPartnership;
 
 class LandlordMessageController extends Controller
 {
@@ -70,7 +73,16 @@ class LandlordMessageController extends Controller
             })
             ->values();
 
-        return view('landlord.messages.index', compact('applications'));
+        $serviceProviderConversations = Message::where('landlordid', $landlordId)
+            ->whereNotNull('serviceproviderpartnershipid')
+            ->whereNull('studentid')
+            ->whereNull('group_id')
+            ->get()
+            ->groupBy(function ($message) {
+                return $message->serviceproviderpartnershipid . '_' . $message->rentalid;
+            });
+
+        return view('landlord.messages.index', compact('applications', 'serviceProviderConversations'));
     }
 
     public function show($applicationId)
@@ -138,6 +150,77 @@ class LandlordMessageController extends Controller
         ]);
 
         return redirect()->route('landlord.messages.show', $application->id)
+            ->with('success', 'Message sent successfully.');
+    }
+
+    public function showServiceProvider($providerRequestId)
+    {
+        $landlordId = session('landlord_id');
+        abort_if(!$landlordId, 401);
+
+        $providerRequest = ServiceRequestProvider::with(['serviceRequest', 'provider'])
+            ->findOrFail($providerRequestId);
+
+        $job = $providerRequest->serviceRequest;
+
+        abort_unless($job && $job->landlordid == $landlordId, 403);
+
+        Message::where('landlordid', $landlordId)
+            ->where('serviceproviderpartnershipid', $providerRequest->serviceproviderpartnershipid)
+            ->where('rentalid', $job->rentalid)
+            ->whereNull('studentid')
+            ->whereNull('group_id')
+            ->where('sender_type', '!=', 'landlord')
+            ->where('is_read_by_landlord', false)
+            ->update([
+                'is_read_by_landlord' => true,
+            ]);
+
+        $messages = Message::where('landlordid', $landlordId)
+            ->where('serviceproviderpartnershipid', $providerRequest->serviceproviderpartnershipid)
+            ->where('rentalid', $job->rentalid)
+            ->whereNull('studentid')
+            ->whereNull('group_id')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $provider = ServiceProviderPartnership::find($providerRequest->serviceproviderpartnershipid);
+        $rental = LandlordRental::find($job->rentalid);
+
+        return view('landlord.messages.service-provider-chat', compact('providerRequest', 'job', 'messages', 'provider', 'rental'));
+    }
+
+    public function storeServiceProvider(Request $request, $providerRequestId)
+    {
+        $landlordId = session('landlord_id');
+        abort_if(!$landlordId, 401);
+
+        $request->validate([
+            'message' => 'required|string|max:1000',
+        ]);
+
+        $providerRequest = ServiceRequestProvider::with('serviceRequest')
+            ->findOrFail($providerRequestId);
+
+        $job = $providerRequest->serviceRequest;
+
+        abort_unless($job && $job->landlordid == $landlordId, 403);
+
+        Message::create([
+            'content' => $request->message,
+            'sender_type' => 'landlord',
+            'timestamp' => now(),
+            'studentid' => null,
+            'group_id' => null,
+            'landlordid' => $landlordId,
+            'rentalid' => $job->rentalid,
+            'serviceproviderpartnershipid' => $providerRequest->serviceproviderpartnershipid,
+            'is_read_by_student' => true,
+            'is_read_by_landlord' => true,
+        ]);
+
+        return redirect()
+            ->route('landlord.service-provider.messages.show', $providerRequest->id)
             ->with('success', 'Message sent successfully.');
     }
 }
