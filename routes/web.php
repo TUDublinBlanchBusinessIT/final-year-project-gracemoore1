@@ -154,6 +154,12 @@ Route::get('/landlord/service-provider-messages/{providerRequest}', [LandlordMes
 Route::post('/landlord/service-provider-messages/{providerRequest}', [LandlordMessageController::class, 'storeServiceProvider'])
     ->name('landlord.service-provider.messages.store');
 
+Route::post('/landlord/service-provider-messages/{providerRequest}/accept', [LandlordMessageController::class, 'acceptServiceProvider'])
+    ->name('landlord.service-provider.messages.accept');
+
+Route::post('/landlord/service-provider-messages/{providerRequest}/decline', [LandlordMessageController::class, 'declineServiceProvider'])
+    ->name('landlord.service-provider.messages.decline');
+
 // STUDENT LOGIN
 Route::get('/student/login', function() {
     return view('auth.login');

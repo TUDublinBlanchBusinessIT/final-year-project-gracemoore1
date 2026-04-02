@@ -29,28 +29,58 @@
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
                 <div class="border-b border-slate-200 px-8 py-5 bg-white">
-                    <div class="flex items-center gap-4">
-                        <a href="{{ route('landlord.messages', ['filter' => 'service_providers']) }}"
-                           class="text-slate-500 hover:text-slate-700 text-xl">
-                            ←
-                        </a>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-center gap-4">
+                            <a href="{{ route('landlord.messages', ['filter' => 'service_providers']) }}"
+                               class="text-slate-500 hover:text-slate-700 text-xl">
+                                ←
+                            </a>
 
-                        <div class="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-2xl font-semibold">
-                            {{ strtoupper(substr($providerName, 0, 1)) }}
+                            <div class="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-2xl font-semibold">
+                                {{ strtoupper(substr($providerName, 0, 1)) }}
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-slate-900">
+                                    {{ $providerName }}
+                                </h3>
+                                <p class="text-slate-500 text-base">
+                                    {{ $job->servicetype ?? 'Service Request' }} ·
+                                    {{ $rental->housenumber ?? '' }} {{ $rental->street ?? '' }},
+                                    {{ $rental->county ?? '' }}
+                                </p>
+                            </div>
                         </div>
 
-                        <div>
-                            <h3 class="text-xl font-semibold text-slate-900">
-                                {{ $providerName }}
-                            </h3>
-                            <p class="text-slate-500 text-base">
-                                {{ $job->servicetype ?? 'Service Request' }} ·
-                                {{ $rental->housenumber ?? '' }} {{ $rental->street ?? '' }},
-                                {{ $rental->county ?? '' }}
-                            </p>
+                        <div class="flex items-center gap-3">
+                            @if($providerRequest->status === 'messaged' || $providerRequest->status === 'pending')
+                                <form method="POST" action="{{ route('landlord.service-provider.messages.accept', $providerRequest->id) }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition">
+                                        Accept Provider
+                                    </button>
+                                </form>
+
+                                <form method="POST" action="{{ route('landlord.service-provider.messages.decline', $providerRequest->id) }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition">
+                                        Decline Provider
+                                    </button>
+                                </form>
+                            @elseif($providerRequest->status === 'assigned')
+                                <span class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-xl font-medium border border-green-200">
+                                    Provider Accepted
+                                </span>
+                            @elseif($providerRequest->status === 'declined')
+                                <span class="inline-flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-xl font-medium border border-red-200">
+                                    Provider Declined
+                                </span>
+                            @endif
                         </div>
                     </div>
-                </div>
+                </div>                
 
                 <div id="chatContainer" class="px-8 py-6 bg-slate-50 min-h-[420px] max-h-[520px] overflow-y-auto">
 

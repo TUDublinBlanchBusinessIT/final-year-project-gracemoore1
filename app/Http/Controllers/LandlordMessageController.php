@@ -220,8 +220,93 @@ class LandlordMessageController extends Controller
             'is_read_by_service_provider' => false,
         ]);
 
+
+
         return redirect()
             ->route('landlord.service-provider.messages.show', $providerRequest->id);
             
     }
+
+    public function acceptServiceProvider($providerRequestId)
+    {
+        $landlordId = session('landlord_id');
+        abort_if(!$landlordId, 401);
+
+        $providerRequest = ServiceRequestProvider::with(['serviceRequest', 'provider'])
+            ->findOrFail($providerRequestId);
+
+        $job = $providerRequest->serviceRequest;
+
+        abort_unless($job && $job->landlordid == $landlordId, 403);
+
+        $providerRequest->update([
+            'status' => 'assigned',
+            'responded_at' => now(),
+        ]);
+
+        ServiceRequestProvider::where('servicerequestid', $providerRequest->servicerequestid)
+            ->where('id', '!=', $providerRequest->id)
+            ->update([
+                'status' => 'closed',
+                'responded_at' => now(),
+            ]);
+
+        $job->update([
+            'serviceproviderpartnershipid' => $providerRequest->serviceproviderpartnershipid,
+        ]);
+
+        Message::create([
+            'content' => '✅ Moya Knox accepted you for this job.',
+            'sender_type' => 'system',
+            'timestamp' => now(),
+            'studentid' => null,
+            'group_id' => null,
+            'landlordid' => $landlordId,
+            'rentalid' => $job->rentalid,
+            'serviceproviderpartnershipid' => $providerRequest->serviceproviderpartnershipid,
+            'is_read_by_student' => true,
+            'is_read_by_landlord' => true,
+            'is_read_by_service_provider' => false,
+        ]);
+
+        return redirect()
+            ->route('landlord.service-provider.messages.show', $providerRequest->id);
+    }
+
+    public function declineServiceProvider($providerRequestId)
+    {
+        $landlordId = session('landlord_id');
+        abort_if(!$landlordId, 401);
+
+        $providerRequest = ServiceRequestProvider::with(['serviceRequest', 'provider'])
+            ->findOrFail($providerRequestId);
+
+        $job = $providerRequest->serviceRequest;
+
+        abort_unless($job && $job->landlordid == $landlordId, 403);
+
+        $providerRequest->update([
+            'status' => 'declined',
+            'responded_at' => now(),
+        ]);
+
+        $landlord = Landlord::find($landlordId);
+
+        Message::create([
+            'content' => '❌ ' . ($landlord->name ?? 'The landlord') . ' declined you for this job.',
+            'sender_type' => 'system',
+            'timestamp' => now(),
+            'studentid' => null,
+            'group_id' => null,
+            'landlordid' => $landlordId,
+            'rentalid' => $job->rentalid,
+            'serviceproviderpartnershipid' => $providerRequest->serviceproviderpartnershipid,
+            'is_read_by_student' => true,
+            'is_read_by_landlord' => true,
+            'is_read_by_service_provider' => false,
+        ]);
+
+        return redirect()
+            ->route('landlord.service-provider.messages.show', $providerRequest->id);
+    }    
 }
