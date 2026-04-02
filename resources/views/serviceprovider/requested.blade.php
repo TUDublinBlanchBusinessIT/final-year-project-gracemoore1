@@ -50,7 +50,7 @@
                                         <img
                                             src="{{ asset('storage/' . $job->requestimage) }}"
                                             alt="Request image"
-                                            class="w-32 h-32 object-cover rounded-xl border border-slate-200 shadow-sm cursor-pointer"
+                                            class="w-40 h-40 object-cover rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:scale-105 transition"
                                             onerror="this.style.display='none';"
                                         >
                                     </a>
@@ -63,30 +63,30 @@
                             </div>
 
                             <div class="mt-5 flex flex-wrap gap-3">
-                                @if($providerRequest->status === 'pending')
-                                    <form method="POST" action="{{ route('serviceprovider.requested.accept', $providerRequest->id) }}">
-                                        @csrf
-                                        <button type="submit"
-                                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition">
-                                            Accept
-                                        </button>
-                                    </form>
-
-                                    <form method="POST" action="{{ route('serviceprovider.requested.decline', $providerRequest->id) }}">
-                                        @csrf
-                                        <button type="submit"
-                                            class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition">
-                                            Decline
-                                        </button>
-                                    </form>
-                                @endif
-
-                                @if($providerRequest->status === 'accepted')
+                                @if(in_array($providerRequest->status, ['pending', 'messaged']))
                                     <a href="{{ route('serviceprovider.messages') }}"
-                                       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
                                         Message Landlord
                                     </a>
                                 @endif
+
+                                @if($providerRequest->status === 'assigned')
+                                    <span class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-xl font-medium border border-green-200">
+                                        Assigned by Landlord
+                                    </span>
+
+                                    <a href="{{ route('serviceprovider.messages') }}"
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
+                                        Open Chat
+                                    </a>
+                                @endif
+
+                                @if(in_array($providerRequest->status, ['declined', 'closed']))
+                                    <span class="inline-flex items-center px-4 py-2 bg-slate-100 text-slate-500 rounded-xl font-medium border border-slate-200">
+                                        No Longer Available
+                                    </span>
+                                @endif
+                            
                             </div>
                         </div>
                     @endforeach
