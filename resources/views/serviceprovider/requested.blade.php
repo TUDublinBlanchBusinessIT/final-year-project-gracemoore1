@@ -45,20 +45,17 @@
                                     </p>
                                 </div>
 
-                                @php
-                                    $requestImageUrl = $job->requestimage
-                                        ? \Illuminate\Support\Facades\Storage::disk('public')->url($job->requestimage)
-                                        : null;
-                                @endphp
-
-                                @if($requestImageUrl)
-                                    <img
-                                        src="{{ $requestImageUrl }}"
-                                        alt="Request image"
-                                        class="w-32 h-32 object-cover rounded-xl border border-slate-200"
-                                        onerror="this.style.display='none';"
-                                    >
+                                @if(!empty($job->requestimage))
+                                    <a href="{{ asset('storage/' . $job->requestimage) }}" target="_blank">
+                                        <img
+                                            src="{{ asset('storage/' . $job->requestimage) }}"
+                                            alt="Request image"
+                                            class="w-32 h-32 object-cover rounded-xl border border-slate-200 shadow-sm cursor-pointer"
+                                            onerror="this.style.display='none';"
+                                        >
+                                    </a>
                                 @endif
+                                
                             </div>
 
                             <div class="mt-4">

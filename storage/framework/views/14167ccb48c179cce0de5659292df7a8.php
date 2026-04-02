@@ -60,20 +60,17 @@
                                     </p>
                                 </div>
 
-                                <?php
-                                    $requestImageUrl = $job->requestimage
-                                        ? \Illuminate\Support\Facades\Storage::disk('public')->url($job->requestimage)
-                                        : null;
-                                ?>
-
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($requestImageUrl): ?>
-                                    <img
-                                        src="<?php echo e($requestImageUrl); ?>"
-                                        alt="Request image"
-                                        class="w-32 h-32 object-cover rounded-xl border border-slate-200"
-                                        onerror="this.style.display='none';"
-                                    >
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($job->requestimage)): ?>
+                                    <a href="<?php echo e(asset('storage/' . $job->requestimage)); ?>" target="_blank">
+                                        <img
+                                            src="<?php echo e(asset('storage/' . $job->requestimage)); ?>"
+                                            alt="Request image"
+                                            class="w-32 h-32 object-cover rounded-xl border border-slate-200 shadow-sm cursor-pointer"
+                                            onerror="this.style.display='none';"
+                                        >
+                                    </a>
                                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                
                             </div>
 
                             <div class="mt-4">

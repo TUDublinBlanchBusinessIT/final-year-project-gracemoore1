@@ -38,7 +38,10 @@ class LandlordServiceRequestController extends Controller
         $imagePath = null;
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('service-requests', 'public');
+            $image = $request->file('image');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('storage/service-requests'), $filename);
+            $imagePath = 'service-requests/' . $filename;
         }
 
         DB::beginTransaction();
