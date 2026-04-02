@@ -14,10 +14,9 @@ class ServiceProviderRequestedJobsController extends Controller
 
         $requestedJobs = ServiceRequestProvider::with('serviceRequest')
             ->where('serviceproviderpartnershipid', $serviceProviderId)
-            ->whereIn('status', ['pending', 'accepted'])
+            ->whereIn('status', ['pending', 'messaged'])
             ->latest()
             ->get();
-
         return view('serviceprovider.requested', compact('requestedJobs'));
     }
 

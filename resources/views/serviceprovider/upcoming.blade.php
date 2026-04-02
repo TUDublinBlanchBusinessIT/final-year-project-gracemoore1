@@ -1,31 +1,79 @@
 <x-app-layout>
-
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-blue-500 leading-tight">
-            RentConnect
-        </h2>                              
+        <h2 class="font-semibold text-base text-gray-800 leading-tight">
+            Upcoming Jobs
+        </h2>
     </x-slot>
 
-    
+    <div class="pb-28 lg:pl-70">
+        <div class="max-w-5xl mx-auto">
 
-    @include('profile.partials.sp-header', ['title' => 'Upcoming Jobs'])
+            @if(session('success'))
+                <div class="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-    <style>
-        .coming-box {
-            max-width: 900px;
-            margin: 30px auto;
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            padding: 60px 50px;
-            text-align: center;
-        }
-        .title { font-size: 30px; font-weight: 800; color: rgb(38,98,227); }
-        .text  { font-size: 20px; color: #444; margin-top: 18px; }
-    </style>
+            @if($upcomingJobs->isEmpty())
+                <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 p-10 text-center">
+                    <h3 class="text-3xl font-semibold text-blue-600 mb-3">Upcoming Jobs</h3>
+                    <p class="text-gray-600">You do not have any upcoming jobs yet.</p>
+                </div>
+            @else
+                <div class="space-y-4">
+                    @foreach($upcomingJobs as $providerRequest)
+                        @php
+                            $job = $providerRequest->serviceRequest;
+                        @endphp
 
-    <div class="coming-box">
-        <div class="title">Upcoming Jobs — Coming Soon</div>
-        <div class="text">This feature is currently in development.</div>
+                        <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 p-6">
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                                <div>
+                                    <div class="flex items-center gap-3">
+                                        <h3 class="text-xl font-semibold text-slate-800">
+                                            {{ $job->servicetype }}
+                                        </h3>
+
+                                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-green-100 text-green-700">
+                                            Assigned
+                                        </span>
+                                    </div>
+
+                                    <p class="text-sm text-slate-500 mt-2">
+                                        {{ $job->address_housenumber }} {{ $job->address_street }}, {{ $job->address_county }} {{ $job->address_postcode }}
+                                    </p>
+
+                                    <p class="text-sm text-slate-500 mt-1">
+                                        Accepted on {{ optional($providerRequest->responded_at)->format('d M Y H:i') }}
+                                    </p>
+                                </div>
+
+                                @if(!empty($job->requestimage))
+                                    <a href="{{ asset('storage/' . $job->requestimage) }}" target="_blank">
+                                        <img
+                                            src="{{ asset('storage/' . $job->requestimage) }}"
+                                            alt="Request image"
+                                            class="w-32 h-32 object-cover rounded-xl border border-slate-200 shadow-sm cursor-pointer"
+                                        >
+                                    </a>
+                                @endif
+                            </div>
+
+                            <div class="mt-4">
+                                <p class="text-slate-700 whitespace-pre-line">{{ $job->description }}</p>
+                            </div>
+
+                            <div class="mt-5 flex flex-wrap gap-3">
+                                <a href="{{ route('serviceprovider.messages.show', $providerRequest->id) }}"
+                                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
+                                    Open Chat
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+        </div>
     </div>
 </x-app-layout>
