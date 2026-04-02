@@ -89,6 +89,23 @@
                         class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                 </div>
 
+                <div class="mb-6">
+                    <label class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            name="is_urgent"
+                            value="1"
+                            <?php echo e(old('is_urgent') ? 'checked' : ''); ?>
+
+                            class="mt-1 rounded border-slate-300 text-red-600 focus:ring-red-500"
+                        >
+                        <div>
+                            <span class="block text-sm font-semibold text-red-700">Urgent</span>
+                            <span class="block text-sm text-red-600">Needed today</span>
+                        </div>
+                    </label>
+                </div>
+                
                 <div class="flex items-center gap-3">
                     <button type="submit"
                         class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">

@@ -29,7 +29,7 @@
                         <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 p-6">
                             <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                                 <div>
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-3 flex-wrap">
                                         <h3 class="text-xl font-semibold text-slate-800">
                                             {{ $job->servicetype }}
                                         </h3>
@@ -37,6 +37,12 @@
                                         <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-green-100 text-green-700">
                                             Assigned
                                         </span>
+
+                                        @if(!empty($job->is_urgent) && $job->is_urgent == 1)
+                                            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-red-100 text-red-700 border border-red-200">
+                                                Urgent · Needed today
+                                            </span>
+                                        @endif
                                     </div>
 
                                     <p class="text-sm text-slate-500 mt-2">
@@ -45,6 +51,10 @@
 
                                     <p class="text-sm text-slate-500 mt-1">
                                         Accepted on {{ optional($providerRequest->responded_at)->format('d M Y H:i') }}
+                                    </p>
+
+                                    <p class="text-sm text-slate-400 mt-1">
+                                        Posted {{ optional($job->created_at)->format('d M Y H:i') }}
                                     </p>
                                 </div>
 

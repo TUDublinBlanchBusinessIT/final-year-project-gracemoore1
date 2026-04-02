@@ -66,6 +66,7 @@ class LandlordServiceRequestController extends Controller
                 'address_county' => $validated['county'],
                 'address_postcode' => $validated['postcode'] ?? null,
                 'requestimage' => $imagePath,
+                'is_urgent' => $request->has('is_urgent') ? 1 : 0,
                 'maintenancelogid' => $log->id,
             ]);
 

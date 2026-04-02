@@ -18,95 +18,84 @@
 
     <div class="pb-28 lg:pl-70">
         <div class="max-w-5xl mx-auto">
-            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
-                <div class="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700">
-                    <?php echo e(session('success')); ?>
-
-                </div>
-            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-
-            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('error')): ?>
-                <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-                    <?php echo e(session('error')); ?>
-
-                </div>
-            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($requestedJobs->isEmpty()): ?>
                 <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 p-10 text-center">
-                    <h3 class="text-3xl font-semibold text-blue-600 mb-3">Requested Jobs</h3>
-                    <p class="text-gray-600">There are no matching requested jobs for you right now.</p>
+                    <h3 class="text-2xl font-semibold text-slate-800 mb-2">Requested Jobs</h3>
+                    <p class="text-slate-500">No requested jobs available right now.</p>
                 </div>
             <?php else: ?>
-                <div class="space-y-4">
+                <div class="space-y-5">
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $requestedJobs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $providerRequest): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
                         <?php
                             $job = $providerRequest->serviceRequest;
                         ?>
 
                         <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 p-6">
-                            <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                                <div>
-                                    <h3 class="text-xl font-semibold text-slate-800">
-                                        <?php echo e($job->servicetype); ?>
+                            <div class="flex flex-col md:flex-row gap-6 md:items-start md:justify-between">
 
-                                    </h3>
-                                    <p class="text-sm text-slate-500 mt-1">
-                                        <?php echo e($job->address_housenumber); ?> <?php echo e($job->address_street); ?>, <?php echo e($job->address_county); ?> <?php echo e($job->address_postcode); ?>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <h3 class="text-2xl font-semibold text-slate-900">
+                                            <?php echo e($job->servicetype); ?>
+
+                                        </h3>
+
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($job->is_urgent) && $job->is_urgent == 1): ?>
+                                            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-red-100 text-red-700 border border-red-200">
+                                                Urgent · Needed today
+                                            </span>
+                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                    </div>
+
+                                    <p class="mt-3 text-sm text-slate-500">
+                                        <?php echo e($job->address_housenumber ?? ''); ?>
+
+                                        <?php echo e($job->address_street ?? ''); ?>,
+                                        <?php echo e($job->address_county ?? ''); ?>
+
+                                        <?php echo e($job->address_postcode ?? ''); ?>
 
                                     </p>
-                                    <p class="text-sm text-slate-500 mt-1">
-                                        Status: <span class="font-medium"><?php echo e(ucfirst($providerRequest->status)); ?></span>
+
+                                    <p class="mt-1 text-sm text-slate-400">
+                                        Posted <?php echo e(optional($job->created_at)->format('d M Y H:i')); ?>
+
                                     </p>
+
+                                    <div class="mt-4 rounded-xl bg-slate-50 border border-slate-200 p-4">
+                                        <p class="text-slate-700 leading-7">
+                                            <?php echo e($job->description); ?>
+
+                                        </p>
+                                    </div>
+
+                                    <div class="mt-5">
+                                        <a href="<?php echo e(route('serviceprovider.messages.show', $providerRequest->id)); ?>"
+                                           class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
+                                            Message Landlord
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($job->requestimage)): ?>
-                                    <a href="<?php echo e(asset('storage/' . $job->requestimage)); ?>" target="_blank">
-                                        <img
-                                            src="<?php echo e(asset('storage/' . $job->requestimage)); ?>"
-                                            alt="Request image"
-                                            class="w-40 h-40 object-cover rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:scale-105 transition"
-                                            onerror="this.style.display='none';"
-                                        >
-                                    </a>
-                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                                
-                            </div>
-
-                            <div class="mt-4">
-                                <p class="text-slate-700 whitespace-pre-line"><?php echo e($job->description); ?></p>
-                            </div>
-
-                            <div class="mt-5 flex flex-wrap gap-3">
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(in_array($providerRequest->status, ['pending', 'messaged'])): ?>
-                                    <a href="<?php echo e(route('serviceprovider.messages.show', $providerRequest->id)); ?>"
-                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
-                                        Message Landlord
-                                    </a>
+                                    <div class="w-full md:w-44 shrink-0">
+                                        <a href="<?php echo e(asset('storage/' . $job->requestimage)); ?>" target="_blank">
+                                            <img
+                                                src="<?php echo e(asset('storage/' . $job->requestimage)); ?>"
+                                                alt="Request image"
+                                                class="w-full h-44 object-cover rounded-2xl border border-slate-200 shadow-sm"
+                                            >
+                                        </a>
+                                    </div>
                                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($providerRequest->status === 'assigned'): ?>
-                                    <span class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-xl font-medium border border-green-200">
-                                        Assigned by Landlord
-                                    </span>
-
-                                    <a href="<?php echo e(route('serviceprovider.messages')); ?>"
-                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
-                                        Open Chat
-                                    </a>
-                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(in_array($providerRequest->status, ['declined', 'closed'])): ?>
-                                    <span class="inline-flex items-center px-4 py-2 bg-slate-100 text-slate-500 rounded-xl font-medium border border-slate-200">
-                                        No Longer Available
-                                    </span>
-                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                            
                             </div>
                         </div>
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                 </div>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
         </div>
     </div>
  <?php echo $__env->renderComponent(); ?>
