@@ -24,4 +24,10 @@ class ServiceProviderPartnership extends Model
         'feepermonth',
         'administratorid'
     ];
+
+    public function serviceRequestNotifications()
+    {
+        return $this->hasMany(ServiceRequestProvider::class, 'serviceproviderpartnershipid');
+    }
+
 }

@@ -16,6 +16,7 @@ use App\Http\Controllers\Auth\LandlordCodeVerificationController;
 use App\Http\Controllers\Auth\LandlordOCRController;
 use App\Http\Controllers\LandlordController;
 use App\Http\Controllers\LandlordMessageController;
+use App\Http\Controllers\Landlord\LandlordMaintenanceController;
 
 
 // Student controllers
@@ -23,6 +24,8 @@ use App\Http\Controllers\StudentRegisterController;
 use App\Http\Controllers\StudentPasswordResetController;
 //student messaging
 use App\Http\Controllers\StudentMessageController;
+//student maintenance log
+use App\Http\Controllers\Student\StudentMaintenanceController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\AdminReportController;
 
@@ -37,11 +40,38 @@ use App\Models\Listing;
 use App\Http\Controllers\Landlord\LandlordRentalController;
 use App\Http\Controllers\PartnershipController;
 
+//service provider
+use App\Http\Controllers\LandlordServiceRequestController;
+use App\Http\Controllers\ServiceProviderRequestedJobsController;
+use App\Http\Controllers\ServiceProviderMessageController;
+use App\Http\Controllers\ServiceProviderUpcomingJobsController;
+
 
 //chatbot
 Route::get('/student/chatbot', [ChatbotController::class, 'studentChat'])->name('student.chatbot');
 Route::get('/landlord/chatbot', [ChatbotController::class, 'landlordChat'])->name('landlord.chatbot');
 Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+
+//landlord/serviceprovider messaging
+Route::middleware(['landlord'])->group(function () {
+    Route::get('/landlord/maintenance/{id}/book-service-provider', [LandlordServiceRequestController::class, 'create'])
+        ->name('landlord.service-request.create');
+
+    Route::post('/landlord/maintenance/{id}/book-service-provider', [LandlordServiceRequestController::class, 'store'])
+        ->name('landlord.service-request.store');
+});
+
+//sp
+Route::middleware(['serviceprovider'])->group(function () {
+    Route::get('/serviceprovider/requested', [ServiceProviderRequestedJobsController::class, 'index'])
+        ->name('serviceprovider.requested');
+
+    Route::post('/serviceprovider/requested/{id}/accept', [ServiceProviderRequestedJobsController::class, 'accept'])
+        ->name('serviceprovider.requested.accept');
+
+    Route::post('/serviceprovider/requested/{id}/decline', [ServiceProviderRequestedJobsController::class, 'decline'])
+        ->name('serviceprovider.requested.decline');
+});
 
 
 
@@ -127,11 +157,18 @@ Route::get('/home', [StudentRegisterController::class, 'dashboard'])
 Route::get('/landlord/messages/{application}', [LandlordMessageController::class, 'show'])->name('landlord.messages.show');
 Route::post('/landlord/messages/{application}', [LandlordMessageController::class, 'store'])->name('landlord.messages.store');
 Route::get('/landlord/messages', [LandlordMessageController::class, 'index'])->name('landlord.messages');
+//service provider for landlord
+Route::get('/landlord/service-provider-messages/{providerRequest}', [LandlordMessageController::class, 'showServiceProvider'])
+    ->name('landlord.service-provider.messages.show');
+Route::post('/landlord/service-provider-messages/{providerRequest}', [LandlordMessageController::class, 'storeServiceProvider'])
+    ->name('landlord.service-provider.messages.store');
 
+Route::post('/landlord/service-provider-messages/{providerRequest}/accept', [LandlordMessageController::class, 'acceptServiceProvider'])
+    ->name('landlord.service-provider.messages.accept');
 
-//report 
-Route::get('/complaint/create', [ComplaintController::class, 'create'])->name('complaint.create');
-Route::post('/complaint', [ComplaintController::class, 'store'])->name('complaint.store');
+Route::post('/landlord/service-provider-messages/{providerRequest}/decline', [LandlordMessageController::class, 'declineServiceProvider'])
+    ->name('landlord.service-provider.messages.decline');
+
 // STUDENT LOGIN
 Route::get('/student/login', function() {
     return view('auth.login');
@@ -196,6 +233,15 @@ Route::get('/student/messages', [StudentMessageController::class, 'index'])->nam
 Route::get('/student/messages/{application}', [StudentMessageController::class, 'show'])->name('student.messages.show');
 Route::post('/student/messages/{application}', [StudentMessageController::class, 'store'])->name('student.messages.store');
 
+    //student maintenance log 
+Route::get('/student/maintenance/{application}', [StudentMaintenanceController::class, 'page'])->name('student.maintenance.log');
+Route::get('/student/maintenance/{application}', [StudentMaintenanceController::class, 'page'])->name('student.maintenance-log');
+
+Route::post('/student/maintenance/{application}', [StudentMaintenanceController::class, 'store'])->name('student.maintenance-log.store');
+
+// Landlord maintenance log
+Route::get('/landlord/maintenance/{application}', [LandlordMaintenanceController::class, 'page'])->name('landlord.maintenance-log');
+Route::post('/landlord/maintenance/{application}/{log}', [LandlordMaintenanceController::class, 'update'])->name('landlord.maintenance-log.update');
 // ===============================
 // RENT TRACKER ROUTES (SESSION-BASED)
 // ===============================
@@ -534,25 +580,26 @@ Route::get('/serviceprovider/dashboard', function () {
     return redirect()->route('serviceprovider.upcoming');
 })->name('serviceprovider.dashboard');
 
-Route::get('/serviceprovider/upcoming', function () {
-    if (!session('serviceprovider_id')) return redirect('/login');
-    return view('serviceprovider.upcoming');
-})->name('serviceprovider.upcoming');
+Route::get('/serviceprovider/upcoming', [ServiceProviderUpcomingJobsController::class, 'index'])
+    ->name('serviceprovider.upcoming');
 
-Route::get('/serviceprovider/completed', function () {
-    if (!session('serviceprovider_id')) return redirect('/login');
-    return view('serviceprovider.completed');
-})->name('serviceprovider.completed');
+Route::post('/serviceprovider/upcoming/{id}/complete', [ServiceProviderUpcomingJobsController::class, 'markCompleted'])
+    ->name('serviceprovider.upcoming.complete');
 
-Route::get('/serviceprovider/requested', function () {
-    if (!session('serviceprovider_id')) return redirect('/login');
-    return view('serviceprovider.requested');
-})->name('serviceprovider.requested');
+Route::get('/serviceprovider/completed', [ServiceProviderUpcomingJobsController::class, 'completed'])
+    ->name('serviceprovider.completed');
 
-Route::get('/serviceprovider/messages', function () {
-    if (!session('serviceprovider_id')) return redirect('/login');
-    return view('serviceprovider.messages');
-})->name('serviceprovider.messages');
+Route::get('/serviceprovider/requested', [ServiceProviderRequestedJobsController::class, 'index'])
+    ->name('serviceprovider.requested');
+
+Route::get('/serviceprovider/messages', [ServiceProviderMessageController::class, 'index'])
+    ->name('serviceprovider.messages');
+
+Route::get('/serviceprovider/messages/{id}', [ServiceProviderMessageController::class, 'show'])
+    ->name('serviceprovider.messages.show');
+
+Route::post('/serviceprovider/messages/{id}', [ServiceProviderMessageController::class, 'store'])
+    ->name('serviceprovider.messages.store');
 
 Route::get('/serviceprovider/profile', function () {
     if (!session('serviceprovider_id')) return redirect('/login');

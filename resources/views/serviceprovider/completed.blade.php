@@ -1,27 +1,14 @@
-<x-app-layout>
+                            <div class="mt-5 flex flex-wrap gap-3">
+                                <a href="{{ route('serviceprovider.messages.show', $providerRequest->id) }}"
+                                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
+                                    Open Chat
+                                </a>
 
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-blue-500 leading-tight">
-            RentConnect
-        </h2>                              
-    </x-slot>
-
-    <style>
-        .coming-box {
-            max-width: 900px;
-            margin: 30px auto;
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            padding: 60px 50px;
-            text-align: center;
-        }
-        .title { font-size: 30px; font-weight: 800; color: rgb(38,98,227); }
-        .text  { font-size: 20px; color: #444; margin-top: 18px; }
-    </style>
-
-    <div class="coming-box">
-        <div class="title">Completed Jobs — Coming Soon</div>
-        <div class="text">This feature is currently in development.</div>
-    </div>
-</x-app-layout>
+                                <form method="POST" action="{{ route('serviceprovider.upcoming.complete', $providerRequest->id) }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition">
+                                        Mark as Completed
+                                    </button>
+                                </form>
+                            </div>

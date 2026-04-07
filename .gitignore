@@ -17,6 +17,7 @@
 /public/hot
 !public/storage
 !/public/storage/rentals
+!/public/storage/maintenance-images
 /storage/*.key
 /storage/pail
 /vendor

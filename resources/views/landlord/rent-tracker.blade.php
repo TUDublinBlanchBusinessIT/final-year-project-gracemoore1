@@ -54,21 +54,21 @@
         const feedEl    = document.getElementById('rt-feed');
         const summaryEl = document.getElementById('rt-summary');
 
-        // ── BALANCE ──────────────────────────────────────────────
+        // BALANCE 
         async function refreshBalance() {
             const res  = await fetch(`/landlord/rent-tracker/balance?application_id=${APP_ID}`);
             RT_balance = await res.json();
             summaryEl.textContent = `Due €${RT_balance.monthly_due} • Paid €${RT_balance.paid} • Outstanding €${RT_balance.outstanding}`;
         }
 
-        // ── FEED ─────────────────────────────────────────────────
+        //  FEED 
         async function refreshFeed() {
             const res  = await fetch(`/landlord/rent-tracker/history?application_id=${APP_ID}&all=1`);
             const data = await res.json();
             renderFeed(data.history);
         }
 
-        // ── DAY SEPARATOR HELPERS ────────────────────────────────
+        //  DAY SEPARATOR HELPERS 
         function daySeparatorLabel(date) {
             const today = new Date(); today.setHours(0,0,0,0);
             const that  = new Date(date); that.setHours(0,0,0,0);
@@ -85,7 +85,7 @@
             return wrap;
         }
 
-        // ── RENDER FEED ──────────────────────────────────────────
+        //  RENDER FEED 
         function renderFeed(items) {
             feedEl.innerHTML = '';
             items.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
@@ -153,7 +153,7 @@
             }
         }
 
-        // ── BOOT ─────────────────────────────────────────────────
+        //  BOOT 
         let RT_balance = null;
 
         async function boot() {

@@ -57,13 +57,23 @@
                         </div>
                     </div>
                     
+                
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($application->status === 'accepted'): ?>
+                        <div class="flex items-center gap-3">
                         <a href="<?php echo e(route('student.rent.page', ['application' => $application->id])); ?><?php echo e($application->group_id ? ('?group_id=' . $application->group_id) : ''); ?>"
-                        class="ml-auto h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
-                        title="Rent Tracker">
+                            class="ml-auto h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
+                            title="Rent Tracker">
                             <span class="text-emerald-600 text-xl font-semibold">€</span>
                         </a>
+
+                        <a href="<?php echo e(route('student.maintenance-log', $application->id)); ?>"
+                            class="ml-3 h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
+                            title="Maintenance Log">
+                            <span class="text-slate-600 text-xl">🛠</span>
+                        </a>
+
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    
                 </div>
 
                 <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
@@ -90,6 +100,15 @@
                                 $lastDate = $messageDate;
                             ?>
                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->sender_type === 'system'): ?>
+                            <div class="flex justify-center my-4">
+                                <div class="inline-block px-4 py-2 rounded-full bg-slate-100 border border-slate-200 text-sm text-slate-500 text-center">
+                                    <?php echo e($message->content); ?>
+
+                                </div>
+                            </div>
+                        <?php else: ?>
                         <div class="flex <?php echo e($isOwnMessage ? 'justify-end' : 'justify-start'); ?>">
                         
                             <div class="max-w-[75%]">
@@ -128,6 +147,7 @@
                                 </div>
                             </div>
                         </div>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                         <div class="flex justify-center items-center h-full">
                             <p class="text-sm text-slate-500">No messages yet.</p>

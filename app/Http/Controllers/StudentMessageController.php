@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class StudentMessageController extends Controller
 {
-        public function index()
+    public function index()
     {
         $studentId = session('student_id');
         $filter = request('filter', 'all');
@@ -51,6 +51,7 @@ class StudentMessageController extends Controller
                             ->where('is_read_by_student', false)
                             ->where(function ($query) use ($studentId) {
                                 $query->where('sender_type', 'landlord')
+                                    ->orWhere('sender_type', 'system')
                                     ->orWhere(function ($subQuery) use ($studentId) {
                                         $subQuery->where('sender_type', 'student')
                                             ->where('studentid', '!=', $studentId);
@@ -61,7 +62,7 @@ class StudentMessageController extends Controller
 
                     return Message::where('studentid', $application->studentid)
                         ->where('rentalid', $application->rentalid)
-                        ->where('sender_type', 'landlord')
+                        ->where('sender_type', '!=', 'student')
                         ->where('is_read_by_student', false)
                         ->exists();
                 }
@@ -106,6 +107,7 @@ class StudentMessageController extends Controller
                 ->where('is_read_by_student', false)
                 ->where(function ($query) use ($studentId) {
                     $query->where('sender_type', 'landlord')
+                        ->orWhere('sender_type', 'system')
                         ->orWhere(function ($subQuery) use ($studentId) {
                             $subQuery->where('sender_type', 'student')
                                 ->where('studentid', '!=', $studentId);
@@ -113,7 +115,7 @@ class StudentMessageController extends Controller
                 })
                 ->update([
                     'is_read_by_student' => true,
-                ]);        
+                ]);
 
             $messages = Message::where('group_id', $application->group_id)
                 ->where('rentalid', $application->rentalid)
@@ -128,7 +130,7 @@ class StudentMessageController extends Controller
         } else {
             Message::where('studentid', $application->studentid)
                 ->where('rentalid', $application->rentalid)
-                ->where('sender_type', 'landlord')
+                ->where('sender_type', '!=', 'student')
                 ->where('is_read_by_student', false)
                 ->update([
                     'is_read_by_student' => true,

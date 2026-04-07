@@ -65,13 +65,23 @@
                         </div>
                     </div>
                     {{-- RIGHT SIDE – RENT TRACKER BUTTON --}}
+                
                     @if($application->status === 'accepted')
+                        <div class="flex items-center gap-3">
                         <a href="{{ route('student.rent.page', ['application' => $application->id]) }}{{ $application->group_id ? ('?group_id=' . $application->group_id) : '' }}"
-                        class="ml-auto h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
-                        title="Rent Tracker">
+                            class="ml-auto h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
+                            title="Rent Tracker">
                             <span class="text-emerald-600 text-xl font-semibold">€</span>
                         </a>
+
+                        <a href="{{ route('student.maintenance-log', $application->id) }}"
+                            class="ml-3 h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
+                            title="Maintenance Log">
+                            <span class="text-slate-600 text-xl">🛠</span>
+                        </a>
+
                     @endif
+                    
                 </div>
 
                 <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
@@ -97,6 +107,14 @@
                                 $lastDate = $messageDate;
                             @endphp
                         @endif
+
+                        @if($message->sender_type === 'system')
+                            <div class="flex justify-center my-4">
+                                <div class="inline-block px-4 py-2 rounded-full bg-slate-100 border border-slate-200 text-sm text-slate-500 text-center">
+                                    {{ $message->content }}
+                                </div>
+                            </div>
+                        @else
                         <div class="flex {{ $isOwnMessage ? 'justify-end' : 'justify-start' }}">
                         
                             <div class="max-w-[75%]">
@@ -130,6 +148,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
                     @empty
                         <div class="flex justify-center items-center h-full">
                             <p class="text-sm text-slate-500">No messages yet.</p>
