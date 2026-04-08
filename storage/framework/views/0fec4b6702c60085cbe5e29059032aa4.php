@@ -10,34 +10,105 @@
 <?php $component->withAttributes([]); ?>
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
-
      <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-xl text-blue-500 leading-tight">
-            RentConnect
-        </h2>                              
+        <h2 class="font-semibold text-base text-gray-800 leading-tight">
+            Upcoming Jobs
+        </h2>
      <?php $__env->endSlot(); ?>
 
-    
+    <div class="pb-28 lg:pl-70">
+        <div class="max-w-5xl mx-auto">
 
-    <?php echo $__env->make('profile.partials.sp-header', ['title' => 'Upcoming Jobs'], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
+                <div class="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+                    <?php echo e(session('success')); ?>
 
-    <style>
-        .coming-box {
-            max-width: 900px;
-            margin: 30px auto;
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            padding: 60px 50px;
-            text-align: center;
-        }
-        .title { font-size: 30px; font-weight: 800; color: rgb(38,98,227); }
-        .text  { font-size: 20px; color: #444; margin-top: 18px; }
-    </style>
+                </div>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    <div class="coming-box">
-        <div class="title">Upcoming Jobs — Coming Soon</div>
-        <div class="text">This feature is currently in development.</div>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($upcomingJobs->isEmpty()): ?>
+                <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 p-10 text-center">
+                    <h3 class="text-3xl font-semibold text-blue-600 mb-3">Upcoming Jobs</h3>
+                    <p class="text-gray-600">You do not have any upcoming jobs yet.</p>
+                </div>
+            <?php else: ?>
+                <div class="space-y-4">
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $upcomingJobs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $providerRequest): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                        <?php
+                            $job = $providerRequest->serviceRequest;
+                        ?>
+
+                        <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 p-6">
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                                <div>
+                                    <div class="flex items-center gap-3 flex-wrap">
+                                        <h3 class="text-xl font-semibold text-slate-800">
+                                            <?php echo e($job->servicetype); ?>
+
+                                        </h3>
+
+                                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-green-100 text-green-700">
+                                            Assigned
+                                        </span>
+
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($job->is_urgent) && $job->is_urgent == 1): ?>
+                                            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-red-100 text-red-700 border border-red-200">
+                                                Urgent · Needed today
+                                            </span>
+                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                    </div>
+
+                                    <p class="text-sm text-slate-500 mt-2">
+                                        <?php echo e($job->address_housenumber); ?> <?php echo e($job->address_street); ?>, <?php echo e($job->address_county); ?> <?php echo e($job->address_postcode); ?>
+
+                                    </p>
+
+                                    <p class="text-sm text-slate-500 mt-1">
+                                        Accepted on <?php echo e(optional($providerRequest->responded_at)->format('d M Y H:i')); ?>
+
+                                    </p>
+
+                                    <p class="text-sm text-slate-400 mt-1">
+                                        Posted <?php echo e(optional($job->created_at)->format('d M Y H:i')); ?>
+
+                                    </p>
+                                </div>
+
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($job->requestimage)): ?>
+                                    <a href="<?php echo e(asset('storage/' . $job->requestimage)); ?>" target="_blank">
+                                        <img
+                                            src="<?php echo e(asset('storage/' . $job->requestimage)); ?>"
+                                            alt="Request image"
+                                            class="w-32 h-32 object-cover rounded-xl border border-slate-200 shadow-sm cursor-pointer"
+                                        >
+                                    </a>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            </div>
+
+                            <div class="mt-4">
+                                <p class="text-slate-700 whitespace-pre-line"><?php echo e($job->description); ?></p>
+                            </div>
+
+                            <div class="mt-5 flex flex-wrap gap-3">
+                                <a href="<?php echo e(route('serviceprovider.messages.show', $providerRequest->id)); ?>"
+                                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
+                                    Open Chat
+                                </a>
+
+                                <form method="POST" action="<?php echo e(route('serviceprovider.upcoming.complete', $providerRequest->id)); ?>">
+                                    <?php echo csrf_field(); ?>
+                                    <button type="submit"
+                                        class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition">
+                                        Mark as Completed
+                                    </button>
+                                </form>
+                            </div>                            
+                        </div>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                </div>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+        </div>
     </div>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

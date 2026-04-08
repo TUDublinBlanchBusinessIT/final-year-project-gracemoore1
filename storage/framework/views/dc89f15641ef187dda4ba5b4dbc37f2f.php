@@ -14,7 +14,7 @@
 
         if ($landlord) {
             $landlordUnreadCount = \App\Models\Message::where('landlordid', $landlord->id)
-                ->where('sender_type', 'student')
+                ->where('sender_type', '!=', 'landlord')
                 ->where('is_read_by_landlord', false)
                 ->count();
         }

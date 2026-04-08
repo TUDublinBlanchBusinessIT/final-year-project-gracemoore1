@@ -80,6 +80,7 @@
                                         ->where('is_read_by_student', false)
                                         ->where(function ($query) use ($loggedInStudentId) {
                                             $query->where('sender_type', 'landlord')
+                                                ->orWhere('sender_type', 'system')
                                                 ->orWhere(function ($subQuery) use ($loggedInStudentId) {
                                                     $subQuery->where('sender_type', 'student')
                                                         ->where('studentid', '!=', $loggedInStudentId);
@@ -110,8 +111,8 @@
 
                                     $unreadCount = \App\Models\Message::where('studentid', $application->studentid)
                                         ->where('rentalid', $application->rentalid)
-                                        ->where('sender_type', 'landlord')
                                         ->where('is_read_by_student', false)
+                                        ->where('sender_type', '!=', 'student')
                                         ->count();
 
                                     $groupSubtitle = 'Individual application';

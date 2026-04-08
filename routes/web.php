@@ -47,6 +47,7 @@ use App\Http\Controllers\ServiceProviderMessageController;
 use App\Http\Controllers\ServiceProviderUpcomingJobsController;
 
 
+
 //chatbot
 Route::get('/student/chatbot', [ChatbotController::class, 'studentChat'])->name('student.chatbot');
 Route::get('/landlord/chatbot', [ChatbotController::class, 'landlordChat'])->name('landlord.chatbot');
@@ -169,6 +170,12 @@ Route::post('/landlord/service-provider-messages/{providerRequest}/accept', [Lan
 Route::post('/landlord/service-provider-messages/{providerRequest}/decline', [LandlordMessageController::class, 'declineServiceProvider'])
     ->name('landlord.service-provider.messages.decline');
 
+    // REPORT / COMPLAINT ROUTES
+Route::get('/complaint/create', [ComplaintController::class, 'create'])
+    ->name('complaint.create');
+
+Route::post('/complaint', [ComplaintController::class, 'store'])
+    ->name('complaint.store');
 // STUDENT LOGIN
 Route::get('/student/login', function() {
     return view('auth.login');
