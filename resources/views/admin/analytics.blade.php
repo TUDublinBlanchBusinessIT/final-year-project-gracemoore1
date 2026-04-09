@@ -105,7 +105,7 @@
         @endif
 
         // Complaints Chart
-        @if(isset($complaints) && $complaints->count())
+        @if(isset($complaints) && count($complaints))
         if (document.getElementById('complaintsChart')) {
             new Chart(document.getElementById('complaintsChart'), {
                 type: 'pie',

@@ -117,7 +117,7 @@
         <?php endif; ?>
 
         // Complaints Chart
-        <?php if(isset($complaints) && $complaints->count()): ?>
+        <?php if(isset($complaints) && count($complaints)): ?>
         if (document.getElementById('complaintsChart')) {
             new Chart(document.getElementById('complaintsChart'), {
                 type: 'pie',
