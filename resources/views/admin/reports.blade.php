@@ -7,7 +7,7 @@
                     RentConnect
                 </div>
                 <div class="mt-1 font-semibold text-gray-800">
-                    Reports
+                    User Complaints
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
                        class="{{ $activeTab === 'pending'
                             ? 'text-slate-900 font-semibold border-b-2 border-slate-900'
                             : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
-                        Reports to be handled
+                        Complaints to be handled
                     </a>
                 </li>
 

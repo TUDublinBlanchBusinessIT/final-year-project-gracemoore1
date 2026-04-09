@@ -9,7 +9,7 @@ class Complaint extends Model
 {
     use HasFactory;
 
-    protected $table = 'complaint';
+    protected $table = 'complaint'; // singular because your table is named "complaint"
 
     protected $fillable = [
         'subject',
@@ -20,4 +20,6 @@ class Complaint extends Model
         'reported_user_id',
         'reported_user_role',
     ];
+
+    public $timestamps = true; // complaint table has created_at/updated_at
 }

@@ -9,7 +9,7 @@ use App\Http\Controllers\ProfileController;
 
 //chatbot
 use App\Http\Controllers\ChatbotController;
-
+use App\Http\Controllers\AnalyticsController;
 // Landlord controllers
 use App\Http\Controllers\Auth\LandlordRegisterController;
 use App\Http\Controllers\Auth\LandlordCodeVerificationController; 
@@ -459,9 +459,8 @@ Route::get('/admin/partnerships', function () {
     return view('admin.partnerships');
 })->name('admin.partnerships');
 
-Route::get('/admin/chatbot', function () {
-    return view('admin.chatbot');
-})->name('admin.chatbot');
+
+Route::get('/admin/analytics', [AnalyticsController::class, 'index'])->name('admin.analytics');
 
 Route::get('/admin/profile', function () {
     return view('admin.profile');

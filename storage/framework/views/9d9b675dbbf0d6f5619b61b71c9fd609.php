@@ -102,7 +102,7 @@
                     <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" fill="none"/>
                     <path d="M7 8h10M7 12h6M7 16h4" stroke="currentColor"/>
                 </svg>
-                <div class="icon-label">Reports</div>
+                <div class="icon-label">User Complaints</div>
             </a>
 
             <a href="<?php echo e(route('admin.accounts')); ?>" class="icon-card">
