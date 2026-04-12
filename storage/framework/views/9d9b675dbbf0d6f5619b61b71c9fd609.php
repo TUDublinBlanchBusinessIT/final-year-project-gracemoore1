@@ -120,14 +120,14 @@
                 <div class="icon-label">Add Partnership</div>
             </a>
 
-            <a href="<?php echo e(route('admin.chatbot')); ?>" class="icon-card">
+            <a href="<?php echo e(route('admin.analytics')); ?>" class="icon-card">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <ellipse cx="12" cy="12" rx="10" ry="8" stroke="currentColor" fill="none"/>
                     <circle cx="9" cy="12" r="1.5" fill="currentColor"/>
                     <circle cx="15" cy="12" r="1.5" fill="currentColor"/>
                     <path d="M9 16c1.5 1 4.5 1 6 0" stroke="currentColor"/>
                 </svg>
-                <div class="icon-label">AI Chatbot</div>
+                <div class="icon-label">Analytics</div>
             </a>
         </div>
     </div>
