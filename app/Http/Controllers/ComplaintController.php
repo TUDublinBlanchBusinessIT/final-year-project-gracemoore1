@@ -1,23 +1,60 @@
 <?php
 
-namespace App\Models;
+namespace App\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use App\Models\Complaint;
+use App\Models\Student;
+use App\Models\Landlord;
 
-class Complaint extends Model
+class ComplaintController extends Controller
 {
-    use HasFactory;
+    public function create(Request $request)
+    {
+        $reportedId = $request->reported_user_id;
+        $reportedRole = $request->reported_user_role;
 
-    protected $table = 'complaint';
+        $reporter = auth()->user();
 
-    protected $fillable = [
-        'subject',
-        'description',
-        'reporter_id',
-        'administratorid',
-        'reporter_role',
-        'reported_user_id',
-        'reported_user_role',
-    ];
+        $reporterDisplay = $reporter
+            ? $reporter->firstname . ' ' . $reporter->surname . ' (' . ucfirst($reporter->role) . ')'
+            : 'Unknown reporter';
+
+        // SIMPLE FIX: ONLY HANDLE WHAT EXISTS IN YOUR SYSTEM
+        $reportedUser = $this->resolveReportedUser($reportedId, $reportedRole);
+
+        $reportedDisplay = $reportedUser
+            ? $reportedUser->firstname . ' ' . $reportedUser->surname . ' (' . ucfirst($reportedRole) . ')'
+            : 'Unknown user (' . ucfirst($reportedRole) . ')';
+
+        return view('complaint.create', [
+            'reported_user_id' => $reportedId,
+            'reported_user_role' => $reportedRole,
+            'reportedDisplay' => $reportedDisplay,
+            'reporterDisplay' => $reporterDisplay,
+        ]);
+    }
+
+    private function resolveReportedUser($id, $role)
+    {
+        return match ($role) {
+            'student' => Student::find($id),
+            'landlord' => Landlord::find($id),
+            default => null,
+        };
+    }
+
+    public function store(Request $request)
+    {
+        Complaint::create([
+            'subject' => $request->subject,
+            'description' => $request->description,
+            'reporter_id' => auth()->id(),
+            'reporter_role' => auth()->user()->role,
+            'reported_user_id' => $request->reported_user_id,
+            'reported_user_role' => $request->reported_user_role,
+        ]);
+
+        return back()->with('success', 'Complaint submitted successfully.');
+    }
 }
