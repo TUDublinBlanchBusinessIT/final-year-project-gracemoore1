@@ -1,9 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
+                Profile
+            </p>
+        </div>
+    </x-slot>    
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">

@@ -11,11 +11,12 @@
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
      <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            <?php echo e(__('Profile')); ?>
-
-        </h2>
-     <?php $__env->endSlot(); ?>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
+                Profile
+            </p>
+        </div>
+     <?php $__env->endSlot(); ?>    
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">

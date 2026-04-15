@@ -1,8 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Post Your Listing
-        </h2>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <div class="flex items-center gap-4">
+                <a href="{{ route('landlord.dashboard') }}"
+                class="flex items-center justify-center w-9 h-9 rounded-full text-slate-500 hover:text-blue-600 hover:bg-slate-100 transition">
+                    ←
+                </a>
+            <p class="text-sm font-semibold uppercase tracking-[0.12em] text-blue-600">
+                Home <span class="mx-1 text-slate-300">/</span> Add Listing
+            </p>
+        </div>
     </x-slot>
 
     {{-- Push content away from landlord sidebar + leave room for mobile bottom nav --}}
@@ -32,10 +39,7 @@
                                 </p>
                             </div>
 
-                            <a href="{{ route('dashboard') }}"
-                               class="text-sm font-semibold text-slate-600 hover:text-slate-900">
-                                ← Back
-                            </a>
+                    
                         </div>
 
                         <form class="mt-8 space-y-8"

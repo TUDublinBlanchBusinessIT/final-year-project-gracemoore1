@@ -12,26 +12,16 @@
 
 
      <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Home
-        </h2>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
+                Home
+            </p>
+        </div>
      <?php $__env->endSlot(); ?>
 
     <div class="pb-28">
 
-        
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-8 text-gray-900">
-                <h1 class="text-3xl font-bold text-blue-600 mb-10">
-                    Welcome back, <?php echo e(Auth::user()->name); ?>!
-                </h1>
-
-                <p class="text-gray-700 text-lg">
-                    This is your dashboard.
-                    You can manage your account, update your profile, and access new features as they are added.
-                </p>
-            </div>
-        </div>
+    
 
         
         <?php
