@@ -11,12 +11,9 @@
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
      <?php $__env->slot('header', null, []); ?> 
-        <div>
-            <h2 class="text-2xl font-bold text-slate-900 leading-tight">
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
                 Messages
-            </h2>
-            <p class="mt-1 text-sm text-blue-600">
-                Manage conversations with students and service providers
             </p>
         </div>
      <?php $__env->endSlot(); ?>

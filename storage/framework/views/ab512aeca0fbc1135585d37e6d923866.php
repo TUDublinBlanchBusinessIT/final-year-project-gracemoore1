@@ -1,10 +1,21 @@
-<x-app-layout>
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
-    {{-- HEADER --}}
-    <x-slot name="header">
+
+    
+     <?php $__env->slot('header', null, []); ?> 
         <div class="border-b border-slate-200 px-6 py-3 bg-white">
             <div class="flex items-center gap-4">
-                <a href="{{ route('landlord.messages.show', $application->id) }}"
+                <a href="<?php echo e(route('landlord.messages.show', $application->id)); ?>"
                    class="text-slate-500 hover:text-slate-700 text-xl">←</a>
 
                 <div class="min-w-0">
@@ -14,26 +25,30 @@
                 </div>
             </div>
         </div>
-    </x-slot>
+     <?php $__env->endSlot(); ?>
 
-    {{-- BODY --}}
+    
     <div class="pb-28 lg:pl-70">
         <div class="max-w-4xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
-                {{-- SUMMARY --}}
+                
                 <div class="px-6 py-3 bg-white border-b border-slate-200">
                     <div class="flex items-center gap-4">
                         <div class="min-w-0">
                             <h3 class="text-lg font-semibold text-slate-900 truncate">
-                                {{ $application->student->firstname ?? 'Student' }}
-                                {{ $application->student->surname ?? '' }}
+                                <?php echo e($application->student->firstname ?? 'Student'); ?>
+
+                                <?php echo e($application->student->surname ?? ''); ?>
+
                             </h3>
 
                             <p class="text-sm text-slate-500 truncate mt-1">
-                                {{ $application->rental->housenumber ?? '' }}
-                                {{ $application->rental->street ?? '' }},
-                                {{ $application->rental->county ?? '' }}
+                                <?php echo e($application->rental->housenumber ?? ''); ?>
+
+                                <?php echo e($application->rental->street ?? ''); ?>,
+                                <?php echo e($application->rental->county ?? ''); ?>
+
                             </p>
                         </div>
                     </div>
@@ -42,7 +57,7 @@
                 </div>    
                 
 
-                {{-- FEED --}}
+                
                 <div id="rt-feed"
                      class="bg-slate-50 px-6 py-6 overflow-y-auto space-y-4"
                      style="min-height: 200px; max-height: 500px;">
@@ -53,8 +68,8 @@
     </div>
 
     <script>
-        const APP_ID  = @json($application->id);
-        const GROUP_ID = @json($groupId);
+        const APP_ID  = <?php echo json_encode($application->id, 15, 512) ?>;
+        const GROUP_ID = <?php echo json_encode($groupId, 15, 512) ?>;
 
         const feedEl    = document.getElementById('rt-feed');
         const summaryEl = document.getElementById('rt-summary');
@@ -169,4 +184,13 @@
         boot();
     </script>
 
-</x-app-layout>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?><?php /**PATH C:\Users\moyak\final-year-project-gracemoore1\resources\views/landlord/rent-tracker.blade.php ENDPATH**/ ?>

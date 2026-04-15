@@ -1,8 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Maintenance Log
-        </h2>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <div class="flex items-center gap-4">
+                <a href="{{ route('landlord.messages.show', $application->id) }}"
+                    class="text-slate-500 hover:text-slate-700 text-xl transition">
+                    ←
+                </a>
+
+                <p class="text-sm font-semibold uppercase tracking-[0.12em] text-blue-600">
+                    Messages <span class="mx-1 text-slate-300">/</span> Maintenance Log
+                </p>
+            </div>
+        </div>
     </x-slot>
 
     <div class="pb-20 lg:pl-70">
@@ -26,12 +35,10 @@
                     <div class="flex items-center gap-4">
                         <a href="{{ route('landlord.messages.show', $application->id) }}"
                            class="text-slate-500 hover:text-slate-700 text-xl">
-                            ←
+                            
                         </a>
 
-                        <div class="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-2xl font-semibold">
-                            M
-                        </div>
+                        
 
                         <div>
                             <h3 class="text-xl font-semibold text-slate-900">

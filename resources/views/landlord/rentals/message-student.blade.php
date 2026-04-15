@@ -2,16 +2,18 @@
     $hasUnreadMaintenance = \App\Models\Maintenancelog::where('applicationid', $application->id)
         ->where('is_seen_by_landlord', false)
         ->exists();
-@endphphp
+@endphp
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Messages
-        </h2>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
+                Messages
+            </p>
+        </div>  
     </x-slot>
 
     <div class="pb-28 lg:pl-70">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-6xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
                 <div class="border-b border-slate-200 px-6 py-4 bg-white">
@@ -89,7 +91,7 @@
                 </div>
 
                 
-            <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
+            <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[420px] overflow-y-auto space-y-4">
 
                 @php
                     $lastDate = null;

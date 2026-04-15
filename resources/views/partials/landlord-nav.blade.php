@@ -1,5 +1,5 @@
 {{-- DESKTOP SIDEBAR --}}
-<aside class="hidden lg:flex fixed left-0 top-0 h-screen w-60 bg-white border-r border-slate-200 px-4 py-6 z-50">
+<aside class="hidden lg:flex fixed left-0 top-0 h-screen w-56 bg-white border-r border-slate-200 px-4 py-6 z-50">
     <div class="w-full flex flex-col gap-2">
         <div class="px-3 pb-5 border-b border-slate-200">
     {{-- Brand --}}
