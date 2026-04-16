@@ -36,11 +36,12 @@
         <div class="mb-6">
             <h3 class="font-semibold text-gray-900 mb-2">Evidence</h3>
 
+
             @if(!empty($evidencePaths))
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                     @foreach($evidencePaths as $path)
                         <img
-                            src="{{ asset('storage/'.$path) }}"
+                            src="{{ url('/evidence/' . basename($path)) }}"
                             class="rounded-lg border object-cover"
                             alt="Uploaded evidence"
                         >

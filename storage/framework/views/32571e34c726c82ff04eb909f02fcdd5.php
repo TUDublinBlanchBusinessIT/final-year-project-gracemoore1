@@ -50,11 +50,12 @@
         <div class="mb-6">
             <h3 class="font-semibold text-gray-900 mb-2">Evidence</h3>
 
+
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($evidencePaths)): ?>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $evidencePaths; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $path): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
                         <img
-                            src="<?php echo e(asset('storage/'.$path)); ?>"
+                            src="<?php echo e(url('/evidence/' . basename($path))); ?>"
                             class="rounded-lg border object-cover"
                             alt="Uploaded evidence"
                         >

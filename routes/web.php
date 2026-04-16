@@ -176,6 +176,12 @@ Route::get('/complaint/create', [ComplaintController::class, 'create'])
 
 Route::post('/complaint', [ComplaintController::class, 'store'])
     ->name('complaint.store');
+
+Route::get('/evidence/{filename}', function ($filename) {
+    $path = storage_path('app/public/complaints/' . $filename);
+    if (!file_exists($path)) abort(404);
+    return response()->file($path);
+});
 // STUDENT LOGIN
 Route::get('/student/login', function() {
     return view('auth.login');
