@@ -132,7 +132,8 @@
                             Submit report
                         </button>
                     </div>
-
+                    <input type="hidden" name="reporter_id" value="<?php echo e($user_id); ?>">
+                    <input type="hidden" name="reporter_role" value="<?php echo e($user_role); ?>">
                 </form>
             </div>
         </div>

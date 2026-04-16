@@ -119,7 +119,8 @@
                             Submit report
                         </button>
                     </div>
-
+                    <input type="hidden" name="reporter_id" value="{{ $user_id }}">
+                    <input type="hidden" name="reporter_role" value="{{ $user_role }}">
                 </form>
             </div>
         </div>
