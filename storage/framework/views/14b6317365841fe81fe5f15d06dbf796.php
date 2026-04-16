@@ -56,105 +56,100 @@
         </h1>
 
         
-        <div class="flex items-center bg-white border border-slate-300 rounded-xl px-4 py-3 shadow-sm">
-            <svg class="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M21 21l-4.35-4.35M10 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12z" />
-            </svg>
-
-            <input type="text" placeholder="Search listings..."
-                   class="ml-3 w-full focus:ring-0 border-none focus:outline-none text-slate-800" />
-
-            <button id="filterToggle" class="ml-3 text-slate-600 hover:text-blue-600" title="Filters" aria-label="Filters">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M3 6h18M6 12h12M10 18h8" />
+        <form method="GET" action="<?php echo e(route('student.dashboard')); ?>" id="searchForm">
+            <div class="flex items-center bg-white border border-slate-300 rounded-xl px-4 py-3 shadow-sm">
+                <svg class="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12z" />
                 </svg>
-            </button>
-        </div>
+                <input type="text" name="q" value="<?php echo e(request('q')); ?>"
+                    placeholder="Search listings..."
+                    class="ml-3 w-full focus:ring-0 border-none focus:outline-none text-slate-800" />
+                <button id="filterToggle" type="button" class="ml-3 text-slate-600 hover:text-blue-600" title="Filters">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M6 12h12M10 18h8" />
+                    </svg>
+                </button>
+            </div>
+        </form>
 
         
         <div class="mt-4 flex gap-2 overflow-x-auto pb-2">
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $collegeToCounty; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college => $county): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
-                <button
-                    onclick="filterCounty('<?php echo e($county); ?>')"
-                    class="shrink-0 px-3 py-2 rounded-full border border-blue-500 text-blue-600 bg-white text-sm font-semibold hover:bg-blue-50">
+                <a href="<?php echo e(route('student.dashboard', ['county' => $county])); ?>"
+                class="shrink-0 px-3 py-2 rounded-full border text-sm font-semibold hover:bg-blue-50
+                        <?php echo e(request('county') === $county ? 'bg-blue-600 text-white border-blue-600' : 'border-blue-500 text-blue-600 bg-white'); ?>">
                     <?php echo e($college); ?>
 
-                </button>
+                </a>
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         </div>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(request()->anyFilled(['q', 'county', 'housetype', 'from', 'until', 'min_rent', 'max_rent', 'nights_bucket'])): ?>
+            <div class="mt-2">
+                <a href="<?php echo e(route('student.dashboard')); ?>"
+                class="inline-flex items-center gap-1 px-3 py-2 rounded-full border border-red-300 text-red-600 bg-white text-sm font-semibold hover:bg-red-50">
+                    ✕ Clear filters
+                </a>
+            </div>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         
-        <div id="filterDrawer"
-             class="hidden bg-white border border-slate-300 rounded-xl shadow-sm px-6 py-6 mt-4">
-            <form class="space-y-4">
+        <div id="filterDrawer" class="hidden bg-white border border-slate-300 rounded-xl shadow-sm px-6 py-6 mt-4">
+            <form method="GET" action="<?php echo e(route('student.dashboard')); ?>" class="space-y-4">
 
-                
                 <div>
                     <label class="font-semibold text-slate-700">Location</label>
-                    <input id="countyInput" type="text"
-                           class="w-full mt-1 rounded-lg border-slate-300"
-                           placeholder="Dublin" />
+                    <input type="text" name="county" value="<?php echo e(request('county')); ?>"
+                        class="w-full mt-1 rounded-lg border-slate-300" placeholder="Dublin" />
                 </div>
-
-                
-                <!--<p class="text-sm text-slate-600">
-                    <?php echo e([
-                        'any' => 'Any',
-                        'single_private' => 'Single room in private home',
-                        'private_shared' => 'Private room in shared house',
-                        'whole_property_group' => 'Whole property (group application only)',
-                    ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '')); ?>
-
-                </p> -->
 
                 <div>
                     <label class="font-semibold text-slate-700">House Type</label>
-                    <select class="w-full mt-1 rounded-lg border-slate-300">
-                        <option>Any</option>
-                        <option>Single Room in Private Home</option>
-                        <option>Shared Student House</option>
+                    <select name="housetype" class="w-full mt-1 rounded-lg border-slate-300">
+                        <option value="">Any</option>
+                        <option value="single_private" <?php echo e(request('housetype') === 'single_private' ? 'selected' : ''); ?>>Single room in private home</option>
+                        <option value="private_shared" <?php echo e(request('private_shared') === 'private_shared' ? 'selected' : ''); ?>>Private room in shared house</option>
+                        <option value="whole_property_group" <?php echo e(request('housetype') === 'whole_property_group' ? 'selected' : ''); ?>>Whole property (group only)</option>
                     </select>
                 </div>
 
-                
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="font-semibold text-slate-700">Available From</label>
-                        <input type="date" class="w-full mt-1 rounded-lg border-slate-300" />
+                        <input type="date" name="from" value="<?php echo e(request('from')); ?>"
+                            class="w-full mt-1 rounded-lg border-slate-300" />
                     </div>
                     <div>
                         <label class="font-semibold text-slate-700">Until</label>
-                        <input type="date" class="w-full mt-1 rounded-lg border-slate-300" />
+                        <input type="date" name="until" value="<?php echo e(request('until')); ?>"
+                            class="w-full mt-1 rounded-lg border-slate-300" />
                     </div>
                 </div>
 
-                
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="font-semibold text-slate-700">Min Rent (€)</label>
-                        <input type="number" class="w-full mt-1 rounded-lg border-slate-300" />
+                        <input type="number" name="min_rent" value="<?php echo e(request('min_rent')); ?>"
+                            class="w-full mt-1 rounded-lg border-slate-300" />
                     </div>
                     <div>
                         <label class="font-semibold text-slate-700">Max Rent (€)</label>
-                        <input type="number" class="w-full mt-1 rounded-lg border-slate-300" />
+                        <input type="number" name="max_rent" value="<?php echo e(request('max_rent')); ?>"
+                            class="w-full mt-1 rounded-lg border-slate-300" />
                     </div>
                 </div>
 
-                
                 <div>
                     <label class="font-semibold text-slate-700">Nights per Week</label>
-                    <select class="w-full mt-1 rounded-lg border-slate-300">
-                        <option>Any</option>
-                        <option>1–3 nights</option>
-                        <option>4–5 nights</option>
-                        <option>6-7 nights</option>
+                    <select name="nights_bucket" class="w-full mt-1 rounded-lg border-slate-300">
+                        <option value="">Any</option>
+                        <option value="1-3" <?php echo e(request('nights_bucket') === '1-3' ? 'selected' : ''); ?>>1–3 nights</option>
+                        <option value="4-5" <?php echo e(request('nights_bucket') === '4-5' ? 'selected' : ''); ?>>4–5 nights</option>
+                        <option value="6-7" <?php echo e(request('nights_bucket') === '6-7' ? 'selected' : ''); ?>>6–7 nights</option>
                     </select>
                 </div>
 
-                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">
+                <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">
                     Apply Filters
                 </button>
             </form>
@@ -456,94 +451,77 @@
 
     
     <script>
-        const filterBtn = document.getElementById('filterToggle');
-        const drawer = document.getElementById('filterDrawer');
+    // Filter drawer toggle
+    const filterBtn = document.getElementById('filterToggle');
+    const drawer = document.getElementById('filterDrawer');
+    if (filterBtn && drawer) {
+        filterBtn.addEventListener('click', () => drawer.classList.toggle('hidden'));
+    }
 
-        if (filterBtn && drawer) {
-            filterBtn.addEventListener('click', () => drawer.classList.toggle('hidden'));
-        }
-
-        function filterCounty(county) {
-            document.querySelectorAll('.county-section').forEach(section => {
-                section.classList.toggle('hidden', section.dataset.county !== county);
-            });
-            const input = document.getElementById('countyInput');
-            if (input) input.value = county;
-        }
-
-        // --- Carousel as we had it originally ---
-        const carouselState = {};
-
-        function stateKey(view, id) {
-            return `${view}-${id}`;
-        }
-
-        function updateCarousel(view, id) {
-            const key = stateKey(view, id);
-            const track = document.getElementById(`track-${view}-${id}`);
-            if (!track) return;
-
-            const state = carouselState[key] || { index: 0, count: track.children.length };
-
-            const translate = -state.index * 100;
-            track.style.transform = `translateX(${translate}%)`;
-
-            Array.from(track.children).forEach(child => child.style.width = "100%");
-        }
-
-        function nextImage(view, id) {
-            const key = stateKey(view, id);
-            const container = document.querySelector(`[data-key="${view}-${id}"]`);
-            const count = parseInt(container?.dataset.count || '0', 10);
-
-            if (!carouselState[key]) carouselState[key] = { index: 0, count };
-            if (count <= 1) return;
-
-            carouselState[key].index = (carouselState[key].index + 1) % count;
-            updateCarousel(view, id);
-        }
-
-        function prevImage(view, id) {
-            const key = stateKey(view, id);
-            const container = document.querySelector(`[data-key="${view}-${id}"]`);
-            const count = parseInt(container?.dataset.count || '0', 10);
-
-            if (!carouselState[key]) carouselState[key] = { index: 0, count };
-            if (count <= 1) return;
-
-            carouselState[key].index =
-                carouselState[key].index === 0 ? count - 1 : carouselState[key].index - 1;
-
-            updateCarousel(view, id);
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll("[data-carousel]").forEach(carousel => {
-                const key = carousel.dataset.key;
-                const [view, id] = key.split("-");
-                const count = parseInt(carousel.dataset.count || '0', 10);
-
-                carouselState[key] = { index: 0, count };
-                updateCarousel(view, id);
-            });
+    // Auto-submit search on Enter
+    const searchForm = document.getElementById('searchForm');
+    if (searchForm) {
+        searchForm.querySelector('input[name="q"]').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') searchForm.submit();
         });
-    </script>
-    <script>
+    }
+
+    // Carousel state
+    const carouselState = {};
+
+    function stateKey(view, id) { return `${view}-${id}`; }
+
+    function updateCarousel(view, id) {
+        const key = stateKey(view, id);
+        const track = document.getElementById(`track-${view}-${id}`);
+        if (!track) return;
+        const state = carouselState[key] || { index: 0, count: track.children.length };
+        track.style.transform = `translateX(-${state.index * 100}%)`;
+        Array.from(track.children).forEach(child => child.style.width = "100%");
+    }
+
+    function nextImage(view, id) {
+        const key = stateKey(view, id);
+        const container = document.querySelector(`[data-key="${view}-${id}"]`);
+        const count = parseInt(container?.dataset.count || '0', 10);
+        if (!carouselState[key]) carouselState[key] = { index: 0, count };
+        if (count <= 1) return;
+        carouselState[key].index = (carouselState[key].index + 1) % count;
+        updateCarousel(view, id);
+    }
+
+    function prevImage(view, id) {
+        const key = stateKey(view, id);
+        const container = document.querySelector(`[data-key="${view}-${id}"]`);
+        const count = parseInt(container?.dataset.count || '0', 10);
+        if (!carouselState[key]) carouselState[key] = { index: 0, count };
+        if (count <= 1) return;
+        carouselState[key].index = carouselState[key].index === 0 ? count - 1 : carouselState[key].index - 1;
+        updateCarousel(view, id);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("[data-carousel]").forEach(carousel => {
+            const key = carousel.dataset.key;
+            const [view, id] = key.split("-");
+            const count = parseInt(carousel.dataset.count || '0', 10);
+            carouselState[key] = { index: 0, count };
+            updateCarousel(view, id);
+        });
+    });
+
+    // Premium/All row scrolling
     const rowIndex = { premium: 0, all: 0 };
 
     function scrollRow(type, direction) {
         const track = document.getElementById(`${type}-track`);
         if (!track) return;
-
         const cardWidth = track.children[0]?.offsetWidth || 420;
         const gap = 24;
         const visible = track.parentElement.offsetWidth;
-
         const max = Math.ceil((track.scrollWidth - visible) / (cardWidth + gap));
         rowIndex[type] = Math.max(0, Math.min(rowIndex[type] + direction, max));
-
-        track.style.transform =
-            `translateX(-${rowIndex[type] * (cardWidth + gap)}px)`;
+        track.style.transform = `translateX(-${rowIndex[type] * (cardWidth + gap)}px)`;
     }
 </script>
 
