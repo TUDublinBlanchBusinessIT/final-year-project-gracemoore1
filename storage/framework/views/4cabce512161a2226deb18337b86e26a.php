@@ -18,6 +18,7 @@
      <?php $__env->endSlot(); ?>
 
     <div class="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-xl shadow">
+        <a href="<?php echo e(url()->previous()); ?>" class="inline-block mb-4 text-slate-500 hover:text-slate-700 text-sm">← Back</a>
         <h3 class="text-lg font-semibold mb-4">Group Application</h3>
 
         

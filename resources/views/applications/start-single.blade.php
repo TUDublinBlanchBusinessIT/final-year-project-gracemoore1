@@ -7,6 +7,7 @@
     </x-slot>
 
     <div class="max-w-2xl mx-auto bg-white shadow border rounded-xl p-6 mt-6">
+        <a href="{{ url()->previous() }}" class="inline-block mb-4 text-slate-500 hover:text-slate-700 text-sm">← Back</a>
 
         <h3 class="text-lg font-semibold mb-4">Single Application</h3>
 
