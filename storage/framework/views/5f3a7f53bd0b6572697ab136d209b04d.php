@@ -13,50 +13,54 @@
 
     
      <?php $__env->slot('header', null, []); ?> 
-        <div class="border-b border-slate-200 px-6 py-4 bg-white">
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
             <div class="flex items-center gap-4">
                 <a href="<?php echo e(route('student.messages.show', $application->id)); ?>"
-                   class="text-slate-500 hover:text-slate-700 text-xl">←</a>
+                    class="flex items-center justify-center w-9 h-9 rounded-full text-slate-500 hover:text-blue-600 hover:bg-slate-100 text-xl transition">
+                    ←
+                </a>
 
-                <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center
-                            text-slate-500 text-lg font-semibold">
-                    <?php echo e(strtoupper(substr($application->rental->landlord->firstname ?? 'L', 0, 1))); ?>
-
-                </div>
-
-                <div class="min-w-0">
-                    <h3 class="text-lg font-semibold text-slate-900 truncate">
-                        <?php echo e($application->rental->landlord->firstname ?? 'Landlord'); ?>
-
-                        <?php echo e($application->rental->landlord->surname ?? ''); ?>
-
-                    </h3>
-                    <p class="text-sm text-slate-500 truncate">
-                        <?php echo e($application->rental->housenumber ?? ''); ?>
-
-                        <?php echo e($application->rental->street ?? ''); ?>,
-                        <?php echo e($application->rental->county ?? ''); ?>
-
-                    </p>
-                </div>
+                <p class="text-lg font-bold uppercase tracking-[0.16em] text-blue-700">
+                    Messages <span class="mx-1 text-slate-300">/</span> Rent Tracker
+                </p>
             </div>
         </div>
      <?php $__env->endSlot(); ?>
 
     
     <div class="pb-28 lg:pl-70">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-5xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
                 
-                <div class="px-6 py-3 bg-white border-b border-slate-200">
-                    <div id="rt-summary" class="text-sm text-slate-700"></div>
+            <div class="px-6 py-3 bg-white border-b border-slate-200">
+                <div class="flex items-center gap-4">
+                    <div class="min-w-0">
+                        <h3 class="text-lg font-semibold text-slate-900 truncate">
+                            <?php echo e($application->rental->landlord->firstname ?? 'Landlord'); ?>
+
+                            <?php echo e($application->rental->landlord->surname ?? ''); ?>
+
+                        </h3>
+
+                        <p class="text-sm text-slate-500 truncate mt-1">
+                            <?php echo e($application->rental->housenumber ?? ''); ?>
+
+                            <?php echo e($application->rental->street ?? ''); ?>,
+                            <?php echo e($application->rental->county ?? ''); ?>
+
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+                            <div id="rt-summary" class="pl-12 pr-6 py-4 border-b border-slate-200">
                 </div>
 
                 
                 <div id="rt-feed"
-                     class="bg-slate-50 px-6 py-6 overflow-y-auto space-y-4"
-                     style="min-height: 200px; max-height: calc(100vh - 280px);">
+                     class="bg-slate-50 px-6 py-5 overflow-y-auto space-y-4"
+                     style="min-height: 200px; max-height: calc(100vh - 360px);">
                 </div>
 
                 

@@ -1,12 +1,23 @@
-<x-app-layout>
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
-    <x-slot name="header">
+
+     <?php $__env->slot('header', null, []); ?> 
         <div class="border-b border-slate-200 px-6 py-3 bg-white">
             <p class="text-lg font-bold uppercase tracking-[0.16em] text-blue-700">
                 Support
             </p>
         </div>
-    </x-slot>
+     <?php $__env->endSlot(); ?>
 
     <style>
         details {
@@ -42,11 +53,11 @@
 
     <div class="bg-white p-6 rounded-xl shadow-sm space-y-10">
 
-        {{-- FINANCIAL SUPPORT --}}
+        
         <section>
             <h2 class="text-xl font-bold text-slate-900 mb-4">Financial Support</h2>
 
-            {{-- SUSI --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> SUSI Grants
@@ -57,7 +68,7 @@
                 <a href="https://www.susi.ie" target="_blank" class="support-link">Visit SUSI →</a>
             </details>
 
-            {{-- Bike Hire --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> Bike Hire Schemes
@@ -69,7 +80,7 @@
                 <a href="https://www.bikeshare.ie" target="_blank" class="support-link">Other Bike Shares →</a>
             </details>
 
-            {{-- Student Discounts --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> Student Discounts
@@ -84,7 +95,7 @@
                 </a>
             </details>
 
-            {{-- Budget Planner --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> Accommodation Budget Planner
@@ -101,11 +112,11 @@
         </section>
 
 
-        {{-- LEGAL SUPPORT --}}
+        
         <section>
             <h2 class="text-xl font-bold text-slate-900 mb-4">Legal Support</h2>
 
-            {{-- Tenant Rights --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> Tenant Rights
@@ -119,7 +130,7 @@
                 </a>
             </details>
 
-            {{-- Garda --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> An Garda Síochána – Emergency & Safety Info
@@ -133,11 +144,11 @@
         </section>
 
 
-        {{-- MENTAL HEALTH SUPPORT --}}
+        
         <section>
             <h2 class="text-xl font-bold text-slate-900 mb-4">Mental Health Support</h2>
 
-            {{-- HSE Mental Health --}}
+            
             <details>
                 <summary class="accordion-summary">
                    <span class="arrow">></span> HSE Mental Health Supports
@@ -148,7 +159,7 @@
                 <a href="https://www2.hse.ie/mental-health/" target="_blank" class="support-link">Mental Health Support →</a>
             </details>
 
-            {{-- Mindfulness --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> Mindfulness & Guided Exercises
@@ -161,7 +172,7 @@
                 </a>
             </details>
 
-            {{-- Anxiety --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> Stress & Anxiety Support
@@ -174,7 +185,7 @@
                 </a>
             </details>
 
-            {{-- Exam Stress --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> Exam Stress Support
@@ -187,7 +198,7 @@
                 </a>
             </details>
 
-            {{-- SpunOut --}}
+            
             <details>
                 <summary class="accordion-summary">
                     <span class="arrow">></span> Youth Wellbeing Resources
@@ -205,8 +216,8 @@
     </div>
 
 
-    {{-- CHATBOT BUTTON --}}
-        <a href="{{ route('student.chatbot') }}"
+    
+        <a href="<?php echo e(route('student.chatbot')); ?>"
             class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700
                 text-white w-14 h-14 rounded-full shadow-xl flex items-center
                 justify-center z-[9999]">
@@ -219,7 +230,7 @@
 
         </a>
 
-        {{-- Chatbot Icon --}}
+        
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
             viewBox="0 0 24 24" stroke="white" class="w-8 h-8">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -231,4 +242,14 @@
 
   
 
-</x-app-layout>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php /**PATH C:\Users\moyak\final-year-project-gracemoore1\resources\views/student/support.blade.php ENDPATH**/ ?>

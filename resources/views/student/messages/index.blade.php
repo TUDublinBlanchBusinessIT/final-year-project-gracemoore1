@@ -1,11 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <h2 class="text-2xl font-bold text-slate-900 leading-tight">
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-lg font-extrabold uppercase tracking-[0.16em] text-blue-600">
                 Messages
-            </h2>
-            <p class="mt-1 text-sm text-blue-600">
-                Manage conversations with landlords
             </p>
         </div>
     </x-slot>

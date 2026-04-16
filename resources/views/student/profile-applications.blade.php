@@ -1,11 +1,10 @@
 <x-app-layout>
     {{-- Header --}}
     <x-slot name="header">
-        <div class="flex items-start justify-start">
-            <div class="text-left">
-                <div class="text-2xl font-extrabold text-blue-600 leading-none">RentConnect</div>
-                <div class="mt-1 font-semibold text-gray-800">Profile</div>
-            </div>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-lg font-bold uppercase tracking-[0.16em] text-blue-700">
+                Profile
+            </p>
         </div>
     </x-slot>
 
