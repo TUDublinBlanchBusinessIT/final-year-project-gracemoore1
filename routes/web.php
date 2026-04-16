@@ -133,6 +133,12 @@ Route::middleware(['landlord'])->group(function () {
     Route::get('/landlord/support', fn () => view('landlord.support'))->name('landlord.support');
 });
 
+Route::post('/landlord/invoice/payment-intent', [LandlordMessageController::class, 'invoicePaymentIntent'])
+    ->name('landlord.invoice.payment-intent');
+
+Route::post('/landlord/invoice/confirm', [LandlordMessageController::class, 'invoiceConfirm'])
+    ->name('landlord.invoice.confirm');
+
 Route::get('/landlord/rentals/{rental}/applications', [LandlordRentalController::class, 'applications'])
     ->name('landlord.applications.index');
 

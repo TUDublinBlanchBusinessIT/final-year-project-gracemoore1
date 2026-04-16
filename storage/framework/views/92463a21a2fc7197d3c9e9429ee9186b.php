@@ -103,26 +103,61 @@
                     </div>
 
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
-                        <div class="mb-4 flex <?php echo e($message->sender_type === 'service_provider' ? 'justify-end' : 'justify-start'); ?>">
+                        <div class="mb-4 flex <?php echo e($message->sender_type === 'service_provider' || $message->sender_type === 'invoice' ? 'justify-end' : 'justify-start'); ?>">
                             <div>
-                                <div class="<?php echo e($message->sender_type === 'service_provider' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-800'); ?> max-w-xl rounded-3xl px-5 py-3 shadow-sm">
-                                    <p class="text-sm leading-6"><?php echo e($message->content); ?></p>
-                                    <p class="mt-2 text-xs <?php echo e($message->sender_type === 'service_provider' ? 'text-blue-100' : 'text-slate-400'); ?>">
-                                        <?php echo e(optional($message->timestamp)->format('d M Y H:i') ?? optional($message->created_at)->format('d M Y H:i')); ?>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->sender_type === 'invoice'): ?>
+                                    <div class="bg-white border border-slate-200 rounded-3xl px-5 py-4 shadow-sm max-w-xl">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <span class="text-lg">🧾</span>
+                                            <span class="font-semibold text-slate-900 text-sm">Invoice</span>
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->invoice_paid): ?>
+                                                <span class="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Paid ✓</span>
+                                            <?php else: ?>
+                                                <span class="ml-auto text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">Awaiting Payment</span>
+                                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                        </div>
+                                        <table class="w-full text-sm mb-3">
+                                            <thead>
+                                                <tr class="text-xs text-slate-500 border-b">
+                                                    <th class="text-left py-1">Invoice Details</th>
+                                                    <th class="text-right py-1">Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = json_decode($message->invoice_data, true); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                                                    <tr class="border-b border-slate-100">
+                                                        <td class="py-1 text-slate-700"><?php echo e($item['detail']); ?></td>
+                                                        <td class="py-1 text-right text-slate-700">€<?php echo e(number_format($item['amount'], 2)); ?></td>
+                                                    </tr>
+                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td class="pt-2 font-semibold text-slate-900">Total</td>
+                                                    <td class="pt-2 text-right font-semibold text-slate-900">€<?php echo e(number_format($message->invoice_amount, 2)); ?></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                        <p class="text-xs text-slate-400"><?php echo e(optional($message->timestamp)->format('d M Y H:i')); ?></p>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="<?php echo e($message->sender_type === 'service_provider' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-800'); ?> max-w-xl rounded-3xl px-5 py-3 shadow-sm">
+                                        <p class="text-sm leading-6"><?php echo e($message->content); ?></p>
+                                        <p class="mt-2 text-xs <?php echo e($message->sender_type === 'service_provider' ? 'text-blue-100' : 'text-slate-400'); ?>">
+                                            <?php echo e(optional($message->timestamp)->format('d M Y H:i') ?? optional($message->created_at)->format('d M Y H:i')); ?>
 
-                                    </p>
-                                </div>
+                                        </p>
+                                    </div>
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->sender_type === 'service_provider'): ?>
+                                        <p class="mt-1 text-xs text-right text-slate-400">
+                                            <?php echo e($message->is_read_by_landlord ? 'Seen' : 'Sent'); ?>
 
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->sender_type === 'service_provider'): ?>
-                                    <p class="mt-1 text-xs text-right text-slate-400">
-                                        <?php echo e($message->is_read_by_landlord ? 'Seen' : 'Sent'); ?>
-
-                                    </p>
+                                        </p>
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             </div>
                         </div>
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
-                
                         <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500">
                             No messages yet. Start the conversation with the landlord about this job.
                         </div>
@@ -145,7 +180,12 @@
                                 ><?php echo e(old('content')); ?></textarea>
                             </div>
 
-                            <div>
+                            <div class="flex flex-col gap-2">
+                                <button type="button" onclick="openInvoiceModal()"
+                                    class="inline-flex items-center justify-center rounded-2xl bg-slate-100 hover:bg-slate-200 px-4 py-3 text-xl"
+                                    title="Send Invoice">
+                                    🧾
+                                </button>
                                 <button
                                     type="submit"
                                     class="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 transition">
@@ -167,7 +207,76 @@
                 container.scrollTop = container.scrollHeight;
             }
         });
+
+        let rowCount = 1;
+        const MAX_ROWS = 15;
+
+        function openInvoiceModal() { document.getElementById('invoiceModal').classList.remove('hidden'); }
+        function closeInvoiceModal() { document.getElementById('invoiceModal').classList.add('hidden'); }
+
+        function addInvoiceRow() {
+            if (rowCount >= MAX_ROWS) return;
+            const container = document.getElementById('invoiceRows');
+            const div = document.createElement('div');
+            div.className = 'grid grid-cols-[1fr_120px_32px] gap-2 items-center';
+            div.innerHTML = `
+                <input type="text" name="invoice_items[${rowCount}][detail]" placeholder="e.g. Materials"
+                    class="rounded-xl border-slate-300 text-sm px-3 py-2" oninput="recalcTotal()">
+                <input type="number" name="invoice_items[${rowCount}][amount]" min="0" step="0.01" placeholder="0.00"
+                    class="rounded-xl border-slate-300 text-sm px-3 py-2" oninput="recalcTotal()">
+                <button type="button" onclick="removeRow(this)" class="text-red-400 hover:text-red-600 text-lg font-bold">✕</button>
+            `;
+            container.appendChild(div);
+            rowCount++;
+        }
+
+        function removeRow(btn) { btn.closest('div').remove(); recalcTotal(); }
+
+        function recalcTotal() {
+            let total = 0;
+            document.querySelectorAll('#invoiceRows input[type="number"]').forEach(input => {
+                const val = parseFloat(input.value);
+                if (!isNaN(val) && val > 0) total += val;
+            });
+            document.getElementById('invoiceTotal').textContent = '€' + total.toFixed(2);
+        }
     </script>
+
+    <div id="invoiceModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-slate-900">🧾 Send Invoice</h3>
+                <button onclick="closeInvoiceModal()" class="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+            </div>
+            <form method="POST" action="<?php echo e(route('serviceprovider.messages.store', $conversation->id)); ?>">
+                <?php echo csrf_field(); ?>
+                <div class="mb-3">
+                    <div class="grid grid-cols-[1fr_120px_32px] gap-2 text-xs font-semibold text-slate-500 mb-1 px-1">
+                        <span>Invoice Details</span>
+                        <span>Amount (€)</span>
+                        <span></span>
+                    </div>
+                    <div id="invoiceRows" class="space-y-2">
+                        <div class="grid grid-cols-[1fr_120px_32px] gap-2 items-center">
+                            <input type="text" name="invoice_items[0][detail]" placeholder="e.g. Labour"
+                                class="rounded-xl border-slate-300 text-sm px-3 py-2" oninput="recalcTotal()">
+                            <input type="number" name="invoice_items[0][amount]" min="0" step="0.01" placeholder="0.00"
+                                class="rounded-xl border-slate-300 text-sm px-3 py-2" oninput="recalcTotal()">
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="addInvoiceRow()" class="text-sm text-blue-600 hover:underline mb-4">+ Add item</button>
+                <div class="flex items-center justify-between border-t border-slate-200 pt-3 mb-4">
+                    <span class="font-semibold text-slate-900">Total</span>
+                    <span id="invoiceTotal" class="font-semibold text-slate-900">€0.00</span>
+                </div>
+                <button type="submit" class="w-full rounded-2xl bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700">
+                    Send Invoice
+                </button>
+            </form>
+        </div>
+    </div>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>

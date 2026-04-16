@@ -247,7 +247,7 @@
 
                                                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($application->status === 'accepted'): ?>
                                                         <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-                                                            Current Tenant
+                                                            Contracted Tenant
                                                         </span>
                                                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 

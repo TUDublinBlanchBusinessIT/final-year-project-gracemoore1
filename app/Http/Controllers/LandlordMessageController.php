@@ -309,4 +309,54 @@ class LandlordMessageController extends Controller
         return redirect()
             ->route('landlord.service-provider.messages.show', $providerRequest->id);
     }    
+
+    public function invoicePaymentIntent(Request $request)
+    {
+        $request->validate([
+            'message_id' => 'required|integer',
+            'amount'     => 'required|numeric|min:1',
+        ]);
+
+        $landlordId = session('landlord_id');
+        abort_if(!$landlordId, 401);
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+        $pi = \Stripe\PaymentIntent::create([
+            'amount'                    => (int) round($request->amount * 100),
+            'currency'                  => 'eur',
+            'automatic_payment_methods' => ['enabled' => true],
+            'description'               => 'Invoice payment',
+            'metadata'                  => [
+                'type'       => 'invoice',
+                'message_id' => $request->message_id,
+                'landlord_id'=> $landlordId,
+            ],
+        ]);
+
+        return response()->json([
+            'client_secret'  => $pi->client_secret,
+            'payment_intent' => $pi->id,
+        ]);
+    }
+
+    public function invoiceConfirm(Request $request)
+    {
+        $request->validate([
+            'message_id'     => 'required|integer',
+            'payment_intent' => 'required|string',
+        ]);
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        $pi = \Stripe\PaymentIntent::retrieve($request->payment_intent);
+
+        if ($pi->status === 'succeeded') {
+            \App\Models\Message::where('id', $request->message_id)
+                ->update(['invoice_paid' => 1]);
+
+            return response()->json(['ok' => true]);
+        }
+
+        return response()->json(['ok' => false, 'status' => $pi->status]);
+    }
 }

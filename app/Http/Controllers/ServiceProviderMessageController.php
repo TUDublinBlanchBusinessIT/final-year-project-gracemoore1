@@ -71,6 +71,38 @@ class ServiceProviderMessageController extends Controller
 
         $job = $conversation->serviceRequest;
 
+        if ($request->has('invoice_items')) {
+        $items = collect($request->invoice_items)
+            ->filter(fn($item) => !empty($item['detail']) && isset($item['amount']) && $item['amount'] > 0)
+            ->values()
+            ->toArray();
+
+        $total = collect($items)->sum('amount');
+
+        Message::create([
+            'content'                      => null,
+            'sender_type'                  => 'invoice',
+            'invoice_data'                 => json_encode($items),
+            'invoice_amount'               => $total,
+            'invoice_paid'                 => 0,
+            'timestamp'                    => now(),
+            'studentid'                    => null,
+            'group_id'                     => null,
+            'landlordid'                   => $job->landlordid,
+            'rentalid'                     => $job->rentalid,
+            'serviceproviderpartnershipid' => $serviceProviderId,
+            'is_read_by_student'           => true,
+            'is_read_by_landlord'          => false,
+            'is_read_by_service_provider'  => true,
+        ]);
+
+        if ($conversation->status === 'pending') {
+            $conversation->update(['status' => 'messaged', 'responded_at' => now()]);
+        }
+
+        return redirect()->route('serviceprovider.messages.show', $conversation->id);
+    }
+
         $request->validate([
             'content' => 'required|string|max:2000',
         ]);

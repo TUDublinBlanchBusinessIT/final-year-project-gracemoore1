@@ -18,7 +18,10 @@ class Message extends Model
         'rentalid',
         'serviceproviderpartnershipid',
         'is_read_by_student',
-        'is_read_by_landlord',    
+        'is_read_by_landlord', 
+        'invoice_data',
+        'invoice_amount',
+        'invoice_paid',   
     ];
 
     public function student()
