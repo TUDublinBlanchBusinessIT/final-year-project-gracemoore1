@@ -16,8 +16,6 @@
         </h2>
      <?php $__env->endSlot(); ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <div class="max-w-6xl mx-auto px-4 py-6">
 
         <!-- Main Tabs -->
@@ -49,89 +47,100 @@
         <nav class="border-b border-slate-200 mt-4">
             <ul class="flex gap-6 text-sm">
                 <li>
-                    <a href="<?php echo e(route('admin.analytics', ['tab' => 'complaints', 'complaint_tab' => 'subject'])); ?>"
-                       class="<?php echo e($complaintTab === 'subject' ? 'text-slate-900 font-semibold border-b-2 border-slate-900' : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300'); ?>">
-                        By Subject
+                    <a href="<?php echo e(route('admin.analytics', ['tab' => 'complaints', 'complaint_tab' => 'reported'])); ?>"
+                       class="<?php echo e($complaintTab === 'reported' ? 'text-slate-900 font-semibold border-b-2 border-slate-900' : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300'); ?>">
+                        Who Is Being Reported
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo e(route('admin.analytics', ['tab' => 'complaints', 'complaint_tab' => 'county'])); ?>"
-                       class="<?php echo e($complaintTab === 'county' ? 'text-slate-900 font-semibold border-b-2 border-slate-900' : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300'); ?>">
-                        By County
+                    <a href="<?php echo e(route('admin.analytics', ['tab' => 'complaints', 'complaint_tab' => 'reporter'])); ?>"
+                       class="<?php echo e($complaintTab === 'reporter' ? 'text-slate-900 font-semibold border-b-2 border-slate-900' : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300'); ?>">
+                        Who Is Reporting
                     </a>
                 </li>
             </ul>
         </nav>
         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        <!-- Chart Section -->
+        <!-- Table Section -->
         <div class="mt-6 bg-white p-6 rounded-xl shadow">
 
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($tab === 'applications'): ?>
                 <h3 class="text-lg font-semibold mb-4">Applications per County</h3>
-                <canvas id="applicationsChart"></canvas>
+                <table class="w-full text-left text-sm">
+                    <thead class="border-b font-semibold text-slate-700">
+                        <tr>
+                            <th class="py-2">County</th>
+                            <th class="py-2">Total Applications</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $applications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $county => $total): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                            <tr class="border-b hover:bg-slate-50">
+                                <td class="py-2"><?php echo e($county ?: 'Unknown'); ?></td>
+                                <td class="py-2"><?php echo e($total); ?></td>
+                            </tr>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                            <tr>
+                                <td colspan="2" class="py-4 text-slate-500">No data available.</td>
+                            </tr>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </tbody>
+                </table>
+
             <?php elseif($tab === 'listings'): ?>
                 <h3 class="text-lg font-semibold mb-4">Listings per County</h3>
-                <canvas id="listingsChart"></canvas>
+                <table class="w-full text-left text-sm">
+                    <thead class="border-b font-semibold text-slate-700">
+                        <tr>
+                            <th class="py-2">County</th>
+                            <th class="py-2">Total Listings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $listings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $county => $total): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                            <tr class="border-b hover:bg-slate-50">
+                                <td class="py-2"><?php echo e($county ?: 'Unknown'); ?></td>
+                                <td class="py-2"><?php echo e($total); ?></td>
+                            </tr>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                            <tr>
+                                <td colspan="2" class="py-4 text-slate-500">No data available.</td>
+                            </tr>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </tbody>
+                </table>
+
             <?php elseif($tab === 'complaints'): ?>
                 <h3 class="text-lg font-semibold mb-4">
-                    Complaints <?php echo e($complaintTab === 'subject' ? 'by Subject' : 'by County'); ?>
+                    <?php echo e($complaintTab === 'reported' ? 'Who Is Being Reported' : 'Who Is Reporting'); ?>
 
                 </h3>
-                <canvas id="complaintsChart"></canvas>
+                <table class="w-full text-left text-sm">
+                    <thead class="border-b font-semibold text-slate-700">
+                        <tr>
+                            <th class="py-2">Role</th>
+                            <th class="py-2">Total Complaints</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $complaints; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $role => $total): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                            <tr class="border-b hover:bg-slate-50">
+                                <td class="py-2"><?php echo e(ucfirst($role)); ?></td>
+                                <td class="py-2"><?php echo e($total); ?></td>
+                            </tr>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                            <tr>
+                                <td colspan="2" class="py-4 text-slate-500">No data available.</td>
+                            </tr>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </tbody>
+                </table>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
         </div>
     </div>
 
-    <script>
-        // Applications Chart
-        <?php if(isset($applications) && $applications->count()): ?>
-        if (document.getElementById('applicationsChart')) {
-            new Chart(document.getElementById('applicationsChart'), {
-                type: 'pie',
-                data: {
-                    labels: <?php echo json_encode($applications->keys()); ?>,
-                    datasets: [{
-                        data: <?php echo json_encode($applications->values()); ?>,
-                        backgroundColor: ['#4F46E5','#22C55E','#F59E0B','#EF4444','#6366F1','#10B981']
-                    }]
-                }
-            });
-        }
-        <?php endif; ?>
-
-        // Listings Chart
-        <?php if(isset($listings) && $listings->count()): ?>
-        if (document.getElementById('listingsChart')) {
-            new Chart(document.getElementById('listingsChart'), {
-                type: 'pie',
-                data: {
-                    labels: <?php echo json_encode($listings->keys()); ?>,
-                    datasets: [{
-                        data: <?php echo json_encode($listings->values()); ?>,
-                        backgroundColor: ['#6366F1','#10B981','#F59E0B','#F43F5E','#8B5CF6']
-                    }]
-                }
-            });
-        }
-        <?php endif; ?>
-
-        // Complaints Chart
-        <?php if(isset($complaints) && count($complaints)): ?>
-        if (document.getElementById('complaintsChart')) {
-            new Chart(document.getElementById('complaintsChart'), {
-                type: 'pie',
-                data: {
-                    labels: <?php echo json_encode($complaints->keys()); ?>,
-                    datasets: [{
-                        data: <?php echo json_encode($complaints->values()); ?>,
-                        backgroundColor: ['#EF4444','#F97316','#6B7280','#3B82F6','#F59E0B']
-                    }]
-                }
-            });
-        }
-        <?php endif; ?>
-    </script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>

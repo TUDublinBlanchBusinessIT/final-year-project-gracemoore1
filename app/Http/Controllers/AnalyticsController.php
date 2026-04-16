@@ -12,7 +12,7 @@ class AnalyticsController extends Controller
     public function index(Request $request)
     {
         $tab = $request->get('tab', 'listings');
-        $complaintTab = $request->get('complaint_tab', 'subject');
+        $complaintTab = $request->get('complaint_tab', 'reported');
 
         // --- Applications per County ---
         $applications = DB::table('application as a')
@@ -20,30 +20,31 @@ class AnalyticsController extends Controller
             ->select('r.county')
             ->selectRaw('count(*) as total')
             ->groupBy('r.county')
+            ->orderByRaw('count(*) DESC')
             ->pluck('total', 'r.county');
 
         // --- Listings per County ---
         $listings = LandlordRental::select('county')
             ->selectRaw('count(*) as total')
             ->groupBy('county')
+            ->orderByRaw('count(*) DESC')
             ->pluck('total', 'county');
 
         // --- Complaints ---
-        if ($complaintTab === 'subject') {
-            // Extract SUBJECT from description and count
-            $complaints = Complaint::all()->map(function($c) {
-                preg_match('/SUBJECT:\s*(.*?)\s*DETAILS:/i', $c->description, $matches);
-                return $matches[1] ?? 'Unknown';
-            })->countBy(); // returns Collection with subject => count
-        } else {
-            // Complaints by county (reported landlords’ rentals)
-            $complaints = DB::table('complaint as c')
-                ->leftJoin('rental as r', 'c.reported_user_id', '=', 'r.landlordid')
-                ->select('r.county')
+        if ($complaintTab === 'reported') {
+            $complaints = DB::table('complaint')
+                ->select('reported_user_role')
                 ->selectRaw('count(*) as total')
-                ->groupBy('r.county')
-                ->pluck('total', 'r.county')
-                ->mapWithKeys(fn($value, $key) => [$key ?? 'Unknown' => $value]);
+                ->groupBy('reported_user_role')
+                ->orderByRaw('count(*) DESC')
+                ->pluck('total', 'reported_user_role');
+        } else {
+            $complaints = DB::table('complaint')
+                ->select('reporter_role')
+                ->selectRaw('count(*) as total')
+                ->groupBy('reporter_role')
+                ->orderByRaw('count(*) DESC')
+                ->pluck('total', 'reporter_role');
         }
 
         return view('admin.analytics', compact('tab', 'complaintTab', 'applications', 'listings', 'complaints'));

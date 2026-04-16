@@ -5,8 +5,6 @@
         </h2>
     </x-slot>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <div class="max-w-6xl mx-auto px-4 py-6">
 
         <!-- Main Tabs -->
@@ -38,86 +36,97 @@
         <nav class="border-b border-slate-200 mt-4">
             <ul class="flex gap-6 text-sm">
                 <li>
-                    <a href="{{ route('admin.analytics', ['tab' => 'complaints', 'complaint_tab' => 'subject']) }}"
-                       class="{{ $complaintTab === 'subject' ? 'text-slate-900 font-semibold border-b-2 border-slate-900' : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
-                        By Subject
+                    <a href="{{ route('admin.analytics', ['tab' => 'complaints', 'complaint_tab' => 'reported']) }}"
+                       class="{{ $complaintTab === 'reported' ? 'text-slate-900 font-semibold border-b-2 border-slate-900' : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
+                        Who Is Being Reported
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.analytics', ['tab' => 'complaints', 'complaint_tab' => 'county']) }}"
-                       class="{{ $complaintTab === 'county' ? 'text-slate-900 font-semibold border-b-2 border-slate-900' : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
-                        By County
+                    <a href="{{ route('admin.analytics', ['tab' => 'complaints', 'complaint_tab' => 'reporter']) }}"
+                       class="{{ $complaintTab === 'reporter' ? 'text-slate-900 font-semibold border-b-2 border-slate-900' : 'text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-slate-300' }}">
+                        Who Is Reporting
                     </a>
                 </li>
             </ul>
         </nav>
         @endif
 
-        <!-- Chart Section -->
+        <!-- Table Section -->
         <div class="mt-6 bg-white p-6 rounded-xl shadow">
 
             @if($tab === 'applications')
                 <h3 class="text-lg font-semibold mb-4">Applications per County</h3>
-                <canvas id="applicationsChart"></canvas>
+                <table class="w-full text-left text-sm">
+                    <thead class="border-b font-semibold text-slate-700">
+                        <tr>
+                            <th class="py-2">County</th>
+                            <th class="py-2">Total Applications</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($applications as $county => $total)
+                            <tr class="border-b hover:bg-slate-50">
+                                <td class="py-2">{{ $county ?: 'Unknown' }}</td>
+                                <td class="py-2">{{ $total }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="2" class="py-4 text-slate-500">No data available.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+
             @elseif($tab === 'listings')
                 <h3 class="text-lg font-semibold mb-4">Listings per County</h3>
-                <canvas id="listingsChart"></canvas>
+                <table class="w-full text-left text-sm">
+                    <thead class="border-b font-semibold text-slate-700">
+                        <tr>
+                            <th class="py-2">County</th>
+                            <th class="py-2">Total Listings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($listings as $county => $total)
+                            <tr class="border-b hover:bg-slate-50">
+                                <td class="py-2">{{ $county ?: 'Unknown' }}</td>
+                                <td class="py-2">{{ $total }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="2" class="py-4 text-slate-500">No data available.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+
             @elseif($tab === 'complaints')
                 <h3 class="text-lg font-semibold mb-4">
-                    Complaints {{ $complaintTab === 'subject' ? 'by Subject' : 'by County' }}
+                    {{ $complaintTab === 'reported' ? 'Who Is Being Reported' : 'Who Is Reporting' }}
                 </h3>
-                <canvas id="complaintsChart"></canvas>
+                <table class="w-full text-left text-sm">
+                    <thead class="border-b font-semibold text-slate-700">
+                        <tr>
+                            <th class="py-2">Role</th>
+                            <th class="py-2">Total Complaints</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($complaints as $role => $total)
+                            <tr class="border-b hover:bg-slate-50">
+                                <td class="py-2">{{ ucfirst($role) }}</td>
+                                <td class="py-2">{{ $total }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="2" class="py-4 text-slate-500">No data available.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             @endif
+
         </div>
     </div>
 
-    <script>
-        // Applications Chart
-        @if(isset($applications) && $applications->count())
-        if (document.getElementById('applicationsChart')) {
-            new Chart(document.getElementById('applicationsChart'), {
-                type: 'pie',
-                data: {
-                    labels: {!! json_encode($applications->keys()) !!},
-                    datasets: [{
-                        data: {!! json_encode($applications->values()) !!},
-                        backgroundColor: ['#4F46E5','#22C55E','#F59E0B','#EF4444','#6366F1','#10B981']
-                    }]
-                }
-            });
-        }
-        @endif
-
-        // Listings Chart
-        @if(isset($listings) && $listings->count())
-        if (document.getElementById('listingsChart')) {
-            new Chart(document.getElementById('listingsChart'), {
-                type: 'pie',
-                data: {
-                    labels: {!! json_encode($listings->keys()) !!},
-                    datasets: [{
-                        data: {!! json_encode($listings->values()) !!},
-                        backgroundColor: ['#6366F1','#10B981','#F59E0B','#F43F5E','#8B5CF6']
-                    }]
-                }
-            });
-        }
-        @endif
-
-        // Complaints Chart
-        @if(isset($complaints) && count($complaints))
-        if (document.getElementById('complaintsChart')) {
-            new Chart(document.getElementById('complaintsChart'), {
-                type: 'pie',
-                data: {
-                    labels: {!! json_encode($complaints->keys()) !!},
-                    datasets: [{
-                        data: {!! json_encode($complaints->values()) !!},
-                        backgroundColor: ['#EF4444','#F97316','#6B7280','#3B82F6','#F59E0B']
-                    }]
-                }
-            });
-        }
-        @endif
-    </script>
 </x-app-layout>
