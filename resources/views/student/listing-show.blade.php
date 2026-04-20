@@ -1,18 +1,18 @@
 <x-app-layout>
+      <x-slot name="header">
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <div class="flex items-center gap-4">
+                <a href="{{ route('student.dashboard') }}"
+                    class="text-slate-500 hover:text-slate-700 text-xl transition">
+                    ←
+                </a>
 
-    {{-- Header --}}
-    <x-slot name="header">
-        <h2 class="font-bold text-xl text-gray-800">
-            Listing Details
-        </h2>
+                <p class="text-lg font-extrabold uppercase tracking-[0.12em] text-blue-600">
+                    Home <span class="mx-1 text-slate-300">/</span> Listing Details
+                </p>
+            </div>
+        </div>
     </x-slot>
-
-    <div class="mb-4">
-        <a href="{{ url()->previous() }}" 
-        class="inline-block px-4 py-2 bg-gray-200 text-gray-800 text-sm rounded hover:bg-gray-300">
-            ← Back
-        </a>
-    </div>
 
     <div class="max-w-5xl mx-auto mt-6 px-4 sm:px-6 lg:px-8">
 

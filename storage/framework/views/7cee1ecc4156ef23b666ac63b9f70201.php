@@ -11,13 +11,17 @@
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
      <?php $__env->slot('header', null, []); ?> 
-        <div class="flex items-center gap-3 text-base font-semibold text-blue-600 uppercase tracking-[0.2em]">
-            <a href="<?php echo e(route('student.support')); ?>" class="text-slate-500 hover:text-blue-600 transition">
-                ←
-            </a>
-            <span>Support</span>
-            <span class="text-slate-400">/</span>
-            <span>Chatbot</span>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <div class="flex items-center gap-4">
+                <a href="<?php echo e(route('student.support')); ?>"
+                    class="text-slate-500 hover:text-slate-700 text-xl transition">
+                    ←
+                </a>
+
+                <p class="text-lg font-extrabold uppercase tracking-[0.12em] text-blue-600">
+                    Support <span class="mx-1 text-slate-300">/</span> Chatbot
+                </p>
+            </div>
         </div>
      <?php $__env->endSlot(); ?>
 
