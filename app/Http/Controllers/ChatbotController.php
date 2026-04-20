@@ -41,7 +41,7 @@ class ChatbotController extends Controller
         $commonWords = [
             'how', 'do', 'i', 'a', 'the', 'is', 'to', 'my', 'can',
             'what', 'where', 'when', 'and', 'for', 'of', 'on', 'in',
-            'it', 'as', 'at', 'by', 'an', 'want'
+            'it', 'as', 'at', 'by', 'an', 'want', 'we', 'our', 'me'
         ];
 
         foreach ($faqs as $faq) {
@@ -100,9 +100,11 @@ class ChatbotController extends Controller
             $hasApplyInMessage = preg_match('/\bapply\b/', $message);
             $hasPropertyInMessage = preg_match('/\bproperty\b|\bproperties\b/', $message);
             $hasListingInMessage = preg_match('/\blisting\b/', $message);
-            $hasViewInMessage = preg_match('/\bview\b/', $message);
-            $hasApplicationsInMessage = preg_match('/\bapplication\b|\bapplications\b/', $message);
-            $hasCreateInMessage = preg_match('/\bcreate\b/', $message);
+
+            $hasViewInMessage = preg_match('/\bview\b|\bsee\b|\bcheck\b/', $message);
+            $hasApplicationsInMessage = preg_match('/\bapplication\b|\bapplications\b|\bapplicant\b|\bapplicants\b|\bapplied\b/', $message);
+
+            $hasCreateInMessage = preg_match('/\bcreate\b|\bupload\b|\badd\b|\bpost\b|\bmake\b/', $message);
 
             $faqKeywordsText = ' ' . strtolower($faq->keywords ?? '') . ' ';
             $faqQuestionText = ' ' . strtolower($faq->question ?? '') . ' ';
@@ -133,7 +135,7 @@ class ChatbotController extends Controller
                 }
             }
 
-            if ($hasCreateInMessage && $hasListingInMessage) {
+            if ($hasCreateInMessage && ($hasListingInMessage || $hasPropertyInMessage)) {
                 if (
                     str_contains($faqKeywordsText, 'listing') ||
                     str_contains($faqQuestionText, 'listing')
@@ -145,6 +147,7 @@ class ChatbotController extends Controller
             if ($hasViewInMessage && $hasApplicationsInMessage) {
                 if (
                     str_contains($faqKeywordsText, 'application') ||
+                    str_contains($faqKeywordsText, 'applicant') ||
                     str_contains($faqQuestionText, 'application')
                 ) {
                     $score += 20;
