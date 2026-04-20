@@ -10,13 +10,41 @@
 <?php $component->withAttributes([]); ?>
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
-     <?php $__env->slot('header', null, []); ?> 
-        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+ <?php $__env->slot('header', null, []); ?> 
+    <div class="border-b border-slate-200 px-6 py-2 bg-white">
+        <div class="flex items-center justify-between">
+
             <p class="text-lg font-extrabold uppercase tracking-[0.16em] text-blue-600">
                 Messages
             </p>
+
+            <div class="relative">
+                <button id="helpBtn"
+                    class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-sm font-bold hover:bg-blue-200 transition">
+                    ?
+                </button>
+
+                <!-- POPUP -->
+                <div id="helpBox"
+                    class="hidden absolute right-0 mt-3 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 text-sm text-slate-600 z-50">
+
+                    <p>
+                        <strong>Welcome to Messages!</strong><br><br>
+
+                        Landlords who wish to message you regarding an application will appear here.<br><br>
+
+                        When your application is accepted, that chat will display a 
+                        <span class="text-green-600 font-semibold">“Current Accommodation”</span> label.<br><br>
+
+                        You can continue messaging and manage everything in one place.
+                    </p>
+
+                </div>
+            </div>
+
         </div>
-     <?php $__env->endSlot(); ?>
+    </div>
+ <?php $__env->endSlot(); ?>
 
     <div class="pb-28 lg:pl-70">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -183,6 +211,27 @@
             </div>
         </div>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const btn = document.getElementById('helpBtn');
+        const box = document.getElementById('helpBox');
+
+        if (btn && box) {
+            btn.addEventListener('click', function () {
+                box.classList.toggle('hidden');
+            });
+
+            // Optional: close when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!btn.contains(e.target) && !box.contains(e.target)) {
+                    box.classList.add('hidden');
+                }
+            });
+        }
+
+    });
+</script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
