@@ -51,11 +51,10 @@
                 
                 <div class="px-6 py-3 bg-white border-b border-slate-200">
                     <div class="flex items-center justify-between gap-4 flex-wrap">
-                        <div id="rt-summary" class="text-sm text-slate-700"></div>
                         <div class="flex items-center gap-2">
                             <label class="text-sm text-slate-600">Rent due day:</label>
                             <select id="due-day-select"
-                                class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-400 focus:ring focus:ring-blue-100">
+                                class="rounded-lg border border-slate-300 px-6 py-1.5 text-sm focus:border-blue-400 focus:ring focus:ring-blue-100 min-w-[140px]">
                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php for($i = 1; $i <= 28; $i++): ?>
                                     <option value="<?php echo e($i); ?>" <?php echo e(($application->rent_due_day ?? null) == $i ? 'selected' : ''); ?>>
                                         <?php echo e($i); ?><?php echo e(in_array($i, [1,21]) ? 'st' : (in_array($i, [2,22]) ? 'nd' : (in_array($i, [3,23]) ? 'rd' : 'th'))); ?>
@@ -87,13 +86,12 @@
         const GROUP_ID = <?php echo json_encode($groupId, 15, 512) ?>;
 
         const feedEl    = document.getElementById('rt-feed');
-        const summaryEl = document.getElementById('rt-summary');
+
 
         // BALANCE 
         async function refreshBalance() {
             const res  = await fetch(`/landlord/rent-tracker/balance?application_id=${APP_ID}`);
             RT_balance = await res.json();
-            summaryEl.textContent = `Due €${RT_balance.monthly_due} • Paid €${RT_balance.paid} • Outstanding €${RT_balance.outstanding}`;
         }
 
         //  FEED 

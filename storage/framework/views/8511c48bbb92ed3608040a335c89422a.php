@@ -48,10 +48,6 @@
         <div class="max-w-4xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
-                
-                <div class="px-6 py-3 bg-white border-b border-slate-200">
-                    <div id="rt-summary" class="text-sm text-slate-700"></div>
-                </div>
 
                 
                 <div id="rt-feed"
@@ -114,7 +110,6 @@
         const CSRF_TOKEN  = '<?php echo e(csrf_token()); ?>';
 
         const feedEl     = document.getElementById('rt-feed');
-        const summaryEl  = document.getElementById('rt-summary');
         const amountIn   = document.getElementById('rt-amount');
         const payBtn     = document.getElementById('rt-pay');
         const stripeForm = document.getElementById('stripe-form');
@@ -130,7 +125,6 @@
         async function refreshBalance() {
             const res  = await fetch(`/student/rent-tracker/balance?application_id=${APP_ID}`);
             RT.balance = await res.json();
-            summaryEl.textContent = `Due €${RT.balance.monthly_due} • Paid €${RT.balance.paid} • Outstanding €${RT.balance.outstanding}`;
         }
 
         // ── FEED ─────────────────────────────────────────────────
