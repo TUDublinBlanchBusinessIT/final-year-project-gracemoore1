@@ -10,8 +10,6 @@
 <?php $component->withAttributes([]); ?>
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
-
-    
      <?php $__env->slot('header', null, []); ?> 
         <div class="border-b border-slate-200 px-6 py-3 bg-white">
             <div class="flex items-center gap-4">
@@ -23,6 +21,29 @@
                 <p class="text-lg font-bold uppercase tracking-[0.16em] text-blue-700">
                     Messages <span class="mx-1 text-slate-300">/</span> Rent Tracker
                 </p>
+            
+            <div class="relative">
+
+                <button id="rentHelpBtn"
+                    class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold hover:bg-blue-200 transition">
+                    ?
+                </button>
+
+                <div id="rentHelpBox"
+                    class="hidden absolute right-0 mt-3 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 text-sm text-slate-600 z-50">
+
+                    <p>
+                        <strong>Rent Tracker</strong><br><br>
+
+                        This is where you can pay your rent securely to your landlord directly within the app.<br><br>
+
+                        All payments are recorded so you can easily keep track of what has been paid and what is outstanding.<br><br>
+
+                        You will also receive a reminder 2 days before your rent is due.
+                    </p>
+
+                </div>
+              
             </div>
         </div>
      <?php $__env->endSlot(); ?>
@@ -338,6 +359,29 @@
         }
 
         boot();
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const btn = document.getElementById('rentHelpBtn');
+        const box = document.getElementById('rentHelpBox');
+
+        if (btn && box) {
+
+            btn.addEventListener('click', function () {
+                box.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!btn.contains(e.target) && !box.contains(e.target)) {
+                    box.classList.add('hidden');
+                }
+            });
+
+        }
+
+    });
     </script>
 
  <?php echo $__env->renderComponent(); ?>

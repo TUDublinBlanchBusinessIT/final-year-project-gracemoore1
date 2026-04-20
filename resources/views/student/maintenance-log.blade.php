@@ -14,6 +14,28 @@
                 <p class="text-lg font-bold uppercase tracking-[0.16em] text-blue-700">
                     Messages <span class="mx-1 text-slate-300">/</span> Maintenance Log
                 </p>
+                    <div class="relative">
+                        <button id="maintenanceHelpBtn"
+                            class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-sm font-bold hover:bg-blue-200 transition">
+                            ?
+                        </button>
+
+                        <div id="maintenanceHelpBox"
+                            class="hidden absolute left-0 top-full mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 text-sm text-slate-600 z-50">
+
+                            <p>
+                                <strong>Maintenance Log</strong><br><br>
+
+                                This is where you can log and keep a record of any issues in the property that you want your landlord to be aware of.<br><br>
+
+                                You can upload a photo, set the urgency of the issue, and provide additional details to clearly explain the problem.<br><br>
+
+                                Once submitted, your landlord is notified and can take action.
+                            </p>
+
+                        </div>
+                    </span>
+                </p>
             </div>
         </div>
     </x-slot>
@@ -241,6 +263,29 @@
             if (container) {
                 container.scrollTop = container.scrollHeight;
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const btn = document.getElementById('maintenanceHelpBtn');
+            const box = document.getElementById('maintenanceHelpBox');
+
+            if (btn && box) {
+
+                btn.addEventListener('click', function () {
+                    box.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!btn.contains(e.target) && !box.contains(e.target)) {
+                        box.classList.add('hidden');
+                    }
+                });
+
+            }
+
         });
     </script>
 </x-app-layout>
