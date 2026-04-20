@@ -11,9 +11,14 @@
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
      <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Virtual Assistant
-        </h2>
+        <div class="flex items-center gap-3 text-base font-semibold text-blue-600 uppercase tracking-[0.2em]">
+            <a href="<?php echo e(route('landlord.support')); ?>" class="text-slate-500 hover:text-blue-600 transition">
+                ←
+            </a>
+            <span>Support</span>
+            <span class="text-slate-400">/</span>
+            <span>Chatbot</span>
+        </div>
      <?php $__env->endSlot(); ?>
 
     <div class="pb-28 lg:pl-70">
