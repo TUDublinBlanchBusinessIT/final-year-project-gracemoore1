@@ -99,7 +99,11 @@
                 @if(!empty($rental->housetype))
                     <div>
                         <span class="font-semibold">House Type:</span>
-                        {{ $rental->housetype }}
+                        {{ [
+                            'single_private' => 'Single room in private home',
+                            'private_shared' => 'Private room in shared house',
+                            'whole_property_group' => 'Whole property (group application only)',
+                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '') }}
                     </div>
                 @endif
 

@@ -115,7 +115,11 @@
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($rental->housetype)): ?>
                     <div>
                         <span class="font-semibold">House Type:</span>
-                        <?php echo e($rental->housetype); ?>
+                        <?php echo e([
+                            'single_private' => 'Single room in private home',
+                            'private_shared' => 'Private room in shared house',
+                            'whole_property_group' => 'Whole property (group application only)',
+                        ][trim($rental->housetype ?? '')] ?? trim($rental->housetype ?? '')); ?>
 
                     </div>
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
