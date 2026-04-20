@@ -1,38 +1,54 @@
-<x-app-layout>
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
-    {{-- HEADER --}}
-    <x-slot name="header">
+
+    
+     <?php $__env->slot('header', null, []); ?> 
         <div class="border-b border-slate-200 px-6 py-4 bg-white">
             <div class="flex items-center gap-4">
-                <a href="{{ route('landlord.messages.show', $application->id) }}"
+                <a href="<?php echo e(route('landlord.messages.show', $application->id)); ?>"
                    class="text-slate-500 hover:text-slate-700 text-xl">←</a>
 
                 <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center
                             text-slate-500 text-lg font-semibold">
-                    {{ strtoupper(substr($application->student->firstname ?? 'S', 0, 1)) }}
+                    <?php echo e(strtoupper(substr($application->student->firstname ?? 'S', 0, 1))); ?>
+
                 </div>
 
                 <div class="min-w-0">
                     <h3 class="text-lg font-semibold text-slate-900 truncate">
-                        {{ $application->student->firstname ?? 'Student' }}
-                        {{ $application->student->surname ?? '' }}
+                        <?php echo e($application->student->firstname ?? 'Student'); ?>
+
+                        <?php echo e($application->student->surname ?? ''); ?>
+
                     </h3>
                     <p class="text-sm text-slate-500 truncate">
-                        {{ $application->rental->housenumber ?? '' }}
-                        {{ $application->rental->street ?? '' }},
-                        {{ $application->rental->county ?? '' }}
+                        <?php echo e($application->rental->housenumber ?? ''); ?>
+
+                        <?php echo e($application->rental->street ?? ''); ?>,
+                        <?php echo e($application->rental->county ?? ''); ?>
+
                     </p>
                 </div>
             </div>
         </div>
-    </x-slot>
+     <?php $__env->endSlot(); ?>
 
-    {{-- BODY --}}
+    
     <div class="pb-28 lg:pl-70">
         <div class="max-w-4xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
-                {{-- SUMMARY --}}
+                
                 <div class="px-6 py-3 bg-white border-b border-slate-200">
                     <div class="flex items-center justify-between gap-4 flex-wrap">
                         <div id="rt-summary" class="text-sm text-slate-700"></div>
@@ -40,11 +56,12 @@
                             <label class="text-sm text-slate-600">Rent due day:</label>
                             <select id="due-day-select"
                                 class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-400 focus:ring focus:ring-blue-100">
-                                @for($i = 1; $i <= 28; $i++)
-                                    <option value="{{ $i }}" {{ ($application->rent_due_day ?? null) == $i ? 'selected' : '' }}>
-                                        {{ $i }}{{ in_array($i, [1,21]) ? 'st' : (in_array($i, [2,22]) ? 'nd' : (in_array($i, [3,23]) ? 'rd' : 'th')) }}
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php for($i = 1; $i <= 28; $i++): ?>
+                                    <option value="<?php echo e($i); ?>" <?php echo e(($application->rent_due_day ?? null) == $i ? 'selected' : ''); ?>>
+                                        <?php echo e($i); ?><?php echo e(in_array($i, [1,21]) ? 'st' : (in_array($i, [2,22]) ? 'nd' : (in_array($i, [3,23]) ? 'rd' : 'th'))); ?>
+
                                     </option>
-                                @endfor
+                                <?php endfor; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             </select>
                             <button onclick="saveDueDay()"
                                 class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
@@ -55,7 +72,7 @@
                     </div>
                 </div>
 
-                {{-- FEED --}}
+                
                 <div id="rt-feed"
                      class="bg-slate-50 px-6 py-6 overflow-y-auto space-y-4"
                      style="min-height: 200px; max-height: calc(100vh - 200px);">
@@ -66,8 +83,8 @@
     </div>
 
     <script>
-        const APP_ID  = @json($application->id);
-        const GROUP_ID = @json($groupId);
+        const APP_ID  = <?php echo json_encode($application->id, 15, 512) ?>;
+        const GROUP_ID = <?php echo json_encode($groupId, 15, 512) ?>;
 
         const feedEl    = document.getElementById('rt-feed');
         const summaryEl = document.getElementById('rt-summary');
@@ -183,11 +200,11 @@
 
         async function saveDueDay() {
             const day = document.getElementById('due-day-select').value;
-            const res = await fetch('{{ route('landlord.rent.set-due-day', $application->id) }}', {
+            const res = await fetch('<?php echo e(route('landlord.rent.set-due-day', $application->id)); ?>', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                 },
                 body: JSON.stringify({ rent_due_day: day })
             });
@@ -201,4 +218,13 @@
         }
     </script>
 
-</x-app-layout>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?><?php /**PATH C:\Users\gmoor\final-year-project-gracemoore1\resources\views/landlord/rent-tracker.blade.php ENDPATH**/ ?>

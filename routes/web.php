@@ -282,6 +282,8 @@ Route::get('/landlord/rent-tracker/history', [LandlordRentTrackerController::cla
 Route::get('/landlord/rent-tracker/{application}', [LandlordRentTrackerController::class, 'page'])
     ->name('landlord.rent.page');
 
+    Route::post('/landlord/rent-tracker/{application}/set-due-day', [\App\Http\Controllers\Landlord\LandlordRentTrackerController::class, 'setDueDay'])
+    ->name('landlord.rent.set-due-day');
 //admin
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 

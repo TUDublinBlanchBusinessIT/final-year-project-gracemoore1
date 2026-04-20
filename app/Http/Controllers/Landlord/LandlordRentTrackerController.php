@@ -207,7 +207,8 @@ class LandlordRentTrackerController extends Controller
             ? Carbon::parse($app->rental->availablefrom)
             : null;
 
-        $dueDay        = $availableFrom ? (int)$availableFrom->format('d') : 1;
+        $dueDay = $app->rent_due_day
+            ?? ($availableFrom ? (int)$availableFrom->format('d') : 1);
         $eom           = Carbon::create($year, $month, 1, 0, 0, 0, $tz)->endOfMonth()->day;
         $dueDayClamped = max(1, min($dueDay, $eom));
 
@@ -216,5 +217,22 @@ class LandlordRentTrackerController extends Controller
         $overdueOn = (clone $dueDate)->addDays(1);
 
         return [$perPerson, $dueDate->toIso8601String(), $remindOn->toIso8601String(), $overdueOn->toIso8601String()];
+    }
+
+    public function setDueDay(Request $request, int $application)
+    {
+        $landlordId = session('landlord_id');
+        abort_if(!$landlordId, 401);
+
+        $request->validate([
+            'rent_due_day' => 'required|integer|min:1|max:28',
+        ]);
+
+        $app = Application::with('rental')->findOrFail($application);
+        abort_unless($this->canAccess($landlordId, $app), 403);
+
+        $app->update(['rent_due_day' => $request->rent_due_day]);
+
+        return response()->json(['ok' => true, 'rent_due_day' => $request->rent_due_day]);
     }
 }

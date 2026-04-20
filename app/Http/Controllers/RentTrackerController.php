@@ -353,7 +353,8 @@ class RentTrackerController extends Controller
             ? Carbon::parse($app->rental->availablefrom)
             : null;
 
-        $dueDay        = $availableFrom ? (int)$availableFrom->format('d') : 1;
+        $dueDay = $app->rent_due_day
+            ?? ($availableFrom ? (int)$availableFrom->format('d') : 1);
         $eom           = Carbon::create($year, $month, 1, 0, 0, 0, $tz)->endOfMonth()->day;
         $dueDayClamped = max(1, min($dueDay, $eom));
 

@@ -19,6 +19,7 @@ class Application extends Model
         'gender',
         'additional_details',
         'group_id',
+        'rent_due_day',
     ];
 
     // Helpful relationships using your custom FK names
