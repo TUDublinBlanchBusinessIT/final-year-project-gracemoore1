@@ -10,11 +10,20 @@
 <?php $component->withAttributes([]); ?>
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
-     <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Book Service Provider
-        </h2>
-     <?php $__env->endSlot(); ?>
+ <?php $__env->slot('header', null, []); ?> 
+    <div class="border-b border-slate-200 px-6 py-3 bg-white">
+        <div class="flex items-center gap-4">
+            <a href="<?php echo e(url()->previous()); ?>"
+               class="text-slate-500 hover:text-slate-700 text-xl">←</a>
+
+            <div class="min-w-0">
+                <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
+                    Messages <span class="mx-1 text-slate-300">/</span> Maintenance Log <span class="mx-1 text-slate-300">/</span> Book Service Provider
+                </p>
+            </div>
+        </div>
+    </div>
+ <?php $__env->endSlot(); ?>
 
     <div class="pb-28 lg:pl-70">
         <div class="max-w-3xl mx-auto bg-white shadow-sm sm:rounded-2xl border border-slate-200 p-6">
