@@ -12,20 +12,47 @@
 
 
     
-     <?php $__env->slot('header', null, []); ?> 
-        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+ <?php $__env->slot('header', null, []); ?> 
+    <div class="border-b border-slate-200 px-6 py-3 bg-white">
+        <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <a href="<?php echo e(route('landlord.messages.show', $application->id)); ?>"
                    class="text-slate-500 hover:text-slate-700 text-xl">←</a>
 
-                <div class="min-w-0">
+                <div class="min-w-0 flex items-center gap-2">
                     <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
                         Messages <span class="mx-1 text-slate-300">/</span> Rent Tracker
                     </p>
+
+                    <div class="relative">
+                        <button id="rentHelpBtn"
+                            class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-sm font-bold hover:bg-blue-200 transition">
+                            ?
+                        </button>
+
+                        <div id="rentHelpBox"
+                            class="hidden absolute right-0 top-full mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 text-sm text-slate-600 z-50">
+
+                            <p class="font-semibold text-slate-800 mb-2">Rent Tracker</p>
+
+                            <p class="mb-2">
+                                This is the rent tracker. Students can pay their rent securely to you directly within the app.
+                            </p>
+
+                            <p class="mb-2">
+                                All payments are recorded so you can easily keep track of what has been paid and what is still outstanding.
+                            </p>
+
+                            <p>
+                                This ensures nothing gets missed and gives you a clear overview of each tenant’s payments.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-     <?php $__env->endSlot(); ?>
+    </div>
+ <?php $__env->endSlot(); ?>  
 
     
     <div class="pb-28 lg:pl-70">
@@ -182,6 +209,21 @@
         }
 
         boot();
+    </script>
+
+    <script>
+        const rentBtn = document.getElementById('rentHelpBtn');
+        const rentBox = document.getElementById('rentHelpBox');
+
+        rentBtn.addEventListener('click', () => {
+            rentBox.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!rentBtn.contains(e.target) && !rentBox.contains(e.target)) {
+                rentBox.classList.add('hidden');
+            }
+        });
     </script>
 
  <?php echo $__env->renderComponent(); ?>

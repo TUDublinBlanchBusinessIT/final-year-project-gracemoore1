@@ -168,7 +168,7 @@ class ChatbotController extends Controller
         }
 
         return response()->json([
-            'reply' => 'Sorry, I could not find an answer for that yet. Please try asking another question.',
+            'reply' => 'Sorry, I could not find an answer for that yet. Please try asking another question, or email your question to rentconnect.app@gmail.com.',
             'matched_question' => null,
         ]);
     }
