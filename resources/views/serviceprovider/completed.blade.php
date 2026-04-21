@@ -1,83 +1,64 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="border-b border-slate-200 px-6 py-3 bg-white">
-            <div class="flex items-center gap-4">
-                <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
-                    Completed Jobs
-                </p>
-            </div>
+            <p class="text-lg font-bold uppercase tracking-[0.12em] text-blue-600">
+                Completed Jobs
+            </p>
         </div>
     </x-slot>
 
     <div class="pb-20 lg:pl-70">
-        <div class="max-w-5xl mx-auto">
-            @forelse($providerRequests as $providerRequest)
-                <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden mb-6">
-                    <div class="p-8">
-                        <div class="flex flex-wrap items-center gap-3 mb-3">
-                            <h3 class="text-2xl font-semibold text-slate-900">
-                                {{ $providerRequest->servicetype ?? 'Service Job' }}
-                            </h3>
+        <div class="max-w-4xl mx-auto space-y-4">
 
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
-                                Completed
-                            </span>
+            @forelse($completedJobs as $providerRequest)
+                @php
+                    $job = $providerRequest->serviceRequest;
+                @endphp
 
-                            @if(!empty($providerRequest->urgent))
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-600">
-                                    Urgent
-                                </span>
-                            @endif
-                        </div>
+                <div class="bg-white shadow-sm rounded-xl border border-slate-200 px-5 py-4">
 
-                        <p class="text-slate-600 text-lg">
-                            {{ $providerRequest->housenumber ?? '' }}
-                            {{ $providerRequest->street ?? '' }},
-                            {{ $providerRequest->county ?? '' }}
-                            {{ $providerRequest->postcode ?? '' }}
+                    <!-- Title + Status -->
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="text-base font-semibold text-slate-900">
+                            {{ $job->servicetype ?? 'Service Job' }}
+                        </h3>
+
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            Completed
+                        </span>
+                    </div>
+
+                    <!-- Address -->
+                    <p class="text-sm text-slate-700 mb-2">
+                        {{ $job->address_housenumber }} {{ $job->address_street }},
+                        {{ $job->address_county }} {{ $job->address_postcode }}
+                    </p>
+
+                    <!-- Dates -->
+                    <div class="text-sm text-slate-500 space-y-1">
+
+                        <p>
+                            <span class="font-semibold text-slate-700">Posted:</span>
+                            {{ optional($job->created_at)->format('d M Y H:i') }}
                         </p>
 
-                        @if(!empty($providerRequest->accepted_at))
-                            <p class="text-slate-600 text-lg mt-1">
-                                Accepted on
-                            </p>
-                            <p class="text-slate-400 text-lg">
-                                {{ \Carbon\Carbon::parse($providerRequest->accepted_at)->format('d M Y H:i') }}
-                            </p>
-                        @endif
+                        <p>
+                            <span class="font-semibold text-slate-700">Completed:</span>
+                            {{ \Carbon\Carbon::parse($providerRequest->responded_at)->format('d M Y H:i') }}
+                        </p>
 
-                        @if(!empty($providerRequest->completed_at))
-                            <p class="text-slate-600 text-lg mt-1">
-                                Completed on
-                            </p>
-                            <p class="text-slate-400 text-lg">
-                                {{ \Carbon\Carbon::parse($providerRequest->completed_at)->format('d M Y H:i') }}
-                            </p>
-                        @endif
-
-                        @if(!empty($providerRequest->description))
-                            <p class="text-slate-800 text-2xl mt-6">
-                                {{ $providerRequest->description }}
-                            </p>
-                        @endif
-
-                        <div class="mt-5 flex flex-wrap gap-3">
-                            <a href="{{ route('serviceprovider.messages.show', $providerRequest->id) }}"
-                               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
-                                Open Chat
-                            </a>
-                        </div>
                     </div>
+
                 </div>
+
             @empty
-                <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
-                    <div class="p-8">
-                        <p class="text-slate-500 text-lg">
-                            No completed jobs yet.
-                        </p>
-                    </div>
+                <div class="bg-white shadow-sm rounded-xl border border-slate-200 px-5 py-4">
+                    <p class="text-slate-500 text-sm">
+                        No completed jobs yet.
+                    </p>
                 </div>
             @endforelse
+
         </div>
     </div>
 </x-app-layout>

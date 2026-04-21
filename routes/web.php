@@ -45,7 +45,7 @@ use App\Http\Controllers\LandlordServiceRequestController;
 use App\Http\Controllers\ServiceProviderRequestedJobsController;
 use App\Http\Controllers\ServiceProviderMessageController;
 use App\Http\Controllers\ServiceProviderUpcomingJobsController;
-use App\Http\Controllers\ServiceProviderCompletedJobsController;
+
 
 
 //chatbot
@@ -607,8 +607,6 @@ Route::get('/serviceprovider/messages/{id}', [ServiceProviderMessageController::
 Route::post('/serviceprovider/messages/{id}', [ServiceProviderMessageController::class, 'store'])
     ->name('serviceprovider.messages.store');
 
-Route::get('/serviceprovider/completed', [ServiceProviderCompletedJobsController::class, 'index'])
-    ->name('serviceprovider.completed');
 
 Route::get('/serviceprovider/profile', function () {
     if (!session('serviceprovider_id')) return redirect('/login');
