@@ -11,9 +11,11 @@
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
      <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Upcoming Jobs
-        </h2>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-lg font-bold uppercase tracking-[0.12em] text-blue-600">
+                Upcoming Jobs
+            </p>
+        </div>
      <?php $__env->endSlot(); ?>
 
     <div class="pb-28 lg:pl-70">
