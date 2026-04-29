@@ -89,6 +89,14 @@ class LandlordMessageController extends Controller
     {
         $application = Application::with(['student', 'rental'])->findOrFail($applicationId);
 
+        $isOtherAccountBanned = false;
+        $otherAccountRole = 'student';
+
+        if (isset($application->student)) {
+            $isOtherAccountBanned =
+                ($application->student->status ?? null) === 'suspended';
+        }
+
         if ($application->applicationtype === 'group' && $application->group_id) {
             Message::where('group_id', $application->group_id)
                 ->where('rentalid', $application->rentalid)
@@ -125,7 +133,16 @@ class LandlordMessageController extends Controller
             $groupMembers = collect();
         }
 
-        return view('landlord.rentals.message-student', compact('application', 'messages', 'groupMembers'));
+        return view(
+            'landlord.rentals.message-student',
+            compact(
+                'application',
+                'messages',
+                'groupMembers',
+                'isOtherAccountBanned',
+                'otherAccountRole'
+            )
+        );
     }
 
     public function store(Request $request, $applicationId)
