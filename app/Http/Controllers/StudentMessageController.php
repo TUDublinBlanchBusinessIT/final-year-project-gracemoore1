@@ -82,6 +82,8 @@ class StudentMessageController extends Controller
             })
             ->values();
 
+
+
         return view('student.messages.index', compact('applications'));
     }
 
@@ -100,6 +102,14 @@ class StudentMessageController extends Controller
                     });
             })
             ->firstOrFail();
+        
+        
+        $isOtherAccountBanned =
+                ($application->rental->landlord->status ?? null) === 'suspended';
+
+        $otherAccountRole = 'landlord';
+
+
 
         if ($application->applicationtype === 'group' && $application->group_id) {
             Message::where('group_id', $application->group_id)
@@ -144,9 +154,21 @@ class StudentMessageController extends Controller
             $groupMembers = collect();
         }
 
-        return view('student.messages.chat', compact('application', 'messages', 'groupMembers'));
+    
+    return view(
+            'student.messages.chat',
+            compact(
+                'application',
+                'messages',
+                'groupMembers',
+                'isOtherAccountBanned',
+                'otherAccountRole'
+            )
+        );
     }
 
+
+       
     public function store(Request $request, $applicationId)
     {
         $request->validate([

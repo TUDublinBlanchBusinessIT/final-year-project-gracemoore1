@@ -2,7 +2,7 @@
     $hasUnreadMaintenance = \App\Models\Maintenancelog::where('applicationid', $application->id)
         ->where('is_seen_by_landlord', false)
         ->exists();
-@endphphp
+@endphp
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-base text-gray-800 leading-tight">
