@@ -47,6 +47,14 @@ class ServiceProviderMessageController extends Controller
 
         $landlord = Landlord::find($job->landlordid);
 
+        // ✅ Banner flag: landlord banned?
+        $isOtherAccountBanned = false;
+        $otherAccountRole = 'landlord';
+
+        if ($landlord) {
+            $isOtherAccountBanned = (($landlord->status ?? null) === 'suspended');
+        }
+
         $messages = Message::where('landlordid', $job->landlordid)
             ->where('serviceproviderpartnershipid', $serviceProviderId)
             ->where('rentalid', $job->rentalid)
@@ -56,7 +64,7 @@ class ServiceProviderMessageController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return view('serviceprovider.chat', compact('conversation', 'landlord', 'messages'));
+        return view('serviceprovider.chat', compact('conversation', 'landlord', 'messages','isOtherAccountBanned','otherAccountRole'));
     }
 
     public function store(Request $request, $id)

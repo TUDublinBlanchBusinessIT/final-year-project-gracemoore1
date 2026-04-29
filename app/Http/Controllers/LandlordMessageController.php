@@ -202,9 +202,16 @@ class LandlordMessageController extends Controller
             ->get();
 
         $provider = ServiceProviderPartnership::find($providerRequest->serviceproviderpartnershipid);
+
+        $isOtherAccountBanned = false;
+        $otherAccountRole = 'service provider';
+
+        if ($provider) {
+            $isOtherAccountBanned = (($provider->status ?? null) === 'suspended');
+        }
         $rental = LandlordRental::find($job->rentalid);
 
-        return view('landlord.messages.service-provider-chat', compact('providerRequest', 'job', 'messages', 'provider', 'rental'));
+        return view('landlord.messages.service-provider-chat', compact('providerRequest', 'job', 'messages', 'provider', 'rental','isOtherAccountBanned','otherAccountRole'));
     }
 
     public function storeServiceProvider(Request $request, $providerRequestId)

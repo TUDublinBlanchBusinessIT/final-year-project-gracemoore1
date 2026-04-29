@@ -68,6 +68,13 @@
                     </div>
                 </div>
 
+                @if($isOtherAccountBanned)
+                    <div class="mx-8 mt-4 mb-2 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-red-800">
+                        <strong>Notice:</strong>
+                        This landlord account has been suspended.
+                    </div>
+                @endif
+                
                 <div id="chatContainer" class="px-8 py-6 bg-slate-50 min-h-[420px] max-h-[520px] overflow-y-auto">
 
                     <div class="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
