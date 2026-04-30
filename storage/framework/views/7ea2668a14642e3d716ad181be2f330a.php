@@ -2,7 +2,7 @@
     $hasUnreadMaintenance = \App\Models\Maintenancelog::where('applicationid', $application->id)
         ->where('is_seen_by_landlord', false)
         ->exists();
-?>hp
+?>
 <?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
 <?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -16,13 +16,15 @@
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
      <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Messages
-        </h2>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
+                Messages
+            </p>
+        </div>  
      <?php $__env->endSlot(); ?>
 
     <div class="pb-28 lg:pl-70">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-6xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
                 <div class="border-b border-slate-200 px-6 py-4 bg-white">
@@ -38,10 +40,35 @@
 
                         
                         <div>
-                            <h3 class="text-lg font-semibold text-slate-900">
-                                <?php echo e($application->student->firstname ?? 'Student'); ?> <?php echo e($application->student->surname ?? ''); ?>
+                            <div class="relative inline-block">
+                                <div class="group">
 
-                            </h3>
+                                    <h3 class="text-lg font-semibold text-slate-900 cursor-pointer">
+                                        <?php echo e($application->student->firstname ?? 'Student'); ?>
+
+                                        <?php echo e($application->student->surname ?? ''); ?>
+
+                                    </h3>
+
+                                    <div
+                                        class="absolute left-0 top-full mt-1 w-44
+                                            bg-white border border-slate-200 rounded-lg shadow-lg
+                                            opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                                            transition-all duration-150 z-50">
+
+                                        <a
+                                            href="<?php echo e(route('complaint.create', [
+                                                'reported_user_id' => $application->student->id,
+                                                'reported_user_role' => 'student'
+                                            ])); ?>"
+                                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-lg"
+                                        >
+                                            Report account
+                                        </a>
+
+                                    </div>
+                                </div>
+                            </div>
                             <p class="text-sm text-slate-500">
                                 <?php echo e($application->rental->housenumber ?? ''); ?>
 
@@ -81,7 +108,7 @@
                 </div>
 
                 
-            <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[500px] overflow-y-auto space-y-4">
+            <div id="chatContainer" class="bg-slate-50 px-6 py-6 h-[420px] overflow-y-auto space-y-4">
 
                 <?php
                     $lastDate = null;

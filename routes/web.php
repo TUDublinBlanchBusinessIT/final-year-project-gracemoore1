@@ -621,7 +621,9 @@ Route::get('/serviceprovider/messages/{id}', [ServiceProviderMessageController::
 Route::post('/serviceprovider/messages/{id}', [ServiceProviderMessageController::class, 'store'])
     ->name('serviceprovider.messages.store');
 
+
 Route::get('/serviceprovider/profile', function () {
     if (!session('serviceprovider_id')) return redirect('/login');
     return view('serviceprovider.profile');
 })->name('serviceprovider.profile');
+

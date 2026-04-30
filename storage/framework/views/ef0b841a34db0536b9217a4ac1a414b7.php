@@ -13,13 +13,23 @@
 
     
      <?php $__env->slot('header', null, []); ?> 
-        <div class="flex items-start justify-start">
-            <div class="text-left">
-                <div class="text-2xl font-extrabold text-blue-600 leading-none">RentConnect</div>
-                <div class="mt-1 font-semibold text-gray-800">Dashboard</div>
-            </div>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-lg font-extrabold uppercase tracking-[0.16em] text-blue-600">
+                Home
+            </p>
         </div>
      <?php $__env->endSlot(); ?>
+
+    <?php
+        // Premium listings only
+        $premiumListings = collect($listings)
+            ->where('is_premium', 1)
+            ->values();
+
+        // All listings (premium + non‑premium)
+        $allListings = collect($listings)->values();
+    ?>
+
 
     <?php
         $student = \App\Models\Student::find(session('student_id'));
@@ -148,6 +158,71 @@
                 </button>
             </form>
         </div>
+
+        <div class="mt-10">
+            <h2 class="text-xl font-bold text-slate-900 mb-3">Premium listings</h2>
+
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($premiumListings->count()): ?>
+                <div class="relative">
+                    <button onclick="scrollRow('premium', -1)"
+                        class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow">
+                        ‹
+                    </button>
+
+                    <button onclick="scrollRow('premium', 1)"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow">
+                        ›
+                    </button>
+
+                    <div class="overflow-hidden px-12">
+                        <div id="premium-track"
+                            class="flex gap-6 transition-transform duration-300 ease-out">
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $premiumListings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rental): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                                <?php echo $__env->make('partials.listing-card', [
+                                    'rental' => $rental,
+                                    'trackPrefix' => 'premium'
+                                ], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <p class="text-sm text-slate-500">
+                    No premium listings available at the moment.
+                </p>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+        </div>
+
+
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($allListings->count()): ?>
+        <div class="mt-10">
+            <h2 class="text-xl font-bold text-slate-900 mb-3">All listings</h2>
+
+            <div class="relative">
+                <button onclick="scrollRow('all', -1)"
+                    class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow">
+                    ‹
+                </button>
+
+                <button onclick="scrollRow('all', 1)"
+                    class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow">
+                    ›
+                </button>
+
+                <div class="overflow-hidden px-12">
+                    <div id="all-track" class="flex gap-6 transition-transform duration-300 ease-out">
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $allListings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rental): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                            <?php echo $__env->make('partials.listing-card', [
+                                'rental' => $rental,
+                                'trackPrefix' => 'all'
+                            ], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
 
         
         
@@ -452,6 +527,25 @@
             });
         });
     </script>
+    <script>
+    const rowIndex = { premium: 0, all: 0 };
+
+    function scrollRow(type, direction) {
+        const track = document.getElementById(`${type}-track`);
+        if (!track) return;
+
+        const cardWidth = track.children[0]?.offsetWidth || 420;
+        const gap = 24;
+        const visible = track.parentElement.offsetWidth;
+
+        const max = Math.ceil((track.scrollWidth - visible) / (cardWidth + gap));
+        rowIndex[type] = Math.max(0, Math.min(rowIndex[type] + direction, max));
+
+        track.style.transform =
+            `translateX(-${rowIndex[type] * (cardWidth + gap)}px)`;
+    }
+</script>
+
 
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

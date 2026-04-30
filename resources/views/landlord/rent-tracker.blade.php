@@ -1,31 +1,47 @@
 <x-app-layout>
 
     {{-- HEADER --}}
-    <x-slot name="header">
-        <div class="border-b border-slate-200 px-6 py-4 bg-white">
+<x-slot name="header">
+    <div class="border-b border-slate-200 px-6 py-3 bg-white">
+        <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <a href="{{ route('landlord.messages.show', $application->id) }}"
                    class="text-slate-500 hover:text-slate-700 text-xl">←</a>
 
-                <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center
-                            text-slate-500 text-lg font-semibold">
-                    {{ strtoupper(substr($application->student->firstname ?? 'S', 0, 1)) }}
-                </div>
-
-                <div class="min-w-0">
-                    <h3 class="text-lg font-semibold text-slate-900 truncate">
-                        {{ $application->student->firstname ?? 'Student' }}
-                        {{ $application->student->surname ?? '' }}
-                    </h3>
-                    <p class="text-sm text-slate-500 truncate">
-                        {{ $application->rental->housenumber ?? '' }}
-                        {{ $application->rental->street ?? '' }},
-                        {{ $application->rental->county ?? '' }}
+                <div class="min-w-0 flex items-center gap-2">
+                    <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
+                        Messages <span class="mx-1 text-slate-300">/</span> Rent Tracker
                     </p>
+
+                    <div class="relative">
+                        <button id="rentHelpBtn"
+                            class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-sm font-bold hover:bg-blue-200 transition">
+                            ?
+                        </button>
+
+                        <div id="rentHelpBox"
+                            class="hidden absolute right-0 top-full mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 text-sm text-slate-600 z-50">
+
+                            <p class="font-semibold text-slate-800 mb-2">Rent Tracker</p>
+
+                            <p class="mb-2">
+                                This is the rent tracker. Students can pay their rent securely to you directly within the app.
+                            </p>
+
+                            <p class="mb-2">
+                                All payments are recorded so you can easily keep track of what has been paid and what is still outstanding.
+                            </p>
+
+                            <p>
+                                This ensures nothing gets missed and gives you a clear overview of each tenant’s payments.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </x-slot>
+    </div>
+</x-slot>  
 
     {{-- BODY --}}
     <div class="pb-28 lg:pl-70">
@@ -34,6 +50,24 @@
 
                 {{-- SUMMARY --}}
                 <div class="px-6 py-3 bg-white border-b border-slate-200">
+                    <div class="flex items-center gap-4">
+                        <div class="min-w-0">
+                            <h3 class="text-lg font-semibold text-slate-900 truncate">
+                                {{ $application->student->firstname ?? 'Student' }}
+                                {{ $application->student->surname ?? '' }}
+                            </h3>
+
+                            <p class="text-sm text-slate-500 truncate mt-1">
+                                {{ $application->rental->housenumber ?? '' }}
+                                {{ $application->rental->street ?? '' }},
+                                {{ $application->rental->county ?? '' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div id="rt-summary" class="px-10 py-4 border-b border-slate-200">
+                </div>    
+                
                     <div class="flex items-center justify-between gap-4 flex-wrap">
                         <div class="flex items-center gap-2">
                             <label class="text-sm text-slate-600">Rent due day:</label>
@@ -57,7 +91,7 @@
                 {{-- FEED --}}
                 <div id="rt-feed"
                      class="bg-slate-50 px-6 py-6 overflow-y-auto space-y-4"
-                     style="min-height: 200px; max-height: calc(100vh - 200px);">
+                     style="min-height: 200px; max-height: 500px;">
                 </div>
 
             </div>
@@ -148,7 +182,7 @@
                     feedEl.appendChild(outer);
 
                 } else if (status === 'succeeded') {
-                    // Payments on the LEFT for landlord
+                    // Payments on the left for landlord
                     const outer  = document.createElement('div');
                     outer.className = 'flex justify-start';
                     const bubble = document.createElement('div');
@@ -178,7 +212,7 @@
         }
 
         boot();
-
+        
         async function saveDueDay() {
             const day = document.getElementById('due-day-select').value;
             const res = await fetch('{{ route('landlord.rent.set-due-day', $application->id) }}', {
@@ -197,6 +231,37 @@
                 await refreshFeed();
             }
         }
+
+    </script>
+
+    <script>
+        const rentBtn = document.getElementById('rentHelpBtn');
+        const rentBox = document.getElementById('rentHelpBox');
+
+        rentBtn.addEventListener('click', () => {
+            rentBox.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!rentBtn.contains(e.target) && !rentBox.contains(e.target)) {
+                rentBox.classList.add('hidden');
+            }
+        });
+    </script>
+
+    <script>
+        const rentBtn = document.getElementById('rentHelpBtn');
+        const rentBox = document.getElementById('rentHelpBox');
+
+        rentBtn.addEventListener('click', () => {
+            rentBox.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!rentBtn.contains(e.target) && !rentBox.contains(e.target)) {
+                rentBox.classList.add('hidden');
+            }
+        });
     </script>
 
 </x-app-layout>

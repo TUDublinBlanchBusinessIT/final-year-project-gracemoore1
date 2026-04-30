@@ -1,7 +1,7 @@
 {{-- resources/views/serviceprovider/dashboard.blade.php --}}
 <x-app-layout>
     @php
-        // Use the session value exactly like your Admin dashboard
+        
         $spName = session('serviceprovider_firstname') ?? 'Service Provider';
     @endphp
 

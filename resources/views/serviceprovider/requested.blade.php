@@ -1,8 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Requested Jobs
-        </h2>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-lg font-bold uppercase tracking-[0.12em] text-blue-600">
+                Requested Jobs
+            </p>
+        </div>
     </x-slot>
 
     <div class="pb-28 lg:pl-70">
