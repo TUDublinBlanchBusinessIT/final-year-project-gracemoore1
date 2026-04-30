@@ -66,8 +66,6 @@
                     </div>
                 </div>
                 <div id="rt-summary" class="px-10 py-4 border-b border-slate-200">
-                </div>    
-                
                     <div class="flex items-center justify-between gap-4 flex-wrap">
                         <div class="flex items-center gap-2">
                             <label class="text-sm text-slate-600">Rent due day:</label>
@@ -79,14 +77,17 @@
                                     </option>
                                 @endfor
                             </select>
+
                             <button onclick="saveDueDay()"
                                 class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
                                 Save
                             </button>
+
                             <span id="due-day-saved" class="text-xs text-green-600 hidden">Saved ✓</span>
                         </div>
                     </div>
                 </div>
+
 
                 {{-- FEED --}}
                 <div id="rt-feed"

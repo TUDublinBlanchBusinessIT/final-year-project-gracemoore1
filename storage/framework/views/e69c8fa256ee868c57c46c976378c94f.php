@@ -12,26 +12,16 @@
 
 
      <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Home
-        </h2>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
+                Home
+            </p>
+        </div>
      <?php $__env->endSlot(); ?>
 
     <div class="pb-28">
 
-        
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-8 text-gray-900">
-                <h1 class="text-3xl font-bold text-blue-600 mb-10">
-                    Welcome back, <?php echo e(Auth::user()->name); ?>!
-                </h1>
-
-                <p class="text-gray-700 text-lg">
-                    This is your dashboard.
-                    You can manage your account, update your profile, and access new features as they are added.
-                </p>
-            </div>
-        </div>
+    
 
         
         <?php
@@ -42,13 +32,52 @@
         ?>
 
         <div class="mt-10">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold text-slate-900">Your Listings</h2>
+
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-xl font-bold text-slate-900">Your Listings</h2>
+
+                    <button
+                        type="button"
+                        onclick="toggleHelpBox()"
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold hover:bg-blue-200 transition"
+                    >
+                        ?
+                    </button>
+                </div>
 
                 <a href="<?php echo e(route('landlord.rentals.create')); ?>"
-                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
                     + Add Listing
                 </a>
+            </div>
+
+            <div
+                id="helpBox"
+                class="hidden mb-6 bg-blue-50 border border-blue-200 rounded-2xl p-5 shadow-sm"
+            >
+                <div class="flex justify-between items-start gap-4">
+                    <div>
+                        <h3 class="text-base font-semibold text-slate-900 mb-2">
+                            Need help with your listings?
+                        </h3>
+
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            This is your home page where you can create, update, and delete your listings.
+                            These listings will be visible to students searching for accommodation.
+                            Try to include as much accurate information as possible about your available property,
+                            including photos, location, and key details, so the right students can apply.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="toggleHelpBox()"
+                        class="text-slate-400 hover:text-slate-700 text-xl leading-none"
+                    >
+                        ×
+                    </button>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -189,6 +218,13 @@
         </div>
 
     </div>
+
+    <script>
+        function toggleHelpBox() {
+            const box = document.getElementById('helpBox');
+            box.classList.toggle('hidden');
+        }
+    </script>    
 
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
