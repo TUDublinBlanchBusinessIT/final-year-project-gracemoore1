@@ -124,7 +124,7 @@ class RentTrackerController extends Controller
         $storedReminders = \App\Models\RentReminder::where('application_id', $application->id)
             ->when($groupFilter['type'] === 'value', fn($q) => $q->where('group_id', $groupFilter['value']))
             ->when($groupFilter['type'] === 'null_or_zero', fn($q) => $q->whereNull('group_id'))
-            ->where(fn($q) => $q->where('month', '!=', $month)->orWhere('year', '!=', $year))
+            ->orderBy('triggered_at', 'asc')
             ->get();
 
         foreach ($storedReminders as $sr) {
@@ -158,30 +158,34 @@ class RentTrackerController extends Controller
         $due     = Carbon::parse($dueDateIso);
         $remind  = Carbon::parse($remindOnIso);
         $overdue = Carbon::parse($overdueOnIso);
+        $dueMonth   = $due->month;
+        $dueYear    = $due->year;
+        $dueForDate = $due->toDateString();
 
         // Green reminder — store permanently if not already stored
         if ($now->gte($remind)) {
             $existingRemind = \App\Models\RentReminder::where('application_id', $application->id)
-                ->where('month', $month)
-                ->where('year', $year)
+                ->when($groupFilter['type'] === 'value', fn($q) => $q->where('group_id', $groupFilter['value']))
+                ->when($groupFilter['type'] === 'null_or_zero', fn($q) => $q->whereNull('group_id'))
                 ->where('type', 'reminder')
+                ->where('for_date', $dueForDate)
                 ->first();
 
             if (!$existingRemind) {
                 $existingRemind = \App\Models\RentReminder::create([
                     'application_id' => $application->id,
                     'group_id'       => $groupFilter['type'] === 'value' ? $groupFilter['value'] : null,
-                    'month'          => $month,
-                    'year'           => $year,
+                    'month'          => $dueMonth,
+                    'year'           => $dueYear,
                     'type'           => 'reminder',
                     'amount'         => $monthlyDue,
-                    'for_date'       => $due->toDateString(),
+                    'for_date'       => $dueForDate,
                     'triggered_at'   => $remind->toDateTimeString(),
                 ]);
             }
 
             $items->push((object)[
-                'id'         => "remind-$year-$month",
+                'id'         => "remind-{$dueForDate}",
                 'amount'     => $existingRemind->amount,
                 'status'     => 'reminder',
                 'label'      => 'Rent Due Soon',
@@ -196,26 +200,26 @@ class RentTrackerController extends Controller
         // Red overdue — store permanently if not already stored
         if ($now->gte($overdue) && $outstanding > 0) {
             $existingOverdue = \App\Models\RentReminder::where('application_id', $application->id)
-                ->where('month', $month)
-                ->where('year', $year)
+                ->when($groupFilter['type'] === 'value', fn($q) => $q->where('group_id', $groupFilter['value']))
+                ->when($groupFilter['type'] === 'null_or_zero', fn($q) => $q->whereNull('group_id'))
                 ->where('type', 'overdue')
+                ->where('for_date', $dueForDate)
                 ->first();
-
             if (!$existingOverdue) {
                 $existingOverdue = \App\Models\RentReminder::create([
                     'application_id' => $application->id,
                     'group_id'       => $groupFilter['type'] === 'value' ? $groupFilter['value'] : null,
-                    'month'          => $month,
-                    'year'           => $year,
+                    'month'          => $dueMonth,
+                    'year'           => $dueYear,
                     'type'           => 'overdue',
                     'amount'         => $outstanding,
-                    'for_date'       => $due->toDateString(),
+                    'for_date'       => $dueForDate,
                     'triggered_at'   => $overdue->toDateTimeString(),
                 ]);
             }
 
             $items->push((object)[
-                'id'         => "overdue-$year-$month",
+                'id'         => "overdue-{$dueForDate}",
                 'amount'     => $existingOverdue->amount,
                 'status'     => 'reminder',
                 'label'      => 'Overdue',
@@ -226,6 +230,8 @@ class RentTrackerController extends Controller
                 'landlordid' => $application->rental->landlordid ?? null,
             ]);
         }
+
+        $items = $items->unique('id');
 
         return response()->json([
             'month'   => $month,
@@ -414,13 +420,25 @@ class RentTrackerController extends Controller
 
         $dueDay = $app->rent_due_day
             ?? ($availableFrom ? (int)$availableFrom->format('d') : 1);
+
         $eom           = Carbon::create($year, $month, 1, 0, 0, 0, $tz)->endOfMonth()->day;
         $dueDayClamped = max(1, min($dueDay, $eom));
 
-        $dueDate   = Carbon::create($year, $month, $dueDayClamped, 9, 0, 0, $tz);
+        $dueDate = Carbon::create($year, $month, $dueDayClamped, 0, 0, 0, $tz)->startOfDay();
+
+        // ✅ roll forward to next month if this month’s due date already passed
+        if ($dueDate->lt(Carbon::now($tz)->startOfDay())) {
+            $dueDate->addMonthNoOverflow();
+        }
+
         $remindOn  = (clone $dueDate)->subDays(2);
         $overdueOn = (clone $dueDate)->addDays(1);
 
-        return [$perPerson, $dueDate->toIso8601String(), $remindOn->toIso8601String(), $overdueOn->toIso8601String()];
+        return [
+            $perPerson,
+            $dueDate->toIso8601String(),
+            $remindOn->toIso8601String(),
+            $overdueOn->toIso8601String()
+        ];
     }
 }
