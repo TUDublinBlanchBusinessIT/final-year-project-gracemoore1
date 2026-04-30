@@ -1,42 +1,73 @@
 <x-app-layout>
-
-    {{-- HEADER --}}
     <x-slot name="header">
-        <div class="border-b border-slate-200 px-6 py-4 bg-white">
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
             <div class="flex items-center gap-4">
                 <a href="{{ route('student.messages.show', $application->id) }}"
-                   class="text-slate-500 hover:text-slate-700 text-xl">←</a>
+                    class="flex items-center justify-center w-9 h-9 rounded-full text-slate-500 hover:text-blue-600 hover:bg-slate-100 text-xl transition">
+                    ←
+                </a>
 
-                <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center
-                            text-slate-500 text-lg font-semibold">
-                    {{ strtoupper(substr($application->rental->landlord->firstname ?? 'L', 0, 1)) }}
-                </div>
+                <p class="text-lg font-bold uppercase tracking-[0.16em] text-blue-700">
+                    Messages <span class="mx-1 text-slate-300">/</span> Rent Tracker
+                </p>
+            
+            <div class="relative">
 
-                <div class="min-w-0">
-                    <h3 class="text-lg font-semibold text-slate-900 truncate">
-                        {{ $application->rental->landlord->firstname ?? 'Landlord' }}
-                        {{ $application->rental->landlord->surname ?? '' }}
-                    </h3>
-                    <p class="text-sm text-slate-500 truncate">
-                        {{ $application->rental->housenumber ?? '' }}
-                        {{ $application->rental->street ?? '' }},
-                        {{ $application->rental->county ?? '' }}
+                <button id="rentHelpBtn"
+                    class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold hover:bg-blue-200 transition">
+                    ?
+                </button>
+
+                <div id="rentHelpBox"
+                    class="hidden absolute right-0 mt-3 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 text-sm text-slate-600 z-50">
+
+                    <p>
+                        <strong>Rent Tracker</strong><br><br>
+
+                        This is where you can pay your rent securely to your landlord directly within the app.<br><br>
+
+                        All payments are recorded so you can easily keep track of what has been paid and what is outstanding.<br><br>
+
+                        You will also receive a reminder 2 days before your rent is due.
                     </p>
+
                 </div>
+              
             </div>
         </div>
     </x-slot>
 
     {{-- BODY --}}
     <div class="pb-28 lg:pl-70">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-5xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
 
+                {{-- SUMMARY --}}
+            <div class="px-6 py-3 bg-white border-b border-slate-200">
+                <div class="flex items-center gap-4">
+                    <div class="min-w-0">
+                        <h3 class="text-lg font-semibold text-slate-900 truncate">
+                            {{ $application->rental->landlord->firstname ?? 'Landlord' }}
+                            {{ $application->rental->landlord->surname ?? '' }}
+                        </h3>
+
+                        <p class="text-sm text-slate-500 truncate mt-1">
+                            {{ $application->rental->housenumber ?? '' }}
+                            {{ $application->rental->street ?? '' }},
+                            {{ $application->rental->county ?? '' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+                            <div id="rt-summary" class="pl-12 pr-6 py-4 border-b border-slate-200">
+                </div>
+
                 {{-- FEED --}}
                 <div id="rt-feed"
-                     class="bg-slate-50 px-6 py-6 overflow-y-auto space-y-4"
-                     style="min-height: 200px; max-height: calc(100vh - 280px);">
+                     class="bg-slate-50 px-6 py-5 overflow-y-auto space-y-4"
+                     style="min-height: 200px; max-height: calc(100vh - 360px);">
                 </div>
 
                 {{-- COMPOSER --}}
@@ -314,4 +345,29 @@
         boot();
     </script>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const btn = document.getElementById('rentHelpBtn');
+        const box = document.getElementById('rentHelpBox');
+
+        if (btn && box) {
+
+            btn.addEventListener('click', function () {
+                box.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!btn.contains(e.target) && !box.contains(e.target)) {
+                    box.classList.add('hidden');
+                }
+            });
+
+        }
+
+    });
+    </script>
+
 </x-app-layout>
+
+
