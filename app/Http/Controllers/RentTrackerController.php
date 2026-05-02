@@ -162,73 +162,52 @@ class RentTrackerController extends Controller
         $dueYear    = $due->year;
         $dueForDate = $due->toDateString();
 
-        // Green reminder — store permanently if not already stored
+        // ✅ Green reminder — store permanently if not already stored
         if ($now->gte($remind)) {
-            $existingRemind = \App\Models\RentReminder::where('application_id', $application->id)
-                ->when($groupFilter['type'] === 'value', fn($q) => $q->where('group_id', $groupFilter['value']))
-                ->when($groupFilter['type'] === 'null_or_zero', fn($q) => $q->whereNull('group_id'))
-                ->where('type', 'reminder')
-                ->where('for_date', $dueForDate)
-                ->first();
 
-            if (!$existingRemind) {
-                $existingRemind = \App\Models\RentReminder::create([
+            \App\Models\RentReminder::firstOrCreate(
+                [
                     'application_id' => $application->id,
                     'group_id'       => $groupFilter['type'] === 'value' ? $groupFilter['value'] : null,
-                    'month'          => $dueMonth,
-                    'year'           => $dueYear,
                     'type'           => 'reminder',
-                    'amount'         => $monthlyDue,
                     'for_date'       => $dueForDate,
-                    'triggered_at'   => $remind->toDateTimeString(),
-                ]);
-            }
+                ],
+                [
+                    'month'        => $dueMonth,
+                    'year'         => $dueYear,
+                    'type'         => 'reminder',
+                    'amount'       => $monthlyDue,
+                    'for_date'     => $dueForDate,
+                    'triggered_at' => $remind->toDateTimeString(),
+                ]
+            );
 
-            $items->push((object)[
-                'id'         => "remind-{$dueForDate}",
-                'amount'     => $existingRemind->amount,
-                'status'     => 'reminder',
-                'label'      => 'Rent Due Soon',
-                'timestamp'  => $existingRemind->triggered_at,
-                'for_date'   => $existingRemind->for_date,
-                'paid_by'    => null,
-                'studentid'  => null,
-                'landlordid' => $application->rental->landlordid ?? null,
-            ]);
+            // ✅ DO NOTHING ELSE
+            // Reminder will be shown via $storedReminders
         }
 
         // Red overdue — store permanently if not already stored
+        // ✅ Red overdue — store permanently if not already stored
         if ($now->gte($overdue) && $outstanding > 0) {
-            $existingOverdue = \App\Models\RentReminder::where('application_id', $application->id)
-                ->when($groupFilter['type'] === 'value', fn($q) => $q->where('group_id', $groupFilter['value']))
-                ->when($groupFilter['type'] === 'null_or_zero', fn($q) => $q->whereNull('group_id'))
-                ->where('type', 'overdue')
-                ->where('for_date', $dueForDate)
-                ->first();
-            if (!$existingOverdue) {
-                $existingOverdue = \App\Models\RentReminder::create([
+
+            \App\Models\RentReminder::firstOrCreate(
+                [
                     'application_id' => $application->id,
                     'group_id'       => $groupFilter['type'] === 'value' ? $groupFilter['value'] : null,
-                    'month'          => $dueMonth,
-                    'year'           => $dueYear,
                     'type'           => 'overdue',
-                    'amount'         => $outstanding,
                     'for_date'       => $dueForDate,
-                    'triggered_at'   => $overdue->toDateTimeString(),
-                ]);
-            }
+                ],
+                [
+                    'month'        => $dueMonth,
+                    'year'         => $dueYear,
+                    'type'         => 'overdue',
+                    'amount'       => $outstanding,
+                    'for_date'     => $dueForDate,
+                    'triggered_at' => $overdue->toDateTimeString(),
+                ]
+            );
 
-            $items->push((object)[
-                'id'         => "overdue-{$dueForDate}",
-                'amount'     => $existingOverdue->amount,
-                'status'     => 'reminder',
-                'label'      => 'Overdue',
-                'timestamp'  => $existingOverdue->triggered_at,
-                'for_date'   => $existingOverdue->for_date,
-                'paid_by'    => null,
-                'studentid'  => null,
-                'landlordid' => $application->rental->landlordid ?? null,
-            ]);
+            // ✅ DO NOTHING ELSE
         }
 
         $items = $items->unique('id');
