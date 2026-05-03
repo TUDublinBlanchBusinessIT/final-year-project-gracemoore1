@@ -151,9 +151,10 @@
 
         <div class="login">
             Already have an account?<br>
-            <a href="{{ route('login') }}" class="text-blue-600 underline">Log in here</a>
+            <a href="<?php echo e(route('login')); ?>" class="text-blue-600 underline">Log in here</a>
 
         </div>
     </div>
 </body>
 </html>
+<?php /**PATH C:\Users\gmoor\final-year-project-gracemoore1\resources\views/welcome.blade.php ENDPATH**/ ?>
