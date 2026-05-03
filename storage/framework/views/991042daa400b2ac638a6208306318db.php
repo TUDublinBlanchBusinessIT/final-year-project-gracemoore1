@@ -144,6 +144,23 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                         <p class="text-sm text-green-700">Password updated.</p>
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
+
+            </form>
+        </div>
+
+        <div class="border-t border-slate-200 pt-6 mt-10">
+            <form method="POST" action="<?php echo e(route('logout')); ?>">
+                <?php echo csrf_field(); ?>
+
+                <div class="flex justify-center">
+                    <button
+                        type="submit"
+                        class="rounded-md bg-blue-600 px-6 py-2
+                            text-sm font-semibold text-white
+                            hover:bg-blue-700 transition">
+                        Log out
+                    </button>
+                </div>
             </form>
         </div>
 

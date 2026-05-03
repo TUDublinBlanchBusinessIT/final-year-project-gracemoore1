@@ -26,6 +26,23 @@
                     @include('profile.partials.delete-user-form')
                 </div>
             </div>
+
+            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+
+                    <div class="flex justify-center">
+                        <button
+                            type="submit"
+                            class="rounded-md bg-blue-600 px-6 py-2
+                                text-sm font-semibold text-white
+                                hover:bg-blue-700 transition">
+                            Log out
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </x-app-layout>
