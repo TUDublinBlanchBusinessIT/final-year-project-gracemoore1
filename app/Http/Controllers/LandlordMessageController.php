@@ -279,9 +279,15 @@ class LandlordMessageController extends Controller
             'serviceproviderpartnershipid' => $providerRequest->serviceproviderpartnershipid,
         ]);
 
+        $landlord = \App\Models\Landlord::find($landlordId);
+
+        $landlordName = $landlord
+            ? trim(($landlord->firstname ?? '') . ' ' . ($landlord->surname ?? ''))
+            : 'The landlord';
+
         Message::create([
-            'content' => '✅ Moya Knox accepted you for this job.',
-            'sender_type' => 'system',
+            'content' => '✅ ' . $landlordName . ' accepted you for this job.',
+            'sender_type' => 'landlord',
             'timestamp' => now(),
             'studentid' => null,
             'group_id' => null,
