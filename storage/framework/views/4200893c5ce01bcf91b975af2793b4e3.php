@@ -40,6 +40,13 @@
             'exists'=> Route::has('serviceprovider.messages'),
             'svg'   => 'chat',
         ],
+        [
+            'label'  => 'Profile',
+            'route'  => 'serviceprovider.profile',
+            'active' => request()->routeIs('serviceprovider.profile'),
+            'exists' => Route::has('serviceprovider.profile'),
+            'svg'    => 'user',
+        ],
     ];
 
     $items = array_values(array_filter($items, fn($i) => !empty($i['exists']) && $i['exists']));
@@ -65,6 +72,10 @@
             'chat' => '<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8z"/>
                        </svg>',
+            'user' => '<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 21a8 8 0 0 0-16 0"/>
+                            <circle cx="12" cy="8" r="4"/>
+                        </svg>',
             default => '',
         };
     };

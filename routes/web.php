@@ -45,7 +45,7 @@ use App\Http\Controllers\LandlordServiceRequestController;
 use App\Http\Controllers\ServiceProviderRequestedJobsController;
 use App\Http\Controllers\ServiceProviderMessageController;
 use App\Http\Controllers\ServiceProviderUpcomingJobsController;
-
+use App\Http\Controllers\ServiceProviderProfileController;
 
 
 //chatbot
@@ -73,6 +73,11 @@ Route::middleware(['serviceprovider'])->group(function () {
     Route::post('/serviceprovider/requested/{id}/decline', [ServiceProviderRequestedJobsController::class, 'decline'])
         ->name('serviceprovider.requested.decline');
 });
+Route::get('/serviceprovider/profile', [ServiceProviderProfileController::class, 'show'])
+    ->name('serviceprovider.profile');
+
+Route::post('/serviceprovider/profile/reset-password', [ServiceProviderProfileController::class, 'updatePassword'])
+    ->name('serviceprovider.profile.resetpassword');
 
 
 
@@ -622,8 +627,5 @@ Route::post('/serviceprovider/messages/{id}', [ServiceProviderMessageController:
     ->name('serviceprovider.messages.store');
 
 
-Route::get('/serviceprovider/profile', function () {
-    if (!session('serviceprovider_id')) return redirect('/login');
-    return view('serviceprovider.profile');
-})->name('serviceprovider.profile');
+
 

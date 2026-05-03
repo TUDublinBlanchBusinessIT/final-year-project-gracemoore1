@@ -23,6 +23,12 @@ class ServiceProviderPartnership extends Model
         'commissionperjob',
         'feepermonth',
         'administratorid'
+
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function serviceRequestNotifications()
