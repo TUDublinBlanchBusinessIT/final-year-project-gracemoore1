@@ -23,15 +23,20 @@ class ServiceProviderMessageController extends Controller
 
         return view('serviceprovider.messages', compact('conversations'));
     }
-
     public function show($id)
     {
         $serviceProviderId = session('serviceprovider_id');
         abort_if(!$serviceProviderId, 401);
 
+        // ✅ Accept either:
+        // - ServiceRequestProvider.id (normal/in-progress)
+        // - ServiceRequest.id (common after completion / from other screens)
         $conversation = ServiceRequestProvider::with(['serviceRequest', 'provider'])
-            ->where('id', $id)
             ->where('serviceproviderpartnershipid', $serviceProviderId)
+            ->where(function ($q) use ($id) {
+                $q->where('id', $id)
+                ->orWhere('servicerequestid', $id);
+            })
             ->firstOrFail();
 
         $job = $conversation->serviceRequest;
@@ -47,7 +52,6 @@ class ServiceProviderMessageController extends Controller
 
         $landlord = Landlord::find($job->landlordid);
 
-        // ✅ Banner flag: landlord banned?
         $isOtherAccountBanned = false;
         $otherAccountRole = 'landlord';
 
@@ -64,7 +68,13 @@ class ServiceProviderMessageController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return view('serviceprovider.chat', compact('conversation', 'landlord', 'messages','isOtherAccountBanned','otherAccountRole'));
+        return view('serviceprovider.chat', compact(
+            'conversation',
+            'landlord',
+            'messages',
+            'isOtherAccountBanned',
+            'otherAccountRole'
+        ));
     }
 
     public function store(Request $request, $id)

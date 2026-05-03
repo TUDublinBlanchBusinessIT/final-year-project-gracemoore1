@@ -49,11 +49,20 @@
                                     ->where('landlordid', $lastMessage->landlordid)
                                     ->latest()
                                     ->first();
+
+                                // ✅ Find correct ServiceRequestProvider (THIS IS THE FIX)
+                                $srp = null;
+                                if ($job) {
+                                    $srp = \App\Models\ServiceRequestProvider::where('servicerequestid', $job->id)
+                                        ->where('serviceproviderpartnershipid', session('serviceprovider_id'))
+                                        ->first();
+                                }
                             ?>
 
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($job): ?>
-                                <a href="<?php echo e(route('serviceprovider.messages.show', $lastMessage->serviceproviderpartnershipid)); ?>"
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($job && $srp): ?>
+                                <a href="<?php echo e(route('serviceprovider.messages.show', $srp->id)); ?>"
                                    class="block rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md">
+                                    
                                     <div class="flex items-start justify-between gap-4">
                                         <div class="min-w-0 flex-1">
                                             <h3 class="text-base font-semibold text-black truncate">
@@ -79,12 +88,13 @@
 
                                         <div class="ml-4 flex flex-col items-end gap-2 shrink-0">
                                             <div class="text-xs text-slate-400 whitespace-nowrap">
-                                                <?php echo e($lastMessage && $lastMessage->created_at ? $lastMessage->created_at->format('d M Y H:i') : ''); ?>
+                                                <?php echo e($lastMessage->created_at?->format('d M Y H:i')); ?>
 
                                             </div>
 
                                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($unreadCount > 0): ?>
-                                                <span class="inline-flex items-center justify-center min-w-[22px] h-[22px] rounded-full bg-red-500 px-2 text-xs font-semibold text-white">
+                                                <span class="inline-flex items-center justify-center min-w-[22px] h-[22px]
+                                                    rounded-full bg-red-500 px-2 text-xs font-semibold text-white">
                                                     <?php echo e($unreadCount); ?>
 
                                                 </span>
