@@ -37,10 +37,17 @@
                 <p><strong>Phone Number:</strong> <?php echo e($provider->phone); ?></p>
                 <p><strong>County:</strong> <?php echo e($provider->county); ?></p>
 
-                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($provider->commissionperjob): ?>
-                    <p><strong>Commission per Job:</strong> €<?php echo e(number_format($provider->commissionperjob, 2)); ?></p>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($provider->commissionperjob !== null): ?>
+                    <p>
+                        <strong>Commission per Job:</strong>
+                        <?php echo e(rtrim(rtrim(number_format($provider->commissionperjob, 2), '0'), '.')); ?>%
+                    </p>
                 <?php else: ?>
-                    <p><strong>Monthly Partnership Fee:</strong> €<?php echo e(number_format($provider->feepermonth, 2)); ?></p>
+                    <p>
+                        <strong>Monthly Partnership Fee:</strong>
+                        €<?php echo e(number_format($provider->feepermonth, 2)); ?>
+
+                    </p>
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                 <p>

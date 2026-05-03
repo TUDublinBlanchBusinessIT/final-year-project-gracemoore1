@@ -26,10 +26,16 @@
                 <p><strong>Phone Number:</strong> {{ $provider->phone }}</p>
                 <p><strong>County:</strong> {{ $provider->county }}</p>
 
-                @if($provider->commissionperjob)
-                    <p><strong>Commission per Job:</strong> €{{ number_format($provider->commissionperjob, 2) }}</p>
+                @if($provider->commissionperjob !== null)
+                    <p>
+                        <strong>Commission per Job:</strong>
+                        {{ rtrim(rtrim(number_format($provider->commissionperjob, 2), '0'), '.') }}%
+                    </p>
                 @else
-                    <p><strong>Monthly Partnership Fee:</strong> €{{ number_format($provider->feepermonth, 2) }}</p>
+                    <p>
+                        <strong>Monthly Partnership Fee:</strong>
+                        €{{ number_format($provider->feepermonth, 2) }}
+                    </p>
                 @endif
 
                 <p>
