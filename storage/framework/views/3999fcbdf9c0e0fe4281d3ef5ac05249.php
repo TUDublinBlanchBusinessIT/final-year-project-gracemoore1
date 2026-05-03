@@ -10,11 +10,51 @@
 <?php $component->withAttributes([]); ?>
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
-     <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Maintenance Log
-        </h2>
-     <?php $__env->endSlot(); ?>
+ <?php $__env->slot('header', null, []); ?> 
+    <div class="border-b border-slate-200 px-6 py-3 bg-white">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="<?php echo e(route('landlord.messages.show', $application->id)); ?>"
+                   class="text-slate-500 hover:text-slate-700 text-xl">←</a>
+
+                <div class="min-w-0 flex items-center gap-2">
+                    <p class="text-m font-semibold uppercase tracking-[0.12em] text-blue-600">
+                        Messages <span class="mx-1 text-slate-300">/</span> Maintenance Log
+                    </p>
+
+                    <div class="relative">
+                        <button id="maintenanceHelpBtn"
+                            class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-sm font-bold hover:bg-blue-200 transition">
+                            ?
+                        </button>
+
+                        <div id="maintenanceHelpBox"
+                            class="hidden absolute right-0 top-full mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 text-sm text-slate-600 z-50">
+
+                            <p class="font-semibold text-slate-800 mb-2">Maintenance Log</p>
+
+                            <p class="mb-2">
+                                This is the Maintenance Log. Students can upload images of issues that may be broken or need attention in your property.
+                            </p>
+
+                            <p class="mb-2">
+                                Students can set a priority level so you are aware of how urgent each issue is.
+                            </p>
+
+                            <p class="mb-2">
+                                You can choose to fix the issue yourself or book a service provider directly within the app.
+                            </p>
+
+                            <p>
+                                Please ensure you update the Maintenance Log with progress and mark issues as completed once resolved.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ <?php $__env->endSlot(); ?>
 
     <div class="pb-20 lg:pl-70">
         <div class="max-w-5xl mx-auto">
@@ -39,12 +79,10 @@
                     <div class="flex items-center gap-4">
                         <a href="<?php echo e(route('landlord.messages.show', $application->id)); ?>"
                            class="text-slate-500 hover:text-slate-700 text-xl">
-                            ←
+                            
                         </a>
 
-                        <div class="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-2xl font-semibold">
-                            M
-                        </div>
+                        
 
                         <div>
                             <h3 class="text-xl font-semibold text-slate-900">
@@ -188,6 +226,41 @@
                                             >
                                                 Book Service Provider
                                             </a>
+
+
+                                        <div class="relative inline-block ml-2">
+                                            <button
+                                                type="button"
+                                                id="serviceHelpBtn"
+                                                class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-sm font-bold hover:bg-blue-200 transition"
+                                            >
+                                        ?
+                                            </button>
+
+                                            <div
+                                                id="serviceHelpBox"
+                                                class="hidden absolute left-0 top-full mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 text-sm text-slate-600 z-50"
+                                                    >
+                                                <p class="font-semibold text-slate-800 mb-2">Service Provider Help</p>
+
+                                                <p class="mb-2">
+                                                    Not in the area or need someone to fix this issue? We’ve got you covered.
+                                                </p>
+
+                                                <p class="mb-2">
+                                                    Click "Book Service Provider", select the type of service provider needed, and add extra details about the job.
+                                                </p>
+
+                                                <p class="mb-2">
+                                                    Matching service providers in the area will message you about this job.
+                                                </p>
+
+                                                <p>
+                                                    You can then review them and choose to accept or reject the provider that suits you best.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>                                            
                                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                     </div>
 
@@ -319,6 +392,38 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                 container.scrollTop = container.scrollHeight;
             }
         });
+    </script>
+
+    <script>
+        const maintenanceBtn = document.getElementById('maintenanceHelpBtn');
+        const maintenanceBox = document.getElementById('maintenanceHelpBox');
+
+        maintenanceBtn.addEventListener('click', () => {
+            maintenanceBox.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!maintenanceBtn.contains(e.target) && !maintenanceBox.contains(e.target)) {
+                maintenanceBox.classList.add('hidden');
+            }
+        });
+    </script>
+
+    <script>
+        const serviceBtn = document.getElementById('serviceHelpBtn');
+        const serviceBox = document.getElementById('serviceHelpBox');
+
+        if (serviceBtn && serviceBox) {
+            serviceBtn.addEventListener('click', () => {
+                serviceBox.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!serviceBtn.contains(e.target) && !serviceBox.contains(e.target)) {
+                    serviceBox.classList.add('hidden');
+                }
+            });
+        }
     </script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

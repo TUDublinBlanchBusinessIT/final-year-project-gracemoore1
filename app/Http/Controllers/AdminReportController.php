@@ -233,7 +233,7 @@ class AdminReportController extends Controller
         // Email reported user if suspended
         if ($reportedEmail) {
             Mail::raw(
-                "Your RentConnect account has been suspended following a review.",
+                "Your RentConnect account has been suspended for misconduct. Please contact rentconnect.app@gmail.com for any enquiries about this issue",
                 fn($m) => $m->to($reportedEmail)->subject("Your account is suspended")
             );
         }

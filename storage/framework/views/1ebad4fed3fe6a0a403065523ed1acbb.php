@@ -15,42 +15,70 @@
 <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
      <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-base text-gray-800 leading-tight">
-            Maintenance Log
-        </h2>
+        <div class="border-b border-slate-200 px-6 py-3 bg-white">
+            <div class="flex items-center gap-4">
+                <a href="<?php echo e(route('student.messages.show', $application->id)); ?>"
+                    class="flex items-center justify-center w-9 h-9 rounded-full text-slate-500 hover:text-blue-600 hover:bg-slate-100 text-xl transition">
+                    ←
+                </a>
+
+                <p class="text-lg font-bold uppercase tracking-[0.16em] text-blue-700">
+                    Messages <span class="mx-1 text-slate-300">/</span> Maintenance Log
+                </p>
+                    <div class="relative">
+                        <button id="maintenanceHelpBtn"
+                            class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-sm font-bold hover:bg-blue-200 transition">
+                            ?
+                        </button>
+
+                        <div id="maintenanceHelpBox"
+                            class="hidden absolute left-0 top-full mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-4 text-sm text-slate-600 z-50">
+
+                            <p>
+                                <strong>Maintenance Log</strong><br><br>
+
+                                This is where you can log and keep a record of any issues in the property that you want your landlord to be aware of.<br><br>
+
+                                You can upload a photo, set the urgency of the issue, and provide additional details to clearly explain the problem.<br><br>
+
+                                Once submitted, your landlord is notified and can take action.
+                            </p>
+
+                        </div>
+                    </span>
+                </p>
+            </div>
+        </div>
      <?php $__env->endSlot(); ?>
 
     <div class="pb-20 lg:pl-70">
         <div class="max-w-5xl mx-auto">
             <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="bg-white shadow-sm sm:rounded-2xl border border-slate-200 overflow-hidden">
 
-                <div class="border-b border-slate-200 px-8 py-5 bg-white">
-                    <div class="flex items-center gap-4">
-                        <a href="<?php echo e(route('student.messages.show', $application->id)); ?>"
-                           class="text-slate-500 hover:text-slate-700 text-xl">
-                            ←
-                        </a>
+                    <div class="px-6 py-3 bg-white border-b border-slate-200">
+                        <div class="flex items-center gap-4">
+                            <div class="min-w-0">
+                                <h3 class="text-lg font-semibold text-slate-900 truncate">
+                                    <?php echo e($application->rental->landlord->firstname ?? 'Landlord'); ?>
 
-                        <div class="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-2xl font-semibold">
-                            M
-                        </div>
+                                    <?php echo e($application->rental->landlord->surname ?? ''); ?>
 
-                        <div>
-                            <h3 class="text-xl font-semibold text-slate-900">
-                                Maintenance Tracker
-                            </h3>
-                            <p class="text-slate-500 text-base">
-                                <?php echo e($application->rental->housenumber ?? ''); ?>
+                                </h3>
 
-                                <?php echo e($application->rental->street ?? ''); ?>,
-                                <?php echo e($application->rental->county ?? ''); ?>
+                                <p class="text-sm text-slate-500 truncate mt-1">
+                                    <?php echo e($application->rental->housenumber ?? ''); ?>
 
-                            </p>
+                                    <?php echo e($application->rental->street ?? ''); ?>,
+                                    <?php echo e($application->rental->county ?? ''); ?>
+
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                
 
-                <div id="maintenanceContainer" class="px-8 py-6 bg-slate-50 min-h-[260px] max-h-[420px] overflow-y-auto">
+                <div id="maintenanceContainer" class="px-8 py-6 bg-slate-50 min-h-[200px] max-h-[420px] overflow-y-auto">
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
                         <div class="mb-6 rounded-xl bg-green-100 text-green-800 px-4 py-3">
                             <?php echo e(session('success')); ?>
@@ -278,6 +306,29 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
             if (container) {
                 container.scrollTop = container.scrollHeight;
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const btn = document.getElementById('maintenanceHelpBtn');
+            const box = document.getElementById('maintenanceHelpBox');
+
+            if (btn && box) {
+
+                btn.addEventListener('click', function () {
+                    box.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!btn.contains(e.target) && !box.contains(e.target)) {
+                        box.classList.add('hidden');
+                    }
+                });
+
+            }
+
         });
     </script>
  <?php echo $__env->renderComponent(); ?>

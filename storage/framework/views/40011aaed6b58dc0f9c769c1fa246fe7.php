@@ -18,7 +18,7 @@
 
     $navLinks = [
         [
-            'label' => 'Reports',
+            'label' => 'User Complaints',
             'icon'  => '📊',
             'route' => 'admin.reports',
             'active'=> request()->routeIs('admin.reports'),
@@ -47,12 +47,12 @@
         ],
     ];
 
-    $profile = [
-        'label' => 'Profile',
-        'icon'  => '👤',
-        'route' => 'admin.profile',
-        'active'=> request()->routeIs('admin.profile'),
-        'exists'=> Route::has('admin.profile'),
+    $analytics = [
+    'label' => 'Analytics',
+    'icon'  => '📈',
+    'route' => 'admin.analytics',
+    'active'=> request()->routeIs('admin.analytics'),
+    'exists'=> Route::has('admin.analytics'),
     ];
 
     // Sidebar items:
@@ -60,19 +60,19 @@
     // - Else: Dashboard + 4 pages + Profile
     if ($onDashboard) {
         $sidebarItems = array_values(array_filter(
-            [$profile],
+            [$analytics],
             fn($i) => !empty($i['exists']) && $i['exists']
         ));
     } else {
         $sidebarItems = array_values(array_filter(
-            array_merge([$dashboardItem], $navLinks, [$profile]),
+            array_merge([$dashboardItem], $navLinks, [$analytics]),
             fn($i) => !empty($i['exists']) && $i['exists']
         ));
     }
 
     // Mobile: always Dashboard + 4 pages + Profile
     $mobileItems = array_values(array_filter(
-        array_merge([$dashboardItem], $navLinks, [$profile]),
+        array_merge([$dashboardItem], $navLinks, [$analytics]),
         fn($i) => !empty($i['exists']) && $i['exists']
     ));
 ?>
